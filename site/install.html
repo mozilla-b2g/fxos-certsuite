@@ -1,0 +1,26 @@
+<html>
+<head>
+<script>
+function install(ev) {
+  // define the manifest URL
+  var manifest_url = location.protocol + location.host + "/static/webapi-test-app/manifest.webapp";
+  // install the app
+  var installLocFind = navigator.mozApps.install(manifest_url);
+  installLocFind.onsuccess = function(data) {
+    // App is installed, do something
+    document.writeln("<h1>installed successfully</h1>");
+  };
+  installLocFind.onerror = function(e) {
+    // App wasn't installed, info is in
+    // installapp.error.name
+    alert("Could not install app! " + e.toString());
+  };
+};
+</script>
+</head>
+<body>
+<button id="install" onclick="install()">
+  Install on FirefoxOS Device
+</button>
+</body>
+</html>
