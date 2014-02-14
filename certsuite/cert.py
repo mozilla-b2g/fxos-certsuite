@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import ConfigParser
+import StringIO
 import argparse
 import json
 import mozdevice
@@ -39,7 +41,20 @@ def cli():
     report['processes_running'] = map(lambda p: { 'name': p[1], 'user': p[2] },
                                       dm.getProcessList())
 
+    # kernel version
+    report['kernel_version'] = dm.shellCheckOutput(["cat", "/proc/version"])
+
+    # application.ini information
+    appinicontents = dm.pullFile('/system/b2g/application.ini')
+    sf = StringIO.StringIO(appinicontents)
+    config = ConfigParser.ConfigParser()
+    config.readfp(sf)
+    report['application_ini'] = {}
+    for section in config.sections():
+        report['application_ini'][section] = dict(config.items(section))
+
     print json.dumps(report)
+
 
 if __name__ == "__main__":
     cli()
