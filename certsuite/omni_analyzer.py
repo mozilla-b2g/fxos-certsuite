@@ -55,7 +55,7 @@ class OmniAnalyzer:
             omnizip = ZipFile(omnifile, 'r')
             omnizip.extractall(path=self.workdir)
         except:
-            print "Error opening omni.ja file: %s. Error: %s" % (omnifile, e.msg)
+            print "Error opening omni.ja file: %s" % (omnifile)
         finally:
             omnizip.close()
 
