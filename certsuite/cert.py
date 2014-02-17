@@ -10,6 +10,7 @@ import socket
 import sys
 import wptserve
 import time
+import moznetwork
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -74,7 +75,7 @@ def connect_handler(request, response):
 @wptserve.handlers.handler
 def headers_handler(request, response):
     response.headers.set("Content-Type", "text/html")
-    response.content = "<p><a href='/install.html'>Click me</a></p>"
+    response.content = "<p><a href='/install.html'>Click me to go to the app install page</a></p>"
 
     global headers
     headers = request.headers
@@ -136,10 +137,10 @@ def cli():
     # WebIDL iteration and fetching HTTP headers
     addr = (hostname(), 8080)
     httpd = wptserve.server.WebTestHttpd(
-        host="0.0.0.0", port=addr[1], routes=routes, doc_root=static_path)
+        host=moznetwork.get_ip(), port=addr[1], routes=routes, doc_root=static_path)
     httpd.start()
 
-    print >> sys.stderr, "#1: Please navigate to http://%s:%d" % \
+    print >> sys.stderr, "#1: On your phone, please navigate to http://%s:%d" % \
         (httpd.host, httpd.port)
     Wait().until(lambda: connected is True)
 
