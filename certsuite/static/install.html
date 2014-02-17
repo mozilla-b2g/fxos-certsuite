@@ -4,7 +4,7 @@
 <script>
 function install(ev) {
   // define the manifest URL
-  var manifest_url = location.protocol + location.host + "/static/webapi-test-app/manifest.webapp";
+  var manifest_url = location.protocol + location.host + "/webapi-test-app/manifest.webapp";
   // install the app
   var installLocFind = navigator.mozApps.install(manifest_url);
   installLocFind.onsuccess = function(data) {
