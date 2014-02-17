@@ -130,15 +130,35 @@ def cli():
     report["headers"] = headers
 
     print >> sys.stderr, "#3: Please click the button to install the app"
-    # TODO(ato): Add handler for device letting us know app's been installed
     Wait().until(lambda: installed is True)
 
     print >> sys.stderr, \
         "#4: Please follow the instructions to install the app, then launch " \
         "it from the homescreen"
-    # TODO(ato): Add handler for device letting us know app's been installed
     Wait().until(lambda: webapi_results is not None)
-    report["webapi_results"] = webapi_results
+    expected_results_json = open('expected_results.json', 'r').read()
+    expected_results = json.loads(expected_results_json)
+    expected_nav = set(expected_results["navList"])
+    nav = set(webapi_results["navList"])
+
+    #compute difference in navigator functions
+    missing_nav = expected_nav.difference(nav)
+    if missing_nav:
+        report['missing_navigation_functions'] = list(missing_nav)
+    added_nav = nav.difference(expected_nav)
+    if added_nav:
+        report['added_navigation_functions'] = list(added_nav)
+
+    #computer difference in window functions
+    expected_window = set(expected_results["windowList"])
+    window = set(webapi_results["windowList"])
+
+    missing_window = expected_window.difference(window)
+    if missing_window:
+        report['missing_window_functions'] = list(missing_window)
+    added_window = window.difference(expected_window)
+    if added_window:
+        report['added_window_functions'] = list(added_window)
 
     print json.dumps(report)
 

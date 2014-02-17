@@ -11,7 +11,6 @@
     <script>
       var navList = [];
       var windowList = [];
-      document.writeln("<h1>navigator.keys</h1>");
       function getTheNames(obj, list) {
         while (obj) {
           for (var name of Object.getOwnPropertyNames(obj)) {
@@ -24,7 +23,6 @@
       }
 
       getTheNames(navigator, navList);
-      document.writeln("<h1>window.getOwnPropertyNames</h1>");
       getTheNames(window, windowList);
       var results = {};
       results.navList = navList;
@@ -34,6 +32,7 @@
       xmlHttp.open( "POST", location.origin + "/webapi_results", true );
       xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
       xmlHttp.send("results=" + JSON.stringify(results));
+      document.writeln("<h1>Done!</h1>");
       //TODO: post the lists to location.protocol + location.host + "/submit/webapi" or something
     </script>
   </head>
