@@ -3,9 +3,25 @@
   <head>
     <meta charset=utf-8>
     <title></title>
+    <script>
+      var navList = [];
+      var windowList = [];
+      document.writeln("<h1>navigator.keys</h1>");
+      function getTheNames(obj, list) {
+        while (obj) {
+          for (var name of Object.getOwnPropertyNames(obj)) {
+            //console.log(name);
+            document.writeln(name+ "<br>");
+            list.push(name);
+          }
+          obj = Object.getPrototypeOf(obj);
+        }
+      }
+      
+      getTheNames(navigator, navList);
+      document.writeln("<h1>window.getOwnPropertyNames</h1>");
+      getTheNames(window, windowList);
+      //TODO: post the lists to location.protocol + location.host + "/submit/webapi" or something
+    </script>
   </head>
-
-  <body>
-    <p>WebAPI Verification App</p>
-  </body>
 </html>
