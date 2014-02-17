@@ -1,5 +1,10 @@
 <!doctype html>
 <html>
+  <!--
+      This Source Code Form is subject to the terms of the Mozilla Public
+      License, v. 2.0. If a copy of the MPL was not distributed with this file,
+      You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
   <head>
     <meta charset=utf-8>
     <title></title>
@@ -17,7 +22,7 @@
           obj = Object.getPrototypeOf(obj);
         }
       }
-      
+
       getTheNames(navigator, navList);
       document.writeln("<h1>window.getOwnPropertyNames</h1>");
       getTheNames(window, windowList);

@@ -12,7 +12,7 @@ deps = ['mozdevice >= 0.33',
 setup(name='fxos-certsuite',
       version=PACKAGE_VERSION,
       description="Certification suite for FirefoxOS",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[],
       keywords='mozilla',
       author='Mozilla Automation and Testing Team',
       author_email='tools@lists.mozilla.org',
@@ -26,5 +26,4 @@ setup(name='fxos-certsuite',
       # -*- Entry points: -*-
       [console_scripts]
       cert = certsuite:certcli
-      """,
-      )
+      """)
