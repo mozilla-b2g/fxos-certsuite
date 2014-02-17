@@ -24,7 +24,6 @@
       var results = {};
       results.navList = navList;
       results.windowList = windowList;
-      alert("posting to: " + location.origin + "/webapi_results");
       var xmlHttp = null;
       xmlHttp = new XMLHttpRequest();
       xmlHttp.open( "POST", location.origin + "/webapi_results", true );
