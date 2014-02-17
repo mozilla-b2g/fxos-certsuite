@@ -9,12 +9,12 @@ import StringIO
 import argparse
 import json
 import mozdevice
+import moznetwork
 import os
-import socket
 import sys
 import wptserve
-import time
-import moznetwork
+
+from wait import Wait
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -30,39 +30,6 @@ headers = None
 installed = False
 
 webapi_results = None
-
-class Wait(object):
-    """An explicit conditional utility class for waiting until a condition
-    evalutes to true or not null.
-
-    """
-
-    def __init__(self, timeout=120, interval=0.1):
-        self.timeout = timeout
-        self.interval = interval
-        self.end = time.time() + self.timeout
-
-    def until(self, condition):
-        rv = None
-        start = time.time()
-
-        while not time.time() >= self.end:
-            try:
-                rv = condition()
-            except (KeyboardInterrupt, SystemExit) as e:
-                raise e
-
-            if isinstance(rv, bool) and not rv:
-                time.sleep(self.interval)
-                continue
-
-            if rv is not None:
-                return rv
-
-            time.sleep(self.interval)
-
-        raise Exception(
-            "Timed out after %s seconds" % ((time.time() - start)))
 
 @wptserve.handlers.handler
 def connect_handler(request, response):
