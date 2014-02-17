@@ -3,13 +3,20 @@
 <meta charset=utf-8>
 <script>
 function install(ev) {
+  var xmlHttp = null;
+  xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", location.origin + "/installed", true );
+  xmlHttp.send( null );
+
   // define the manifest URL
-  var manifest_url = location.protocol + location.host + "/webapi-test-app/manifest.webapp";
+  var manifest_url = location.origin + "/webapi-test-app/manifest.webapp";
   // install the app
   var installLocFind = navigator.mozApps.install(manifest_url);
   installLocFind.onsuccess = function(data) {
     // App is installed, do something
     document.writeln("<h1>installed successfully</h1>");
+    //NOTE: ideally the xhr request should happen here, but there's some
+    //unknown error that occurs if I make a request after onsuccess...
   };
   installLocFind.onerror = function(e) {
     // App wasn't installed, info is in

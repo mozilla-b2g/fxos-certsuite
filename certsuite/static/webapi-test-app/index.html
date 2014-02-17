@@ -21,6 +21,15 @@
       getTheNames(navigator, navList);
       document.writeln("<h1>window.getOwnPropertyNames</h1>");
       getTheNames(window, windowList);
+      var results = {};
+      results.navList = navList;
+      results.windowList = windowList;
+      alert("posting to: " + location.origin + "/webapi_results");
+      var xmlHttp = null;
+      xmlHttp = new XMLHttpRequest();
+      xmlHttp.open( "POST", location.origin + "/webapi_results", true );
+      xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+      xmlHttp.send("results=" + JSON.stringify(results));
       //TODO: post the lists to location.protocol + location.host + "/submit/webapi" or something
     </script>
   </head>

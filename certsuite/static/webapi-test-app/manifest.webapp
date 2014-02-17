@@ -1,7 +1,7 @@
 {
   "name": "WebAPI Verification App",
   "description": "WebAPI Verification app",
-  "launch_path": "/static/webapi-test-app/index.html",
+  "launch_path": "/webapi-test-app/index.html",
   "developer": {
     "name": "The Ateam",
     "url": "https://wiki.mozilla.org/Auto-tools"

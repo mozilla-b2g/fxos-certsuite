@@ -23,6 +23,10 @@ connected = False
 
 headers = None
 
+installed = False
+
+webapi_results = None
+
 class Wait(object):
     """An explicit conditional utility class for waiting until a condition
     evalutes to true or not null.
@@ -67,7 +71,7 @@ def hostname():
 @wptserve.handlers.handler
 def connect_handler(request, response):
     response.headers.set("Content-Type", "text/html")
-    response.content = "<p><a href='/headers'>Click me</a></p>"
+    response.content = "<p><a href='/headers'><h1>Click me</h1></a></p>"
 
     global connected
     connected = True
@@ -75,16 +79,28 @@ def connect_handler(request, response):
 @wptserve.handlers.handler
 def headers_handler(request, response):
     response.headers.set("Content-Type", "text/html")
-    response.content = "<p><a href='/install.html'>Click me to go to the app install page</a></p>"
+    response.content = "<p><a href='/install.html'><h1>Click me to go to the app install page<h1></a></p>"
 
     global headers
     headers = request.headers
+
+@wptserve.handlers.handler
+def installed_handler(request, response):
+    global installed 
+    installed = True
+
+@wptserve.handlers.handler
+def webapi_results_handler(request, response):
+    global webapi_results
+    webapi_results = json.loads(request.POST["results"])
 
 static_path = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "static"))
 
 routes = [("GET", "/", connect_handler),
           ("GET", "/headers", headers_handler),
+          ("GET", "/installed", installed_handler),
+          ("POST", "/webapi_results", webapi_results_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
 def cli():
@@ -151,6 +167,12 @@ def cli():
 
     print >> sys.stderr, "#3: Please click the button to install the app"
     # TODO(ato): Add handler for device letting us know app's been installed
+    Wait().until(lambda: installed is True)
+
+    print >> sys.stderr, "#4: Please follow the instructions to install the app, then launch it from the homescreen"
+    # TODO(ato): Add handler for device letting us know app's been installed
+    Wait().until(lambda: webapi_results is not None)
+    report["webapi_results"] = webapi_results
 
     print json.dumps(report)
 
