@@ -64,14 +64,6 @@ class Wait(object):
         raise Exception(
             "Timed out after %s seconds" % ((time.time() - start)))
 
-def hostname():
-    """Relies on ``/etc/hosts`` to find the fully qualified network
-    hostname for this machine.
-
-    """
-
-    return socket.gethostbyname(socket.gethostname())
-
 @wptserve.handlers.handler
 def connect_handler(request, response):
     response.headers.set("Content-Type", "text/html")
@@ -155,12 +147,13 @@ def cli():
 
     # Step 2: Navigate to local hosted web server to install app for
     # WebIDL iteration and fetching HTTP headers
-    addr = (hostname(), 8080)
+    addr = (moznetwork.get_ip(), 8080)
     httpd = wptserve.server.WebTestHttpd(
-        host=moznetwork.get_ip(), port=addr[1], routes=routes, doc_root=static_path)
+        host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
     httpd.start()
 
-    print >> sys.stderr, "#1: On your phone, please navigate to http://%s:%d" % \
+    print >> sys.stderr, \
+        "#1: On your phone, please navigate to http://%s:%d/" % \
         (httpd.host, httpd.port)
     Wait().until(lambda: connected is True)
 
@@ -173,7 +166,9 @@ def cli():
     # TODO(ato): Add handler for device letting us know app's been installed
     Wait().until(lambda: installed is True)
 
-    print >> sys.stderr, "#4: Please follow the instructions to install the app, then launch it from the homescreen"
+    print >> sys.stderr, \
+        "#4: Please follow the instructions to install the app, then launch " \
+        "it from the homescreen"
     # TODO(ato): Add handler for device letting us know app's been installed
     Wait().until(lambda: webapi_results is not None)
     report["webapi_results"] = webapi_results
