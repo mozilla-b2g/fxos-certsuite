@@ -34,7 +34,8 @@ webapi_results = None
 @wptserve.handlers.handler
 def connect_handler(request, response):
     response.headers.set("Content-Type", "text/html")
-    response.content = "<p><a href='/headers'><h1>Click me</h1></a></p>"
+    response.content = "<head><meta charset=utf-8 name=\"viewport\" content=\"width=device-width\"></head>" \
+                       "<p><a href='/headers'><h1>Click me</h1></a></p>"
 
     global connected
     connected = True
@@ -42,7 +43,8 @@ def connect_handler(request, response):
 @wptserve.handlers.handler
 def headers_handler(request, response):
     response.headers.set("Content-Type", "text/html")
-    response.content = "<p><a href='/install.html'><h1>Click me to go to the app install page<h1></a></p>"
+    response.content = "<head><meta charset=utf-8 name=\"viewport\" content=\"width=device-width\"></head>" \
+                       "<p><a href='/install.html'><h1>Click me to go to the app install page<h1></a></p>"
 
     global headers
     headers = request.headers
