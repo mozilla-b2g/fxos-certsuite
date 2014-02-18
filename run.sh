@@ -17,5 +17,9 @@ fi
 source certsuite_venv/bin/activate
 python setup.py install
 echo "Done, running the suite"
-cert
+if [ -z $1 ] ; then
+  cert
+else
+  cert --version $1
+fi
 deactivate

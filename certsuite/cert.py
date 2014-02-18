@@ -32,6 +32,8 @@ installed = False
 
 webapi_results = None
 
+supported_versions = ["1.4", "1.3"]
+
 @wptserve.handlers.handler
 def connect_handler(request, response):
     response.headers.set("Content-Type", "text/html")
@@ -74,6 +76,10 @@ def cli():
     parser.add_argument("--no-reboot",
                         help="don't reboot device before running test",
                         action="store_true")
+    parser.add_argument("--version",
+                        help="version of FxOS under test",
+                        default="1.4",
+                        action="store")
     args = parser.parse_args()
 
     report = {'buildprops': {}}
@@ -91,6 +97,14 @@ def cli():
     if not args.no_reboot:
         print "Rebooting device..."
         dm.reboot(wait=True)
+
+    if args.version not in supported_versions:
+        print "%s is not a valid version. Please enter one of %s" % \
+              (args.version, supported_versions)
+        sys.exit(1)
+        
+    file_path = pkg_resources.resource_filename(
+                        __name__, os.path.sep.join(['expected_webapi_results', '%s.json' % args.version]))
 
     # get build properties
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
@@ -141,8 +155,6 @@ def cli():
     Wait().until(lambda: webapi_results is not None)
     print >> sys.stderr, \
         "Processing results..."
-    file_path = pkg_resources.resource_filename(
-                        __name__, 'expected_results.json')
     expected_results_json = open(file_path, 'r').read()
     expected_results = json.loads(expected_results_json)
     #compute difference in navigator functions
