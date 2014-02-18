@@ -8,15 +8,27 @@ Requirements
 ------------
 
 Currently requires a Linux or Mac based system with adb installed.
+
 The device and machine running the tests must be on the same WIFI
 network.
+
+Furthermore, you must turn on adb access:
+
+For 1.3: Launch Settings, and navigate to Device Information -> More Information -> Developer, then check Remote Debugging.
+
+For 1.4: Launch Settings, and navigate to Device Information -> More Information, then check Developer Options
+         Hold down the Home button, and close the Settings app (press the x)
+         Launch Settings, and navigate to Developer, then select 'ADB only' in Remote Debugging
 
 Quick Setup and Usage
 -------------------
 
 You can setup your environment and run the tests by running:
 
-    source run.sh
+    source run.sh <some version>
+
+Where < some version > is one of our supported release versions, either 1.3 or 1.4. If you don't pass a version,
+1.4 will be assumed.
 
 This sets up a virtual environment for you, with all the proper
 packages installed, activates the environment, runs the tests, 
