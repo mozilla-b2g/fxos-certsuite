@@ -9,31 +9,51 @@
     <meta charset=utf-8>
     <title></title>
     <script>
-      var navList = [];
-      var windowList = [];
-      function getTheNames(obj, list) {
-        while (obj) {
-          for (var name of Object.getOwnPropertyNames(obj)) {
-            //console.log(name);
-            document.writeln(name+ "<br>");
-            list.push(name);
+      function runTest() {
+        var navList = [];
+        var navNullList = [];
+        var windowList = [];
+        function getTheNames(obj, list, nullList) {
+          var orig_obj = obj;
+          while (obj) {
+            for (var name of Object.getOwnPropertyNames(obj)) {
+              console.log(name);
+              if (nullList === undefined) {
+                list.push(name);
+              }
+              else {
+                // we care if a value is null or not if we get here
+                try {
+                  if (orig_obj[name] === null) {
+                    nullList.push(name);
+                  }
+                  else {
+                    list.push(name);
+                  }
+                }
+                catch(e) {
+                }
+              }
+            }
+            obj = Object.getPrototypeOf(obj);
           }
-          obj = Object.getPrototypeOf(obj);
         }
+  
+        getTheNames(navigator, navList, navNullList);
+        getTheNames(window, windowList);
+        var results = {};
+        results.navList = navList;
+        results.navNullList = navNullList;
+        results.windowList = windowList;
+        console.log("posting");
+        var xmlHttp = null;
+        xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", location.origin + "/webapi_results", true );
+        xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+        xmlHttp.send("results=" + JSON.stringify(results));
+        document.writeln("Done!");
       }
-
-      getTheNames(navigator, navList);
-      getTheNames(window, windowList);
-      var results = {};
-      results.navList = navList;
-      results.windowList = windowList;
-      var xmlHttp = null;
-      xmlHttp = new XMLHttpRequest();
-      xmlHttp.open( "POST", location.origin + "/webapi_results", true );
-      xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-      xmlHttp.send("results=" + JSON.stringify(results));
-      document.writeln("<h1>Done!</h1>");
-      //TODO: post the lists to location.protocol + location.host + "/submit/webapi" or something
+      runTest();
     </script>
   </head>
 </html>

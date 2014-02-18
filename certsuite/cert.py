@@ -136,18 +136,32 @@ def cli():
         "#4: Please follow the instructions to install the app, then launch " \
         "it from the homescreen"
     Wait().until(lambda: webapi_results is not None)
+    print >> sys.stderr, \
+        "Processing results..."
     expected_results_json = open('expected_results.json', 'r').read()
     expected_results = json.loads(expected_results_json)
+    #compute difference in navigator functions
     expected_nav = set(expected_results["navList"])
     nav = set(webapi_results["navList"])
 
-    #compute difference in navigator functions
     missing_nav = expected_nav.difference(nav)
     if missing_nav:
-        report['missing_navigation_functions'] = list(missing_nav)
+        report['missing_navigator_functions'] = list(missing_nav)
     added_nav = nav.difference(expected_nav)
     if added_nav:
-        report['added_navigation_functions'] = list(added_nav)
+        report['added_navigator_functions'] = list(added_nav)
+
+    # NOTE: privileged functions in an unprivileged app are null
+    # compute difference in navigator "null" functions, ie: privileged functions
+    expected_nav_null = set(expected_results["navNullList"])
+    nav_null = set(webapi_results["navNullList"])
+
+    missing_nav_null = expected_nav_null.difference(nav_null)
+    if missing_nav_null:
+        report['missing_navigator_unprivileged_functions'] = list(missing_nav_null)
+    added_nav_null = nav_null.difference(expected_nav_null)
+    if added_nav_null:
+        report['added_navigator_privileged_functions'] = list(added_nav_null)
 
     #computer difference in window functions
     expected_window = set(expected_results["windowList"])
