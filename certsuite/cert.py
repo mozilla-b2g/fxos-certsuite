@@ -136,7 +136,7 @@ def cli():
 
     print >> sys.stderr, \
         "#4: Please follow the instructions to install the app, then launch " \
-        "it from the homescreen"
+        "<strong>WebAPIVerifier</strong> from the homescreen"
     Wait().until(lambda: webapi_results is not None)
     print >> sys.stderr, \
         "Processing results..."
