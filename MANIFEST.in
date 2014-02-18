@@ -1,1 +1,2 @@
 recursive-include certsuite/static *
+include certsuite/expected_results.json

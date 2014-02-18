@@ -13,6 +13,7 @@ import moznetwork
 import os
 import sys
 import wptserve
+import pkg_resources
 
 from wait import Wait
 
@@ -140,7 +141,9 @@ def cli():
     Wait().until(lambda: webapi_results is not None)
     print >> sys.stderr, \
         "Processing results..."
-    expected_results_json = open('expected_results.json', 'r').read()
+    file_path = pkg_resources.resource_filename(
+                        __name__, 'expected_results.json')
+    expected_results_json = open(file_path, 'r').read()
     expected_results = json.loads(expected_results_json)
     #compute difference in navigator functions
     expected_nav = set(expected_results["navList"])
