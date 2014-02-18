@@ -6,7 +6,7 @@ if [ $? != 0 ]; then
   if [ $? != 0 ]; then
     echo "Neither pip nor easy_install is found in your path"
     echo "Please install pip directly using: http://pip.readthedocs.org/en/latest/installing.html#install-or-upgrade-pip"
-    exit 0
+    exit 1
   fi
   easy_install pip
 fi
