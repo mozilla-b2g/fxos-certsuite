@@ -24,10 +24,17 @@ function install(ev) {
     //NOTE: ideally the xhr request should happen here, but there's some
     //unknown error that occurs if I make a request after onsuccess...
   };
-  installLocFind.onerror = function(e) {
+  installLocFind.onerror = function(evt) {
     // App wasn't installed, info is in
     // installapp.error.name
-    alert("Could not install app! " + e.toString());
+    var message = "";
+    if (installLocFind.error.name == "MULTIPLE_APPS_PER_ORIGIN_FORBIDDEN") {
+      message = "Application is installed already, please check your homescreen";
+    }
+    else {
+      message = "Could not install app! Error: " + installLocFind.error.name;
+    }
+    alert(message);
   };
 };
 </script>
