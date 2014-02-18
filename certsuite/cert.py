@@ -122,7 +122,7 @@ def cli():
     print >> sys.stderr, \
         "#1: On your phone, please navigate to http://%s:%d/" % \
         (httpd.host, httpd.port)
-    Wait().until(lambda: connected is True)
+    Wait(timeout=240).until(lambda: connected is True)
 
     print >> sys.stderr, \
         "#2: Please click the link on the web page to connect your device"
