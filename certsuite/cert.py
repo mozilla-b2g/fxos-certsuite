@@ -8,6 +8,7 @@ import ConfigParser
 import StringIO
 import argparse
 import json
+import logging
 import mozdevice
 import moznetwork
 import os
@@ -83,6 +84,8 @@ def cli():
     args = parser.parse_args()
 
     report = {'buildprops': {}}
+
+    logging.basicConfig()
 
     # Step 1: Get device information
     try:
