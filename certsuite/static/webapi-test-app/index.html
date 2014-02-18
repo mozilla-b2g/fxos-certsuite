@@ -23,15 +23,11 @@
               }
               else {
                 // we care if a value is null or not if we get here
-                try {
-                  if (orig_obj[name] === null) {
-                    nullList.push(name);
-                  }
-                  else {
-                    list.push(name);
-                  }
+                if (orig_obj[name] === null) {
+                  nullList.push(name);
                 }
-                catch(e) {
+                else {
+                  list.push(name);
                 }
               }
             }
