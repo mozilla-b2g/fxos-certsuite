@@ -6,7 +6,8 @@ import hashlib
 import re
 import json
 import base64
-from zipfile import ZipFile
+import subprocess
+import zipfile
 
 JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
@@ -40,6 +41,7 @@ class OmniAnalyzer:
     def getomni(self):
         # Get the omni.ja from /system/b2g/omni.ja
         # Unzip it 
+        omnizip = None
         try:
             dm = mozdevice.DeviceManagerADB()
         except mozdevice.DMError, e:
@@ -51,13 +53,22 @@ class OmniAnalyzer:
         dm.getFile('/system/b2g/omni.ja', omnifile)
 
         # Try to unzip it
+        # The following is the right way to do this in python, however that throws a BadZipFile error
+        # referencing an incorrect magic number. However the normal unzip command works just fine.
+        # NOTE: This will DEPEND on running on linux/mac :-()
         try:
-            omnizip = ZipFile(omnifile, 'r')
+            omnizip = zipfile.ZipFile(omnifile, 'r')
             omnizip.extractall(path=self.workdir)
+        except zipfile.BadZipfile:
+            # Then let's try a hack - only works on mac or linux
+            subprocess.call(['unzip', '-d', self.workdir, omnifile])
         except:
             print "Error opening omni.ja file: %s" % (omnifile)
+            sys.exit(1)
         finally:
-            omnizip.close()
+            if omnizip:
+                omnizip.close()
+
 
     def run(self):
         # iterate over the modules, greprefs.js, defaults/pref/b2g.js and the top level files in chrome/chrome/content and components
@@ -125,6 +136,7 @@ class OmniAnalyzer:
 
     def _encode_base64(self, filename):
         encoded = ''
+        f = None
         for root, dirs, files in os.walk(self.workdir):
             if filename in files:
                 path = os.path.join(root, filename)
@@ -132,10 +144,11 @@ class OmniAnalyzer:
         try:
             f = open(path, 'rb')
             encoded = base64.b64encode(f.read())
-        except e:
-            print "Failed to encode file %s Error: %s" % (path, e.msg)
+        except:
+            print "Failed to encode file %s" % (filename)
         finally:
-            f.close()
+            if f:
+                f.close()
         return encoded
 
     def verify(self, reference, device):
