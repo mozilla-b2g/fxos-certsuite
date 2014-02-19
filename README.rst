@@ -1,3 +1,4 @@
+==============
 fxos-certsuite
 ==============
 
@@ -5,7 +6,7 @@ A tool to verify the functionality and characteristics of FirefoxOS
 devices.
 
 Requirements
-------------
+============
 
 Currently requires a Linux or Mac based system with adb installed.  If you
 need to install adb, see
@@ -17,15 +18,17 @@ network.
 Furthermore, you must turn on adb access:
 
 For FirefoxOS version 1.3: Launch Settings, and navigate to Device
-Information -> More Information -> Developer, then check Remote Debugging.
+Information -> More Information -> Developer, then check Remote
+Debugging.
 
-For version 1.4: Launch Settings, and navigate to Device Information -> More
-Information, then check Developer Options.  Next, hold down the Home button,
-and close the Settings app (press the x).  Finally, launch Settings again,
-and navigate to Developer, then select 'ADB only' in Remote Debugging.
+For version 1.4: Launch Settings, and navigate to Device Information
+-> More Information, then check Developer Options.  Next, hold down
+the Home button, and close the Settings app (press the x).  Finally,
+launch Settings again, and navigate to Developer, then select 'ADB
+only' in Remote Debugging.
 
 Quick Setup and Usage
----------------------
+=====================
 
 You can setup your environment and run the tests by running:
 
@@ -38,14 +41,14 @@ specify where you want the json file to be created. By default, it will create
 it as results.json in the current working directory.
 
 This command sets up a virtual environment for you, with all the proper
-packages installed, activates the environment, runs the tests, 
+packages installed, activates the environment, runs the tests,
 and lastly deactivates the environment.
 
 You may call 'run.sh' as many times as you like, and it
 will run the tests using its previously set up virtual environment.
 
 Alternative Setup
------------------
+=================
 
 If the quick setup doesn't work, then follow these instructions.
 You can set up and run this tool inside a virtual environment.  From
@@ -67,9 +70,8 @@ To get a list of command-line arguments, use:
 
     cert --help
 
-
 Submitting Results
-------------------
+==================
 
 Once the tests have completed successfully, they will write a file
 containing the results; by default this file is called results.json.  Please
