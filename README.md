@@ -41,7 +41,7 @@ This command sets up a virtual environment for you, with all the proper
 packages installed, activates the environment, runs the tests, 
 and lastly deactivates the environment.
 
-You may call 'source run.sh' as many times as you like, and it
+You may call 'run.sh' as many times as you like, and it
 will run the tests using its previously set up virtual environment.
 
 Alternative Setup
