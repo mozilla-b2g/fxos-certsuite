@@ -7,6 +7,7 @@ import re
 import json
 import base64
 import subprocess
+import traceback
 import zipfile
 import shutil
 
@@ -23,6 +24,9 @@ class OmniAnalyzer:
         self.workdir = dir
         warnings = 0
 
+        if os.path.isdir(self.workdir):
+            shutil.rmtree(self.workdir)
+
         self.results_dict = self.run()
         if not self.generate_reference:
             ref = self._get_reference()
@@ -32,11 +36,14 @@ class OmniAnalyzer:
         json.dump(self.results_dict, f)
         f.close()
 
+        if os.path.isdir(self.workdir):
+            shutil.rmtree(self.workdir)
+
         # Also print our results to stdout - TODO: Necessary or desired?
         if dump:
-            print json.dumps(self.results_dict)
+            print json.dumps(self.results_dict, indent=2)
         if warnings:
-            print "Found %s warnings" % warnings
+            print "Found %s changes in omni.ja" % warnings
         else:
             print "No warnings detected in omni.ja"
 
@@ -66,6 +73,7 @@ class OmniAnalyzer:
             subprocess.call(['unzip', '-d', self.workdir, omnifile])
         except:
             print "Error opening omni.ja file: %s" % (omnifile)
+            traceback.print_exc()
             sys.exit(1)
         finally:
             if omnizip:
@@ -92,8 +100,6 @@ class OmniAnalyzer:
 
         # And grab the greprefs file from the root
         analysis['directories']['root'] = {'greprefs.js': self._hash_file(os.path.join(self.workdir, 'greprefs.js'))}
-
-        shutil.rmtree(self.workdir)
 
         return analysis
 
@@ -133,7 +139,8 @@ class OmniAnalyzer:
                 f = open(self.verify_file, "r")
                 ref = json.load(f)
             except:
-                "ERROR: Could not load reference file %s, Error: %s" % (self.verify_file, e.msg)
+                print "ERROR: Could not load reference file %s" % self.verify_file
+                traceback.print_exc()
             finally:
                 f.close()
         return ref
@@ -150,6 +157,7 @@ class OmniAnalyzer:
             encoded = base64.b64encode(f.read())
         except:
             print "Failed to encode file %s" % (filename)
+            traceback.print_exc()
         finally:
             if f:
                 f.close()

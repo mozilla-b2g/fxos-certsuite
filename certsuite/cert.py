@@ -150,7 +150,6 @@ def cli():
     omni_work_dir = pkg_resources.resource_filename(
                         __name__, 'omnidir')
     omni_analyzer = OmniAnalyzer(vfile=omni_verify_file, results=omni_results_path, dir=omni_work_dir)
-    omni_analyzer.run()
     omni_results = open(omni_results_path, 'r').read()
     report["omni_result"] = json.loads(omni_results)
     os.remove(omni_results_path)
@@ -162,19 +161,20 @@ def cli():
         host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
     httpd.start()
 
-    print "\n #1: On your phone, please navigate to http://%s:%d/" % \
-        (httpd.host, httpd.port)
-    Wait(timeout=240).until(lambda: connected is True)
+    print "\n#1: On your phone, please launch the browser app and navigate to "\
+        "http://%s:%d/" % (httpd.host, httpd.port)
+    Wait(timeout=600).until(lambda: connected is True)
 
-    print "\n#2: Please click the link on the web page to connect your device"
+    print "\n#2: On the web page that's loaded, please click the 'Click me' link"
     Wait().until(lambda: headers is not None)
     report["headers"] = headers
 
-    print "\n#3: Please click the button to install the app"
+    print "\n#3: Next, click the link which reads 'Click me to go to the app " \
+        "install page', then click the button which appears to install the test app"
     Wait().until(lambda: installed is True)
 
     print "\n#4: Please follow the instructions to install the app, then launch " \
-        "<strong>WebAPIVerifier</strong> from the homescreen"
+        "WebAPIVerifier from the homescreen"
     Wait().until(lambda: webapi_results is not None)
     print "Processing results..."
     expected_results_json = open(file_path, 'r').read()
@@ -217,7 +217,7 @@ def cli():
     if not result_file_path:
         result_file_path = "results.json"
     result_file = open(result_file_path, "w")
-    result_file.write(json.dumps(report))
+    result_file.write(json.dumps(report, indent=2))
     result_file.close()
 
     print "\nResults have been stored in: %s" % result_file_path
