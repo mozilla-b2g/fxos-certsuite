@@ -29,7 +29,7 @@ Quick Setup and Usage
 
 You can setup your environment and run the tests by running:
 
-    source run.sh --version=<some version> --result-file=<absolute filepath>
+    ./run.sh --version=<some version> --result-file=<absolute filepath>
 
 The --version and --result arguments are optional. If passed, --version must
 be one of our supported release  versions, either 1.3 or 1.4. If you don't pass
