@@ -26,7 +26,7 @@ Furthermore, you must turn on adb access on the device:
 
 **For Firefox OS version 1.3:** Launch *Settings*, and navigate to
 *Device Information* -> *More Information* -> *Developer*, then check
-**Remote Debugging*.
+*Remote Debugging*.
 
 **For version 1.4:** Launch *Settings*, and navigate to *Device
 Information* -> *More Information*, then check *Developer Options*.
