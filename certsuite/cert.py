@@ -12,12 +12,12 @@ import logging
 import mozdevice
 import moznetwork
 import os
+import pkg_resources
 import sys
 import wptserve
-import pkg_resources
 
-from wait import Wait
 from omni_analyzer import OmniAnalyzer
+from wait import Wait
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -115,7 +115,7 @@ def cli():
         print "%s is not a valid version. Please enter one of %s" % \
               (args.version, supported_versions)
         sys.exit(1)
-        
+
     file_path = pkg_resources.resource_filename(
                         __name__, os.path.sep.join(['expected_webapi_results', '%s.json' % args.version]))
 
