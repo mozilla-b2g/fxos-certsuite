@@ -7,9 +7,11 @@ devices.
 Requirements
 ------------
 
-Currently requires a Linux or Mac based system with adb installed.
+Currently requires a Linux or Mac based system with adb installed.  If you
+need to install adb, see
+https://developer.mozilla.org/en-US/Firefox_OS/Debugging/Installing_ADB.
 
-The device and machine running the tests must be on the same WIFI
+The device and the machine running the tests must be on the same WiFi
 network.
 
 Furthermore, you must turn on adb access:
