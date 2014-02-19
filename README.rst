@@ -37,7 +37,7 @@ the x).  Finally, launch *Settings* again, and navigate to
 Quick Setup and Usage
 =====================
 
-You can setup your environment and run the tests by running:
+You can setup your environment and run the tests by running::
 
     ./run.sh --version=<some version> --result-file=<absolute filepath>
 
@@ -60,21 +60,21 @@ Alternative Setup
 
 If the quick setup doesn't work, then follow these instructions.  You
 can set up and run this tool inside a virtual environment.  From the
-root directory of your source checkout, run:
+root directory of your source checkout, run::
 
     virtualenv .
     ./bin/pip install -e .
 
-Then activate the virtualenv:
+Then activate the virtualenv::
 
     source bin/activate
 
 You should then be able to run the certification suite simply by
-executing:
+executing::
 
     cert
 
-To get a list of command-line arguments, use:
+To get a list of command-line arguments, use::
 
     cert --help
 
