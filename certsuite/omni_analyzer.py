@@ -14,7 +14,7 @@ JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
 
 class OmniAnalyzer:
-    def __init__(self, vfile, results, dir, mode=None, vserver=None):
+    def __init__(self, vfile, results, dir, mode=None, vserver=None, dump=False):
         self.generate_reference = mode
         self.verification_server = vserver
         self.verify_file = vfile
@@ -32,8 +32,10 @@ class OmniAnalyzer:
         json.dump(self.results_dict, f)
         f.close()
 
+        import pdb;pdb.set_trace()
         # Also print our results to stdout - TODO: Necessary or desired?
-        print json.dumps(self.results_dict)
+        if dump:
+            print json.dumps(self.results_dict)
         if warnings:
             print "Found %s warnings" % warnings
         else:
@@ -189,10 +191,11 @@ def main():
         default=os.path.join(os.getcwd(), "results.json"))
     parser.add_argument("--workingdir", help="Directory to work in - will be removed", 
         default=os.path.join(os.getcwd(), "omnidir"))
+    parser.add_argument("--dump", help="Dumps the resulting json to stdout", action="store_true")
     
     args = parser.parse_args()
-    omni_analyzer = OmniAnalyzer(mode=args.generate, vserver=args.verifyserver,
-        vfile=args.verifyfile, results=args.resultsfile, dir=args.workingdir)
+    omni_analyzer = OmniAnalyzer(vfile=args.verifyfile, results=args.resultsfile, dir=args.workingdir,
+                                 mode=args.generate, vserver=args.verifyserver, dump=args.dump)
 
 
 if __name__ == "__main__":
