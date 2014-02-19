@@ -16,6 +16,11 @@ installed.
 If you need to install adb, see
 https://developer.mozilla.org/en-US/Firefox_OS/Debugging/Installing_ADB.
 
+Once installed, be sure to add adb to your PATH (replacing $SDK_HOME 
+with the location of the android sdk):
+
+    PATH=$SDK_HOME:$PATH
+
 The device and the host machine running the tests must also be on the
 same Wi-Fi network.
 
