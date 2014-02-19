@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -192,7 +194,7 @@ class OmniAnalyzer:
             res['directories'][d] = dirresults
         return warn_count, res
 
-def main():
+def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--generate", help="Generate the reference file", action="store_true")
     group = parser.add_mutually_exclusive_group()
@@ -204,9 +206,9 @@ def main():
         default=os.path.join(os.getcwd(), "omnidir"))
     parser.add_argument("--dump", help="Dumps the resulting json to stdout", action="store_true")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
     omni_analyzer = OmniAnalyzer(vfile=args.verifyfile, results=args.resultsfile, dir=args.workingdir,
                                  mode=args.generate, vserver=args.verifyserver, dump=args.dump)
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
