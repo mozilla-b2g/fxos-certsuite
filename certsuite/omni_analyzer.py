@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import os
 import sys
 import argparse
@@ -49,7 +53,7 @@ class OmniAnalyzer:
 
     def getomni(self):
         # Get the omni.ja from /system/b2g/omni.ja
-        # Unzip it 
+        # Unzip it
         omnizip = None
         try:
             dm = mozdevice.DeviceManagerADB()
@@ -57,7 +61,7 @@ class OmniAnalyzer:
             print "Error connecting to device via adb (error: %s). Please be " \
                 "sure device is connected and 'remote debugging' is enabled." % \
                 e.msg
-            sys.exit(1)     
+            sys.exit(1)
         omnifile = os.path.join(self.workdir, 'omni.ja')
         dm.getFile('/system/b2g/omni.ja', omnifile)
 
@@ -85,7 +89,7 @@ class OmniAnalyzer:
         # and hash each file using md5. Organize them into logical areas in the resulting directionary.
         self.getomni()
         analysis = {'directories': {}}
-        
+
         # Analyze contents of <workdir>/chrome for chrome files
         analysis['directories']['chrome'] = self._walker(os.path.join(self.workdir, 'chrome'))
 
@@ -128,7 +132,7 @@ class OmniAnalyzer:
 
     def _get_reference(self):
         # We can potentially grab the reference file from a server or from a local file. The server would be
-        # a REST endpoint we could call and get the JSON file back (the JSON is formatted just like what 
+        # a REST endpoint we could call and get the JSON file back (the JSON is formatted just like what
         # we generate using our run method)
         ref = {}
         if self.verification_server:
@@ -167,9 +171,9 @@ class OmniAnalyzer:
         # Verifies the device JSON structure matches that of the reference JSON for this release
         # If we find a discrepancy, package the file for later analysis
         # TODO: If we decide to use a docker system so that we can have a known environment, we might want
-        #       to explore using a database for storing the reference and all the reference files. Then 
-        #       we can just provide diffs as our output from this function.  If we don't provide diffs from 
-        #       this function, we should write something that takes the JSON output of this method, and uses 
+        #       to explore using a database for storing the reference and all the reference files. Then
+        #       we can just provide diffs as our output from this function.  If we don't provide diffs from
+        #       this function, we should write something that takes the JSON output of this method, and uses
         #       a generated reference JSON to get file by file diffs by base 64 decoding the file-contents in the JSON.
         warn_count = 0
         res = {'directories': {}}
@@ -196,14 +200,13 @@ def main():
     group.add_argument("--verifyfile", help="Use local file for verification.")
     parser.add_argument("--resultsfile", help="File to store the results in (JSON format)",
         default=os.path.join(os.getcwd(), "results.json"))
-    parser.add_argument("--workingdir", help="Directory to work in - will be removed", 
+    parser.add_argument("--workingdir", help="Directory to work in - will be removed",
         default=os.path.join(os.getcwd(), "omnidir"))
     parser.add_argument("--dump", help="Dumps the resulting json to stdout", action="store_true")
-    
+
     args = parser.parse_args()
     omni_analyzer = OmniAnalyzer(vfile=args.verifyfile, results=args.resultsfile, dir=args.workingdir,
                                  mode=args.generate, vserver=args.verifyserver, dump=args.dump)
-
 
 if __name__ == "__main__":
     main()
