@@ -16,7 +16,7 @@ installed.
 If you need to install adb, see
 https://developer.mozilla.org/en-US/Firefox_OS/Debugging/Installing_ADB.
 
-Once installed, add adb to your PATH in your to your ~/.bashrc
+Once installed, add adb to your PATH in your ~/.bashrc
 or equivalent file, by adding the following line to the file
 (replacing $SDK_HOME with the location of the android sdk):
 
