@@ -82,11 +82,16 @@ def cli():
                         help="version of FxOS under test",
                         default="1.3",
                         action="store")
+    parser.add_argument("--debug",
+                        help="enable debug logging",
+                        action="store_true")
     args = parser.parse_args()
 
     report = {'buildprops': {}}
 
     logging.basicConfig()
+    if not args.debug:
+        logging.disable(logging.ERROR)
 
     # Step 1: Get device information
     try:
@@ -154,20 +159,20 @@ def cli():
     httpd.start()
 
     print >> sys.stderr, \
-        "#1: On your phone, please navigate to http://%s:%d/" % \
+        "\n #1: On your phone, please navigate to http://%s:%d/" % \
         (httpd.host, httpd.port)
     Wait(timeout=240).until(lambda: connected is True)
 
     print >> sys.stderr, \
-        "#2: Please click the link on the web page to connect your device"
+        "\n#2: Please click the link on the web page to connect your device"
     Wait().until(lambda: headers is not None)
     report["headers"] = headers
 
-    print >> sys.stderr, "#3: Please click the button to install the app"
+    print >> sys.stderr, "\n#3: Please click the button to install the app"
     Wait().until(lambda: installed is True)
 
     print >> sys.stderr, \
-        "#4: Please follow the instructions to install the app, then launch " \
+        "\n#4: Please follow the instructions to install the app, then launch " \
         "<strong>WebAPIVerifier</strong> from the homescreen"
     Wait().until(lambda: webapi_results is not None)
     print >> sys.stderr, \
