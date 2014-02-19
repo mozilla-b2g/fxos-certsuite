@@ -91,7 +91,7 @@ class OmniAnalyzer:
         analysis['directories']['defaults'] = self._walker(os.path.join(self.workdir, 'defaults'))
 
         # And grab the greprefs file from the root
-        analysis['directories']['root'] = {os.path.join(self.workdir, 'greprefs.js'): self._hash_file(os.path.join(self.workdir, 'greprefs.js'))}
+        analysis['directories']['root'] = {'greprefs.js': self._hash_file(os.path.join(self.workdir, 'greprefs.js'))}
 
         shutil.rmtree(self.workdir)
 
