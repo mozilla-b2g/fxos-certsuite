@@ -8,12 +8,13 @@ import json
 import base64
 import subprocess
 import zipfile
+import shutil
 
 JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
 
 class OmniAnalyzer:
-    def __init__(self, mode, vserver, vfile, results, dir):
+    def __init__(self, vfile, results, dir, mode=None, vserver=None):
         self.generate_reference = mode
         self.verification_server = vserver
         self.verify_file = vfile
@@ -90,6 +91,8 @@ class OmniAnalyzer:
 
         # And grab the greprefs file from the root
         analysis['directories']['root'] = {os.path.join(self.workdir, 'greprefs.js'): self._hash_file(os.path.join(self.workdir, 'greprefs.js'))}
+
+        shutil.rmtree(self.workdir)
 
         return analysis
 
@@ -188,7 +191,6 @@ def main():
         default=os.path.join(os.getcwd(), "omnidir"))
     
     args = parser.parse_args()
-    workdir = os.path.join("omni")
     omni_analyzer = OmniAnalyzer(mode=args.generate, vserver=args.verifyserver,
         vfile=args.verifyfile, results=args.resultsfile, dir=args.workingdir)
 

@@ -17,6 +17,7 @@ import wptserve
 import pkg_resources
 
 from wait import Wait
+from omni_analyzer import OmniAnalyzer
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -79,7 +80,7 @@ def cli():
                         action="store_true")
     parser.add_argument("--version",
                         help="version of FxOS under test",
-                        default="1.4",
+                        default="1.3",
                         action="store")
     args = parser.parse_args()
 
@@ -131,6 +132,19 @@ def cli():
     report['application_ini'] = {}
     for section in config.sections():
         report['application_ini'][section] = dict(config.items(section))
+
+    # run the omni.ja analyzer
+    omni_results_path = pkg_resources.resource_filename(
+                        __name__, 'omni.json')
+    omni_verify_file = pkg_resources.resource_filename(
+                        __name__, os.path.sep.join(['expected_omni_results', '%s.json' % args.version]))
+    omni_work_dir = pkg_resources.resource_filename(
+                        __name__, 'omnidir')
+    omni_analyzer = OmniAnalyzer(vfile=omni_verify_file, results=omni_results_path, dir=omni_work_dir)
+    omni_analyzer.run()
+    omni_results = open(omni_results_path, 'r').read()
+    report["omni_result"] = json.loads(omni_results)
+    os.remove(omni_results_path)
 
     # Step 2: Navigate to local hosted web server to install app for
     # WebIDL iteration and fetching HTTP headers
