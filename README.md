@@ -27,9 +27,10 @@ You can setup your environment and run the tests by running:
 
     source run.sh --version=<some version> --result-file=<absolute filepath>
 
-Where < some version > is one of our supported release versions, either 1.3 or 1.4. If you don't pass a version,
-1.3 will be assumed. The < absolute filepath > option can be used to specify where you want the json file to 
-be created. By default, it will create it as results.json in the current working directory.
+The --version and --result arguments are optional. If passed, < some version > must be one of our supported release 
+versions, either 1.3 or 1.4. If you don't pass a version, 1.3 will be assumed. The < absolute filepath > option can 
+be used to specify where you want the json file to be created. By default, it will create it as results.json in the 
+current working directory.
 
 This command sets up a virtual environment for you, with all the proper
 packages installed, activates the environment, runs the tests, 
