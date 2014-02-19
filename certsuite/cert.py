@@ -85,6 +85,10 @@ def cli():
     parser.add_argument("--debug",
                         help="enable debug logging",
                         action="store_true")
+    parser.add_argument("--result-file",
+                        help="absolute file path to store the resulting json." \
+                             "Defaults to results.json on your current path",
+                        action="store")
     args = parser.parse_args()
 
     report = {'buildprops': {}}
@@ -158,25 +162,21 @@ def cli():
         host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
     httpd.start()
 
-    print >> sys.stderr, \
-        "\n #1: On your phone, please navigate to http://%s:%d/" % \
+    print "\n #1: On your phone, please navigate to http://%s:%d/" % \
         (httpd.host, httpd.port)
     Wait(timeout=240).until(lambda: connected is True)
 
-    print >> sys.stderr, \
-        "\n#2: Please click the link on the web page to connect your device"
+    print "\n#2: Please click the link on the web page to connect your device"
     Wait().until(lambda: headers is not None)
     report["headers"] = headers
 
-    print >> sys.stderr, "\n#3: Please click the button to install the app"
+    print "\n#3: Please click the button to install the app"
     Wait().until(lambda: installed is True)
 
-    print >> sys.stderr, \
-        "\n#4: Please follow the instructions to install the app, then launch " \
+    print "\n#4: Please follow the instructions to install the app, then launch " \
         "<strong>WebAPIVerifier</strong> from the homescreen"
     Wait().until(lambda: webapi_results is not None)
-    print >> sys.stderr, \
-        "Processing results..."
+    print "Processing results..."
     expected_results_json = open(file_path, 'r').read()
     expected_results = json.loads(expected_results_json)
     #compute difference in navigator functions
@@ -213,7 +213,14 @@ def cli():
     if added_window:
         report['added_window_functions'] = list(added_window)
 
-    print json.dumps(report)
+    result_file_path = args.result_file
+    if not result_file_path:
+        result_file_path = "results.json"
+    result_file = open(result_file_path, "w")
+    result_file.write(json.dumps(report))
+    result_file.close()
+
+    print "\nResults have been stored in: %s" % result_file_path
 
 if __name__ == "__main__":
     cli()

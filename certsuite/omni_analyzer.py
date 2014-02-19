@@ -32,7 +32,6 @@ class OmniAnalyzer:
         json.dump(self.results_dict, f)
         f.close()
 
-        import pdb;pdb.set_trace()
         # Also print our results to stdout - TODO: Necessary or desired?
         if dump:
             print json.dumps(self.results_dict)
