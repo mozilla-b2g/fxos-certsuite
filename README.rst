@@ -40,6 +40,9 @@ Next, hold down the *Home* button, and close the *Settings* app (press
 the x).  Finally, launch *Settings* again, and navigate to
 *Developer*, then select *ADB only* in *Remote Debugging*.
 
+Once this is done, go to Settings->Display and set the 'Screen Timeout' to
+'never'. You need this because adb will not work when the device is locked.
+
 Quick Setup and Usage
 =====================
 
