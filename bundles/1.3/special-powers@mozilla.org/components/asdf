@@ -1,0 +1,15 @@
+33a34,43
+>   // set up the logger
+>   Components.utils.import("resource://gre/modules/Log.jsm");
+>   this.logger = Log.repository.getLogger("Specialpowers");
+>   this.logger.level = Log.Level["Trace"];
+>   try {
+>     let formatter = new Log.BasicFormatter();
+>     this.logger.addAppender(new Log.DumpAppender(formatter));
+>     this.logger.info("MDAS SPPPPPPP");
+>   }
+>   catch(e) {}
+43c53
+<   SpecialPowersObserver.prototype._xpcom_categories = [{category: "profile-after-change", service: true }];
+---
+>   //SpecialPowersObserver.prototype._xpcom_categories = [{category: "profile-after-change", service: true }];

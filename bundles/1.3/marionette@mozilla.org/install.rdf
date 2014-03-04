@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>marionette@mozilla.org</em:id>
+    <em:version>1.0.0</em:version>
+    <em:type>2</em:type>
+
+    <em:targetApplication>
+      <Description>
+        <!-- ff's app code: 
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>-->
+        <em:id>{3c2e2abc-06d4-11e1-ac3b-374f68613e61}</em:id>
+        <em:minVersion>1</em:minVersion>
+        <em:maxVersion>100</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+
+    <!-- Front End MetaData -->
+    <em:name>Marionette</em:name>
+    <em:description>Testing</em:description>
+    <em:creator>Mozilla</em:creator>
+  </Description>    
+</RDF>

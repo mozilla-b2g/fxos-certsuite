@@ -1,0 +1,4 @@
+content marionette chrome/content/
+component {786a1369-dca5-4adc-8486-33d23c88010f} components/marionetteextensioncomponent.js
+contract @mozilla.org/marionetteextension;1 {786a1369-dca5-4adc-8486-33d23c88010f}
+category profile-after-change MarionetteExtensionComponent @mozilla.org/marionetteextension;1
