@@ -25,3 +25,4 @@ if [ $TRIES == 0 ]; then
   echo "b2g did not start up!"
   exit 1
 fi
+adb forward tcp:2828 tcp:2828
