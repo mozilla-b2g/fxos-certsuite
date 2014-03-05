@@ -7,11 +7,12 @@ from setuptools import setup
 PACKAGE_VERSION = '0.1'
 deps = ['mozdevice >= 0.33',
         'moznetwork >= 0.24',
-        "wptserve >= 1.0.1"]
+        'mozprocess >= 0.18',
+        'wptserve >= 1.0.1']
 
 setup(name='fxos-certsuite',
       version=PACKAGE_VERSION,
-      description="Certification suite for FirefoxOS",
+      description='Certification suite for FirefoxOS',
       classifiers=[],
       keywords='mozilla',
       author='Mozilla Automation and Testing Team',
@@ -25,5 +26,6 @@ setup(name='fxos-certsuite',
       entry_points="""
       # -*- Entry points: -*-
       [console_scripts]
+      runcertsuite = certsuite:harness_main
       cert = certsuite:certcli
       """)
