@@ -9,7 +9,7 @@ class MinimalTestCase(MarionetteTestCase):
         try:
             response = raw_input("\n=== INSTRUCTION ===\n%s\nWere you successful? [y/n]\n" % message)
             while response not in ['y', 'n']:
-                response = raw_input("Please enter 'y' or 'n': " % message)
+                response = raw_input("Please enter 'y' or 'n': ")
         except KeyboardInterrupt:
             self.fail("Test interrupted by user")
         if response == 'n':
