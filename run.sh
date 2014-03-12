@@ -42,5 +42,5 @@ fi
 source certsuite_venv/bin/activate
 python setup.py install
 echo "Done, running the suite"
-cert $@
+runcertsuite $@
 deactivate
