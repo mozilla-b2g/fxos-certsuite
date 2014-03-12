@@ -6,7 +6,9 @@ from marionette import Marionette, MarionetteTestCase, MarionetteException
 class MinimalTestCase(MarionetteTestCase):
     def __init__(self, *args, **kwargs):
         self.cert_test_app = None
-        super(MinimalTestCase, self).__init__(*args, **kwargs)
+        # Use a new marionette object instead of relying on older references
+        self.marionette = Marionette
+        super(MinimalTestCase, self).__init__(self.marionette, **kwargs)
 
     def setUp(self):
         super(MinimalTestCase, self).setUp()
