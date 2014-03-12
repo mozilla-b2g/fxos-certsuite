@@ -23,7 +23,7 @@ class MinimalTestCase(MarionetteTestCase):
         self.marionette.import_script(os.path.join(os.path.dirname(__file__), "app_management.js"))
         script = "GaiaApps.launchWithName('CertTest App');"
         try:
-            # NOTE: if the app is already launched, this doesn't launch a new app, it will return 
+            # NOTE: if the app is already launched, this doesn't launch a new app, it will return
             # a reference to the existing app
             self.cert_test_app = self.marionette.execute_async_script(script, script_timeout=5000)
             self.assertTrue(self.cert_test_app, "Could not launch CertTest App")
@@ -83,11 +83,11 @@ class MinimalTestCase(MarionetteTestCase):
 
     def instruct(self, message):
         response = None
+        print("\n=== INSTRUCTION ===\n%s" % message)
         try:
-            response = raw_input("\n=== INSTRUCTION ===\n%s\nWere you successful? [Y/n]\n" % message) or 'y'
-            while response not in ['y', 'n']:
-                response = raw_input("Please enter 'y' or 'n': ") or 'y'
-        except KeyboardInterrupt:
+            while response not in ["y", "n", ""]:
+                response = raw_input("Were you successful? [Yn] ").lower()
+        except (KeyboardInterrupt, EOFError):
             self.fail("Test interrupted by user")
-        if response == 'n':
+        if response == "n":
             self.fail("Failed on step: %s" % message)
