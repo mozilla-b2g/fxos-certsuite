@@ -83,16 +83,22 @@ class MinimalTestCase(MarionetteTestCase):
         else:
             self.manually_close_app()
 
-    def instruct(self, message):
+    def prompt(self, message_type, message, question):
         response = None
-        print("\n=== INSTRUCTION ===\n%s" % message)
+        print("\n=== %s ===\n%s" % (message_type, message))
         try:
             while response not in ["y", "n", ""]:
-                response = raw_input("Were you successful? [Yn] ").lower()
+                response = raw_input("%s [Yn] " % question).lower()
         except (KeyboardInterrupt, EOFError):
             self.fail("Test interrupted by user")
         if response == "n":
             self.fail("Failed on step: %s" % message)
+
+    def instruct(self, message):
+        self.prompt("INSTRUCTION", message, "Were you successful?")
+
+    def confirm(self, message):
+        self.prompt("CONFIRMATION", message, "Response: ")
 
     def unplug_and_instruct(self, message):
         self.instruct("Unplug the phone.\n%s\nPlug the phone back in after you are done, "\
