@@ -1,6 +1,7 @@
 import os
 
-from marionette import MarionetteTestCase, MarionetteException
+import mozdevice
+from marionette import Marionette, MarionetteTestCase, MarionetteException
 
 class MinimalTestCase(MarionetteTestCase):
     def __init__(self, *args, **kwargs):
@@ -22,6 +23,8 @@ class MinimalTestCase(MarionetteTestCase):
         self.marionette.import_script(os.path.join(os.path.dirname(__file__), "app_management.js"))
         script = "GaiaApps.launchWithName('CertTest App');"
         try:
+            # NOTE: if the app is already launched, this doesn't launch a new app, it will return 
+            # a reference to the existing app
             self.cert_test_app = self.marionette.execute_async_script(script, script_timeout=5000)
             self.assertTrue(self.cert_test_app, "Could not launch CertTest App")
             self.marionette.switch_to_frame(self.cert_test_app["frame"])
@@ -40,6 +43,26 @@ class MinimalTestCase(MarionetteTestCase):
             self.fail(message)
         self.assertTrue("certtest" in self.marionette.get_url())
 
+    def manually_close_app(self):
+        instruction = "Could not close CertTest app automatically. " \
+                      "Please close the app manually by holding down the Home button " \
+                      "and pressing the X above the CertTest app card."
+        try:
+            response = raw_input("\n=== INSTRUCTION ===\n%s\nWere you successful at closing the app? [Y/n]\n" % instruction) or 'y'
+            while response not in ['y', 'n']:
+                response = raw_input("Please enter 'y' or 'n': ") or 'y'
+        except KeyboardInterrupt:
+            self.fail("Test interrupted by user")
+        if response == 'n':
+            print "Must reboot"
+            dm = mozdevice.DeviceManagerADB()
+            dm.reboot(wait=True)
+            self.instruct("Please unlock the lockscreen after device reboots")
+            dm.forward("tcp:2828", "tcp:2828")
+            self.marionette = Marionette()
+            self.marionette.start_session()
+            self.fail("Failed attempts at closing app.")
+
     def close_cert_app(self):
         # TODO: replace this with pkg_resources if we know that we'll be installing this as a package
         self.marionette.import_script(os.path.join(os.path.dirname(__file__), "app_management.js"))
@@ -51,21 +74,19 @@ class MinimalTestCase(MarionetteTestCase):
                 self.marionette.execute_async_script(script, script_timeout=5000)
                 self.assertTrue('certtest' not in self.marionette.get_url())
             except MarionetteException as e:
-                self.instruct("Could not close CertTest app automatically." \
-                          "Please close by hand.")
+                self.manually_close_app()
             except Exception as e:
                 message = "Unexpected exception: %s" % e
                 self.fail(message)
         else:
-            self.instruct("Could not close CertTest app automatically." \
-                          "Please close by hand.")
+            self.manually_close_app()
 
     def instruct(self, message):
         response = None
         try:
-            response = raw_input("\n=== INSTRUCTION ===\n%s\nWere you successful? [y/n]\n" % message)
+            response = raw_input("\n=== INSTRUCTION ===\n%s\nWere you successful? [Y/n]\n" % message) or 'y'
             while response not in ['y', 'n']:
-                response = raw_input("Please enter 'y' or 'n': ")
+                response = raw_input("Please enter 'y' or 'n': ") or 'y'
         except KeyboardInterrupt:
             self.fail("Test interrupted by user")
         if response == 'n':
