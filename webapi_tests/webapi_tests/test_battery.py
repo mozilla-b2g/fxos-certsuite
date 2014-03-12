@@ -4,7 +4,7 @@ class TestBattery(MinimalTestCase):
     def tearDown(self):
         self.marionette.execute_script("""
         window.navigator.battery.onchargingchange = null;
-        window.navigator.battery.onlevelchange = null;
+        window.navigator.battery.onchargingtimechange = null;
         """)
         MinimalTestCase.tearDown(self)
 
@@ -27,20 +27,33 @@ class TestBattery(MinimalTestCase):
         # set up listener to store changes in an object
         script = """
         window.wrappedJSObject.chargeStates = [];
-        window.wrappedJSObject.charge_function = function(event){
+        window.wrappedJSObject.chargingStates = [];
+        window.wrappedJSObject.change_function = function(event, obj){
                                   var battery =  window.navigator.battery;
                                   var data = [event.type, battery.charging, battery.chargingTime,
                                               battery.dischargingTime];
-                                  window.wrappedJSObject.chargeStates.push(data);
+                                  obj.push(data);
                                 };
-        window.navigator.battery.onchargingchange = window.wrappedJSObject.charge_function;
+        window.navigator.battery.onchargingchange = function(evt) { 
+                                                 window.wrappedJSObject.change_function(
+                                                    evt, 
+                                                    window.wrappedJSObject.chargeStates);};
+        window.navigator.battery.onchargingtimechange = function(evt) { 
+                                                 window.wrappedJSObject.change_function(
+                                                    evt, 
+                                                    window.wrappedJSObject.chargingStates);};
         """
         self.marionette.execute_script(script)
         self.unplug_and_instruct("Wait 5 seconds")
         charge_values = self.marionette.execute_script("return window.wrappedJSObject.chargeStates")
-        self.assertNotEqual(0, len(charge_values))
-        state = charge_values[0]
-        self.assertEqual(state[0], "chargingchange")
-        self.assertEqual(state[1], False)
-        self.assertEqual(state[2], None)
-        self.assertEqual(state[3], None)
+        charging_values = self.marionette.execute_script("return window.wrappedJSObject.chargingStates")
+        def check_values(values, event):
+            state = values[0]
+            self.assertEqual(state[0], event)
+            self.assertEqual(state[1], False)
+            self.assertEqual(state[2], None)
+            self.assertEqual(state[3], None)
+            state = values[1]
+            self.assertEqual(state[1], True)
+        check_values(charge_values, "chargingchange")
+        check_values(charging_values, "chargingtimechange")
