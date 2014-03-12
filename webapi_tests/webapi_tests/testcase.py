@@ -1,4 +1,5 @@
 import os
+import time
 
 import mozdevice
 from marionette import Marionette, MarionetteTestCase, MarionetteException
@@ -43,6 +44,14 @@ class MinimalTestCase(MarionetteTestCase):
         except Exception as e:
             message = "Unexpected exception: %s" % e
             self.fail(message)
+        tries = 60 
+        while tries > 0:
+            if 'blank' not in self.marionette.get_url():
+                break
+            time.sleep(1)
+            tries -= 1
+        if tries == 0:
+            self.fail("CertTest app did not load in time")
         self.assertTrue("certtest" in self.marionette.get_url())
 
     def manually_close_app(self):
