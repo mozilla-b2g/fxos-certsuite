@@ -91,3 +91,12 @@ class MinimalTestCase(MarionetteTestCase):
             self.fail("Test interrupted by user")
         if response == "n":
             self.fail("Failed on step: %s" % message)
+
+    def unplug_and_instruct(self, message):
+        self.instruct("Unplug the phone.\n%s\nPlug the phone back in after you are done, "\
+                      "and unlock the screen if necessary.\n" % message)
+        dm = mozdevice.DeviceManagerADB()
+        dm.forward("tcp:2828", "tcp:2828")
+        self.marionette = Marionette()
+        self.marionette.start_session()
+        self.use_cert_app()
