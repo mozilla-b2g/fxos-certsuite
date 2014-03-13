@@ -18,7 +18,7 @@ class TestProximity(MinimalTestCase):
         window.addEventListener('devicelight', window.wrappedJSObject.prox_function);
         """
         self.marionette.execute_script(script)
-        self.instruct("Move your hand in front of the phone and press 'y' when the screen darkens")
+        self.instruct("Move your hand toward the screen until the screen darkens")
         proximity_values = self.marionette.execute_script("return window.wrappedJSObject.proximityStates")
         self.assertNotEqual(0, len(proximity_values))
         self.assertTrue(proximity_values[0])
