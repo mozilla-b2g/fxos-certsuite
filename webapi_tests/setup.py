@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from setuptools import setup
+from setuptools import find_packages
 
 PACKAGE_VERSION = '0.1'
 deps = ['marionette_client==0.7.1']
@@ -17,7 +18,7 @@ setup(name='webapi_tests',
       author_email='tools@lists.mozilla.org',
       url='https://github.com/mozilla-b2g/fxos-certsuite',
       license='MPL',
-      packages=['webapi_tests'],
+      packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
       install_requires=deps,
