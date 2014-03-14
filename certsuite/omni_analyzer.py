@@ -22,6 +22,25 @@ from mozlog.structured import structuredlog
 JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
 
+def unzip_omnifile(omnifile, path):
+    # The following is the right way to do this in python, however that throws a BadZipFile error
+    # referencing an incorrect magic number. However the normal unzip command works just fine.
+    # NOTE: This will DEPEND on running on linux/mac :-()
+    omnizip = None
+    try:
+        omnizip = zipfile.ZipFile(omnifile, 'r')
+        omnizip.extractall(path)
+    except zipfile.BadZipfile:
+        # Then let's try a hack - only works on mac or linux
+        subprocess.call(['unzip', '-d', path, omnifile])
+    except:
+        print "Error opening omni.ja file: %s" % (omnifile)
+        traceback.print_exc()
+        sys.exit(1)
+    finally:
+        if omnizip:
+            omnizip.close()
+
 class OmniAnalyzer:
     def __init__(self, vfile, results, dir, mode=None, vserver=None, dump=False, logger=structuredlog.StructuredLogger("omni-analyzer")):
         self.generate_reference = mode
@@ -59,7 +78,6 @@ class OmniAnalyzer:
     def getomni(self):
         # Get the omni.ja from /system/b2g/omni.ja
         # Unzip it
-        omnizip = None
         try:
             dm = mozdevice.DeviceManagerADB()
         except mozdevice.DMError, e:
@@ -71,23 +89,7 @@ class OmniAnalyzer:
         dm.getFile('/system/b2g/omni.ja', omnifile)
 
         # Try to unzip it
-        # The following is the right way to do this in python, however that throws a BadZipFile error
-        # referencing an incorrect magic number. However the normal unzip command works just fine.
-        # NOTE: This will DEPEND on running on linux/mac :-()
-        try:
-            omnizip = zipfile.ZipFile(omnifile, 'r')
-            omnizip.extractall(path=self.workdir)
-        except zipfile.BadZipfile:
-            # Then let's try a hack - only works on mac or linux
-            subprocess.call(['unzip', '-d', self.workdir, omnifile])
-        except:
-            print "Error opening omni.ja file: %s" % (omnifile)
-            traceback.print_exc()
-            sys.exit(1)
-        finally:
-            if omnizip:
-                omnizip.close()
-
+        unzip_omnifile(omnifile, self.workdir)
 
     def run(self):
         # iterate over the modules, greprefs.js, defaults/pref/b2g.js and the top level files in chrome/chrome/content and components
@@ -114,16 +116,21 @@ class OmniAnalyzer:
 
     def _walker(self, root_dir):
         r = {}
+
         # walk <workdir>/chrome/chrome/content - chrome files
         for root, dirs, files in os.walk(root_dir):
+            # we want to be able to store the relative path from the workdir
+            skip = len(os.path.commonprefix([root, self.workdir])) + 1
             for f in files:
                 if JS_FILES.search(f) or MANIFEST_FILES.search(f):
-                    r[f] = self._hash_file(os.path.join(root, f))
+                    path = os.path.join(root, f)
+                    r[path[skip:]] = self._hash_file(path)
         return r
 
     def _hash_file(self, path):
         f = open(path, "rb")
         if f==None:
+            print 'warning: could not hash: %s: file not found' % path
             return ''
         md5 = hashlib.md5()
         while 1:
@@ -157,12 +164,8 @@ class OmniAnalyzer:
     def _encode_base64(self, filename):
         encoded = ''
         f = None
-        for root, dirs, files in os.walk(self.workdir):
-            if filename in files:
-                path = os.path.join(root, filename)
-                break
         try:
-            f = open(path, 'rb')
+            f = open(os.path.join(self.workdir, filename), 'rb')
             encoded = base64.b64encode(f.read())
         except:
             print "Failed to encode file %s" % (filename)
@@ -175,11 +178,6 @@ class OmniAnalyzer:
     def verify(self, reference, device):
         # Verifies the device JSON structure matches that of the reference JSON for this release
         # If we find a discrepancy, package the file for later analysis
-        # TODO: If we decide to use a docker system so that we can have a known environment, we might want
-        #       to explore using a database for storing the reference and all the reference files. Then
-        #       we can just provide diffs as our output from this function.  If we don't provide diffs from
-        #       this function, we should write something that takes the JSON output of this method, and uses
-        #       a generated reference JSON to get file by file diffs by base 64 decoding the file-contents in the JSON.
         warn_count = 0
         self.logger.test_start('omni-verify')
         res = {'directories': {}}
@@ -200,6 +198,14 @@ class OmniAnalyzer:
                 else:
                     self.logger.test_status('omni-verify', filename, 'PASS')
             res['directories'][d] = dirresults
+
+        # Also check for files present in reference but missing from device
+        for d in reference['directories'].keys():
+            for filename in reference['directories'][d].keys():
+                if filename not in device['directories'][d]:
+                    res['directories'][d][filename] = {'reason': 'PARTNER_CHANGE', 'file-contents': ''}
+                    warn_count += 1
+
         self.logger.test_end('omni-verify', 'PASS' if warn_count == 0 else 'FAIL')
         return warn_count, res
 
