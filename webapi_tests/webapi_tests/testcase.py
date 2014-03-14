@@ -32,9 +32,10 @@ class MinimalTestCase(MarionetteTestCase):
             self.assertTrue(self.cert_test_app, "Could not launch CertTest App")
             self.marionette.switch_to_frame(self.cert_test_app["frame"])
         except MarionetteException as e:
-            self.instruct("Could not launch CertTest app automatically." \
+            self.instruct("Could not launch CertTest app automatically. "
                           "Please launch by hand.")
-            iframes = self.marionette.execute_script("return document.getElementsByTagName('iframe').length")
+            iframes = self.marionette.execute_script(
+                "return document.getElementsByTagName('iframe').length")
             for i in range(0, iframes):
                 self.marionette.switch_to_frame(i)
                 if ("certtest" in self.marionette.get_url()):
