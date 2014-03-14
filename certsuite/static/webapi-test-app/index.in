@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <!--
+      This Source Code Form is subject to the terms of the Mozilla Public
+      License, v. 2.0. If a copy of the MPL was not distributed with this file,
+      You can obtain one at http://mozilla.org/MPL/2.0/.
+    -->
+  <head>
+    <meta charset=utf-8>
+    <title></title>
+    <script src="testharness.js"></script>
+    <script src="testharnessreport.js"></script>
+    <script src="webidl2.js"></script>
+    <script src="idlharness.js"></script>
+    <script>
+      setup({explicit_done:true, timeout_multiplier:10});
+
+      function runTest() {
+
+        var webIDLResults = []
+        add_completion_callback(function (tests) {
+          tests.forEach(function (test) {
+            var result;
+            switch(test.status) {
+              case test.PASS:
+                result = 'PASS';
+                break;
+              case test.FAIL:
+                result = 'FAIL';
+                break;
+              case test.TIMEOUT:
+                result = 'TIMEOUT';
+                break;
+              case test.NOTRUN:
+                result = 'NOTRUN';
+                break;
+            }
+            webIDLResults.push({name:test.name, result:result, message:test.message});
+          });
+        });
+
+        var idl_array = new IdlArray();
+
+        //add each file
+        var idl = document.getElementsByClassName('idl');
+        for (var i = 0; i < idl.length; ++i) {
+          console.log(idl.item(i).id);
+          try {
+            idl_array.add_idls(idl.item(i).text);
+          } catch(e) {
+            console.log('exception parsing: ' + e.line + ' ' + e.message);
+          }
+        }
+        //add untested interfaces
+        var untested = document.getElementsByClassName('untested');
+        for (var i = 0; i < untested.length; ++i) {
+            idl_array.add_untested_idls(untested.item(i).text);
+        }
+
+        //test Window
+        idl_array.add_objects({Window: ["window"]});
+        idl_array.prevent_implements_testing();
+        try {
+            idl_array.test();
+        } catch (e) {
+            console.log("caught exception running tests: " + e.message);
+        }
+        done();
+
+        var navList = [];
+        var navNullList = [];
+        var windowList = [];
+
+        function getTheNames(obj, list, nullList) {
+          var orig_obj = obj;
+          while (obj) {
+            for (var name of Object.getOwnPropertyNames(obj)) {
+              //console.log(name);
+              if (nullList === undefined) {
+                list.push(name);
+              }
+              else {
+                // we care if a value is null or not if we get here
+                if (orig_obj[name] === null) {
+                  nullList.push(name);
+                }
+                else {
+                  list.push(name);
+                }
+              }
+            }
+            obj = Object.getPrototypeOf(obj);
+          }
+        }
+  
+        getTheNames(navigator, navList, navNullList);
+        getTheNames(window, windowList);
+
+        var results = {};
+        results.navList = navList;
+        results.navNullList = navNullList;
+        results.windowList = windowList;
+        results.webIDLResults = webIDLResults;
+        console.log("posting");
+        var xmlHttp = null;
+        xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "POST", location.origin + "/webapi_results", true );
+        xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+        xmlHttp.send("results=" + JSON.stringify(results));
+      }
+    </script>
+  </head>
+<body onload="runTest();">Done</body>
+</head>
+</html>

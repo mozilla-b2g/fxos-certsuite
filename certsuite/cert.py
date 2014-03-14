@@ -172,6 +172,16 @@ def cli():
         host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
     httpd.start()
 
+    # concatentate index.in with merged_idl.html to create test app
+    out = open('certsuite/static/webapi-test-app/index.html', 'w')
+    index_in = open('certsuite/static/webapi-test-app/index.in', 'r')
+    out.write(index_in.read())
+    index_in.close()
+    merged_idl = open('certsuite/webidl/merged_idl.html', 'r')
+    out.write(merged_idl.read())
+    merged_idl.close()
+    out.close()
+
     print "\n#1: On your phone, please launch the browser app and navigate to "\
         "http://%s:%d/" % (httpd.host, httpd.port)
     Wait(timeout=600).until(lambda: connected is True)
@@ -186,7 +196,7 @@ def cli():
 
     print "\n#4: Please follow the instructions to install the app, then launch " \
         "WebAPIVerifier from the homescreen"
-    Wait().until(lambda: webapi_results is not None)
+    Wait(timeout=600).until(lambda: webapi_results is not None)
     print "Processing results..."
     expected_results_json = open(file_path, 'r').read()
     expected_results = json.loads(expected_results_json)
@@ -250,6 +260,8 @@ def cli():
     else:
         logger.test_status('webapi', 'added-window-functions', 'PASS')
     logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
+
+    report['webIDLResults'] = webapi_results['webIDLResults']
 
     result_file_path = args.result_file
     if not result_file_path:
