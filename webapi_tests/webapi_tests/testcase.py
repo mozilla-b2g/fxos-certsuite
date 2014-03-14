@@ -76,8 +76,10 @@ class MinimalTestCase(MarionetteTestCase):
             self.fail("Failed attempts at closing app.")
 
     def close_cert_app(self):
-        # TODO: replace this with pkg_resources if we know that we'll be installing this as a package
-        self.marionette.import_script(os.path.join(os.path.dirname(__file__), "app_management.js"))
+        # TODO: replace this with pkg_resources if we know that we'll
+        # be installing this as a package
+        self.marionette.import_script(
+            os.path.join(os.path.dirname(__file__), "app_management.js"))
         # app management is done in the system app
         self.marionette.switch_to_frame()
         if self.cert_test_app and "origin" in self.cert_test_app:
@@ -111,8 +113,9 @@ class MinimalTestCase(MarionetteTestCase):
         self.prompt("CONFIRMATION", message, "Response: ")
 
     def unplug_and_instruct(self, message):
-        self.instruct("Unplug the phone.\n%s\nPlug the phone back in after you are done, "\
-                      "and unlock the screen if necessary.\n" % message)
+        self.instruct(
+            "Unplug the phone.\n%s\nPlug the phone back in after you are "
+            "done, and unlock the screen if necessary.\n" % message)
         dm = mozdevice.DeviceManagerADB()
         dm.forward("tcp:2828", "tcp:2828")
         self.marionette = Marionette()
