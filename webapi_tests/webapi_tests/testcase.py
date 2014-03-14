@@ -44,7 +44,7 @@ class MinimalTestCase(MarionetteTestCase):
         except Exception as e:
             message = "Unexpected exception: %s" % e
             self.fail(message)
-        tries = 60 
+        tries = 60
         while tries > 0:
             if 'blank' not in self.marionette.get_url():
                 break
@@ -94,7 +94,7 @@ class MinimalTestCase(MarionetteTestCase):
 
     def prompt(self, message_type, message, question):
         response = None
-        print("\n=== %s ===\n%s" % (message_type, message))
+        print("\n\n=== %s ===\n%s" % (message_type, message))
         try:
             while response not in ["y", "n", ""]:
                 response = raw_input("%s [Yn] " % question).lower()
