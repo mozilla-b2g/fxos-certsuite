@@ -17,17 +17,20 @@ import traceback
 import zipfile
 import shutil
 
+from mozlog.structured import structuredlog
+
 JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
 
 class OmniAnalyzer:
-    def __init__(self, vfile, results, dir, mode=None, vserver=None, dump=False):
+    def __init__(self, vfile, results, dir, mode=None, vserver=None, dump=False, logger=structuredlog.StructuredLogger("omni-analyzer")):
         self.generate_reference = mode
         self.verification_server = vserver
         self.verify_file = vfile
         self.results_file = results
         self.results_dict = {}
         self.workdir = dir
+        self.logger = logger
         warnings = 0
 
         if os.path.isdir(self.workdir):
@@ -178,6 +181,7 @@ class OmniAnalyzer:
         #       this function, we should write something that takes the JSON output of this method, and uses
         #       a generated reference JSON to get file by file diffs by base 64 decoding the file-contents in the JSON.
         warn_count = 0
+        self.logger.test_start('omni-verify')
         res = {'directories': {}}
         for d in device['directories'].keys():
             dirresults = {}
@@ -187,11 +191,16 @@ class OmniAnalyzer:
                     # File found in device not in reference, partner has added file, so tag it for analysis
                     dirresults[filename] = {'reason': 'PARTNER_FILE', 'file-contents': self._encode_base64(filename)}
                     warn_count += 1
+                    self.logger.test_status('omni-verify', filename, 'FAIL', message='PARTNER_FILE')
                 elif reference['directories'][d][filename] != device['directories'][d][filename]:
                     # Hash mismatch, partner changed file from reference, tag for analysis
                     dirresults[filename] = {'reason': 'PARTNER_CHANGE', 'file-contents': self._encode_base64(filename)}
                     warn_count += 1
+                    self.logger.test_status('omni-verify', filename, 'FAIL', message='PARTNER_CHANGE')
+                else:
+                    self.logger.test_status('omni-verify', filename, 'PASS')
             res['directories'][d] = dirresults
+        self.logger.test_end('omni-verify', 'PASS' if warn_count == 0 else 'FAIL')
         return warn_count, res
 
 def main(argv):

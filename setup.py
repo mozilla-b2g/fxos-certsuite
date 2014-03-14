@@ -6,6 +6,7 @@ from setuptools import setup
 
 PACKAGE_VERSION = '0.1'
 deps = ['mozdevice >= 0.33',
+        'mozlog >= 1.6',
         'moznetwork >= 0.24',
         'mozprocess >= 0.18',
         'wptserve >= 1.0.1']

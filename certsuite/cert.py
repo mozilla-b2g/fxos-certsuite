@@ -16,6 +16,12 @@ import pkg_resources
 import sys
 import wptserve
 
+from mozlog.structured import (
+    commandline,
+    formatters,
+    handlers,
+    structuredlog,
+)
 from omni_analyzer import OmniAnalyzer
 from wait import Wait
 
@@ -89,6 +95,8 @@ def cli():
                         help="absolute file path to store the resulting json." \
                              "Defaults to results.json on your current path",
                         action="store")
+    commandline.add_logging_group(parser)
+
     args = parser.parse_args()
 
     report = {'buildprops': {}}
@@ -97,6 +105,8 @@ def cli():
     if not args.debug:
         logging.disable(logging.ERROR)
 
+    logger = commandline.setup_logging("certsuite", vars(args), {})
+
     # Step 1: Get device information
     try:
         dm = mozdevice.DeviceManagerADB()
@@ -104,6 +114,7 @@ def cli():
         print "Error connecting to device via adb (error: %s). Please be " \
             "sure device is connected and 'remote debugging' is enabled." % \
             e.msg
+        logger.error("Error connecting to device: %s" % e.msg)
         sys.exit(1)
 
     # Reboot phone so it is in a fresh state
@@ -149,7 +160,7 @@ def cli():
                         __name__, os.path.sep.join(['expected_omni_results', '%s.json' % args.version]))
     omni_work_dir = pkg_resources.resource_filename(
                         __name__, 'omnidir')
-    omni_analyzer = OmniAnalyzer(vfile=omni_verify_file, results=omni_results_path, dir=omni_work_dir)
+    omni_analyzer = OmniAnalyzer(vfile=omni_verify_file, results=omni_results_path, dir=omni_work_dir, logger=logger)
     omni_results = open(omni_results_path, 'r').read()
     report["omni_result"] = json.loads(omni_results)
     os.remove(omni_results_path)
@@ -183,12 +194,22 @@ def cli():
     expected_nav = set(expected_results["navList"])
     nav = set(webapi_results["navList"])
 
+    logger.test_start('webapi')
+    webapi_passed = True
     missing_nav = expected_nav.difference(nav)
     if missing_nav:
         report['missing_navigator_functions'] = list(missing_nav)
+        logger.test_status('webapi', 'missing-navigator-functions', 'FAIL', message=','.join(missing_nav))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'missing-navigator-functions', 'PASS')
     added_nav = nav.difference(expected_nav)
     if added_nav:
         report['added_navigator_functions'] = list(added_nav)
+        logger.test_status('webapi', 'added-navigator-functions', 'FAIL', message=','.join(added_nav))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'added-navigator-functions', 'PASS')
 
     # NOTE: privileged functions in an unprivileged app are null
     # compute difference in navigator "null" functions, ie: privileged functions
@@ -198,9 +219,17 @@ def cli():
     missing_nav_null = expected_nav_null.difference(nav_null)
     if missing_nav_null:
         report['missing_navigator_unprivileged_functions'] = list(missing_nav_null)
+        logger.test_status('webapi', 'missing-navigator-unprivileged-functions', 'FAIL', message=','.join(missing_nav_null))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'missing-navigator-unprivileged-functions', 'PASS')
     added_nav_null = nav_null.difference(expected_nav_null)
     if added_nav_null:
         report['added_navigator_privileged_functions'] = list(added_nav_null)
+        logger.test_status('webapi', 'added-navigator-unprivileged-functions', 'FAIL', message=','.join(added_nav_null))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'added-navigator-unprivileged-functions', 'PASS')
 
     #computer difference in window functions
     expected_window = set(expected_results["windowList"])
@@ -209,9 +238,18 @@ def cli():
     missing_window = expected_window.difference(window)
     if missing_window:
         report['missing_window_functions'] = list(missing_window)
+        logger.test_status('webapi', 'missing-window-functions', 'FAIL', message=','.join(missing_window))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'missing-window-functions', 'PASS')
     added_window = window.difference(expected_window)
     if added_window:
         report['added_window_functions'] = list(added_window)
+        logger.test_status('webapi', 'added-window-functions', 'FAIL', message=','.join(added_window))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'added-window-functions', 'PASS')
+    logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
 
     result_file_path = args.result_file
     if not result_file_path:
