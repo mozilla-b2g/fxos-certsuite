@@ -6,8 +6,8 @@ from setuptools import setup
 from setuptools import find_packages
 
 PACKAGE_VERSION = '0.1'
-deps = ['marionette_client==0.7.1']
-        
+deps = ['marionette_client==0.7.1',
+        'moznetwork>=0.24']
 
 setup(name='webapi_tests',
       version=PACKAGE_VERSION,
@@ -22,5 +22,4 @@ setup(name='webapi_tests',
       include_package_data=True,
       zip_safe=False,
       install_requires=deps,
-      entry_points="""
-      """)
+      entry_points='')

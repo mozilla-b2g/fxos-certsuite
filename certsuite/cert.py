@@ -195,7 +195,9 @@ def cli():
     Wait().until(lambda: installed is True)
 
     print "\n#4: Please follow the instructions to install the app, then launch " \
-        "WebAPIVerifier from the homescreen"
+        "WebAPIVerifier from the homescreen. This will start the WebAPI tests " \
+        "and may take a couple minutes to complete. The app will load when " \
+        "it is complete."
     Wait(timeout=600).until(lambda: webapi_results is not None)
     print "Processing results..."
     expected_results_json = open(file_path, 'r').read()
