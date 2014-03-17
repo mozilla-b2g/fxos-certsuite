@@ -39,6 +39,9 @@ if [ ! -d "certsuite_venv" ]; then
   virtualenv --no-site-packages certsuite_venv || { echo 'error creating virtualenv' ; exit 1; }
 fi
 
+# concat index.in and merge_idl.html to create index.html
+cat certsuite/static/webapi-test-app/index.in certsuite/webidl/merged_idl.html > certsuite/static/webapi-test-app/index.html
+
 source certsuite_venv/bin/activate
 python setup.py install
 echo "Done, running the suite"
