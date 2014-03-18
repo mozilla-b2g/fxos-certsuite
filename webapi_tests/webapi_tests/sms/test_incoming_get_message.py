@@ -4,7 +4,6 @@ from webapi_tests import SmsTestCommon
 class TestSmsIncomingGetMessage(MinimalTestCase, SmsTestCommon):
     def tearDown(self):
         self.marionette.execute_script("""
-            window.navigator.mozMobileMessage.onreceived = null;
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
@@ -15,7 +14,6 @@ class TestSmsIncomingGetMessage(MinimalTestCase, SmsTestCommon):
 
         # test mozMobileMessage.getMessage with valid id
         sms_to_get = self.in_sms['id']
-        print "Testing mozMobileMessage.getMessage with valid id"
         error_message = "mozMobileMessage.getMessage should have found the SMS message"
         self.get_message(sms_to_get, True, error_message)
 
@@ -26,6 +24,5 @@ class TestSmsIncomingGetMessage(MinimalTestCase, SmsTestCommon):
 
         # test mozMobileMessage.getMessage with invalid message object; should fail
         sms_to_get = self.in_sms['id'] + 999 # no chance of receiving 999 more SMS between test cases
-        print "Testing mozMobileMessage.getMessage with invalid id"
         error_message = "mozMobileMessage.getMessage should NOT have found the SMS message"
         self.get_message(sms_to_get, False, error_message)

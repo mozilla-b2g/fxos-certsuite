@@ -4,7 +4,6 @@ from webapi_tests import SmsTestCommon
 class TestSmsIncoming(MinimalTestCase, SmsTestCommon):
     def tearDown(self):
         self.marionette.execute_script("""
-            window.navigator.mozMobileMessage.onreceived = null;
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)

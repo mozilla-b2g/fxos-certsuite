@@ -6,7 +6,6 @@ from webapi_tests import SmsTestCommon
 class TestSmsIncomingDelete(MinimalTestCase, SmsTestCommon):
     def tearDown(self):
         self.marionette.execute_script("""
-            window.navigator.mozMobileMessage.onreceived = null;
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
@@ -23,6 +22,5 @@ class TestSmsIncomingDelete(MinimalTestCase, SmsTestCommon):
         self.delete_message(sms_to_delete)
 
         # now verify the message has been deleted by trying to get it, should fail
-        print "Verifying SMS (id: %s) has been deleted" %sms_to_delete
         error_message = "mozMobileMessage.getMessage found the deleted SMS but shouldn't have; delete failed"
         self.get_message(sms_to_delete, False, error_message)
