@@ -37,8 +37,9 @@ def get_test_failures(raw_log):
         if data['status'] == 'FAIL':
             failures.append(data)
     with open(raw_log, 'r') as f:
-        reader.map_action(reader.read(f),
-                          {"test_status":test_status})
+        #XXX: bug 985606: map_action is a generator
+        list(reader.map_action(reader.read(f),
+                               {"test_status":test_status}))
     return failures
 
 def run_test(test, temp_dir, args):
@@ -109,7 +110,7 @@ def main():
                                                          test))
                 result = run_test(test_path, temp_dir, args)
                 log_result(results, result)
-                if result.results_file:
+                if result.results_file and os.path.exists(result.results_file):
                     f.write(result.results_file, '%s_results.json' % result.test_name)
         f.writestr('certsuite-results.json', json.dumps(results))
     print 'Results saved in %s' % output_zipfile
