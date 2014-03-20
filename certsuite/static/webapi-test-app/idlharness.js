@@ -129,12 +129,6 @@ policies and contribution forms [3].
  *   document.head would only be tested for HTMLHeadElement, and so on for
  *   further objects.
  *
- * prevent_implements_testing():
- *   This prevents testing of the interfaces implemented by an interface.
- *   e.g. when testing Document, everything defined in Document will be
- *   tested, but not things defined by ParentNode, which is implemented by
- *   Document.
- *
  * test():
  *   Run all tests.  This should be called after you've called all other
  *   methods to add IDLs and objects.
@@ -291,8 +285,7 @@ IdlArray.prototype.internal_add_idls = function(parsed_idls)
         parsed_idl.array = this;
         if (parsed_idl.name in this.members)
         {
-            //TODO: handle this case properly
-            //throw "Duplicate identifier " + parsed_idl.name;
+            throw "Duplicate identifier " + parsed_idl.name;
         }
         switch(parsed_idl.type)
         {
@@ -361,15 +354,6 @@ IdlArray.prototype.prevent_multiple_testing = function(name)
 };
 
 //@}
-IdlArray.prototype.prevent_implements_testing = function()
-//@{
-{
-    /** Entry point.  See documentation at beginning of file. */
-    this.no_implements_testing = true;
-};
-
-
-//@}
 IdlArray.prototype.recursively_get_implements = function(interface_name)
 //@{
 {
@@ -428,25 +412,21 @@ IdlArray.prototype.test = function()
     }.bind(this));
     this.partials = [];
 
-    if (!this.no_implements_testing)
+    for (var lhs in this["implements"])
     {
-        for (var lhs in this["implements"])
+        this.recursively_get_implements(lhs).forEach(function(rhs)
         {
-            this.recursively_get_implements(lhs).forEach(function(rhs)
+            var errStr = lhs + " implements " + rhs + ", but ";
+            if (!(lhs in this.members)) throw errStr + lhs + " is undefined.";
+            if (!(this.members[lhs] instanceof IdlInterface)) throw errStr + lhs + " is not an interface.";
+            if (!(rhs in this.members)) throw errStr + rhs + " is undefined.";
+            if (!(this.members[rhs] instanceof IdlInterface)) throw errStr + rhs + " is not an interface.";
+            this.members[rhs].members.forEach(function(member)
             {
-                var errStr = lhs + " implements " + rhs + ", but ";
-                if (!(lhs in this.members)) throw errStr + lhs + " is undefined.";
-                if (!(this.members[lhs] instanceof IdlInterface)) throw errStr + lhs + " is not an interface.";
-                if (!(rhs in this.members)) throw errStr + rhs + " is undefined.";
-                if (!(this.members[rhs] instanceof IdlInterface)) throw errStr + rhs + " is not an interface.";
-                this.members[rhs].members.forEach(function(member)
-                {
-                    this.members[lhs].members.push(new IdlInterfaceMember(member));
-                }.bind(this));
+                this.members[lhs].members.push(new IdlInterfaceMember(member));
             }.bind(this));
-        }
+        }.bind(this));
     }
-
     this["implements"] = {};
 
     // Now run test() on every member, and test_object() for every object.

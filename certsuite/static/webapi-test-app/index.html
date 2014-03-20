@@ -10,8 +10,8 @@
     <title></title>
     <script src="testharness.js"></script>
     <script src="testharnessreport.js"></script>
-    <script src="webidl2.js"></script>
     <script src="idlharness.js"></script>
+    <script src="merged_idl.js"></script>
     <script>
       setup({explicit_done:true, timeout_multiplier:10});
 
@@ -41,30 +41,23 @@
 
         var idl_array = new IdlArray();
 
-        //add each file
-        var idl = document.getElementsByClassName('idl');
-        for (var i = 0; i < idl.length; ++i) {
-          console.log(idl.item(i).id);
-          try {
-            idl_array.add_idls(idl.item(i).text);
-          } catch(e) {
-            console.log('exception parsing: ' + e.line + ' ' + e.message);
-          }
-        }
-        //add untested interfaces
-        var untested = document.getElementsByClassName('untested');
-        for (var i = 0; i < untested.length; ++i) {
-            idl_array.add_untested_idls(untested.item(i).text);
-        }
+        TESTED_IDL.forEach(function (text) {
+          idl = JSON.parse(text);
+          idl_array.internal_add_idls([idl]);
+        });
 
-        //test Window
-        idl_array.add_objects({Window: ["window"]});
-        idl_array.prevent_implements_testing();
-        try {
-            idl_array.test();
-        } catch (e) {
-            console.log("caught exception running tests: " + e.message);
-        }
+        UNTESTED_IDL.forEach(function (text) {
+          idl = JSON.parse(text);
+          idl.untested = true;
+          if ('members' in idl) {
+            idl.members.forEach(function (member) {
+              member.untested = true;
+            });
+          }
+          idl_array.internal_add_idls([idl]);
+        });
+
+        idl_array.test();
         done();
 
         var navList = [];
@@ -75,7 +68,6 @@
           var orig_obj = obj;
           while (obj) {
             for (var name of Object.getOwnPropertyNames(obj)) {
-              //console.log(name);
               if (nullList === undefined) {
                 list.push(name);
               }
@@ -101,15 +93,19 @@
         results.navNullList = navNullList;
         results.windowList = windowList;
         results.webIDLResults = webIDLResults;
-        console.log("posting");
         var xmlHttp = null;
         xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "POST", location.origin + "/webapi_results", true );
         xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
         xmlHttp.send("results=" + JSON.stringify(results));
+
+        var status_el = document.getElementById('status');
+        status_el.innerHTML = 'Done.';
       }
     </script>
   </head>
-<body onload="runTest();">Done</body>
+<body onload="setTimeout(runTest, 100);">
+<div id="status">Running tests...</div>
+</body>
 </head>
 </html>
