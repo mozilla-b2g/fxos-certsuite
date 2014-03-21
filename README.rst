@@ -2,8 +2,13 @@
 Firefox OS Certification Testsuite
 ==================================
 
-A tool to verify the functionality and characteristics of Firefox OS
-devices.
+Tests and tools to verify the functionality and characteristics of
+Firefox OS on real devices.
+
+The test suite is designed to run on unprivileged devices and does not
+rely on high level instrumentation.  Instead human interaction is
+needed throughout the test suite to perform various instructions in
+order to assert that conditions are met on the device.
 
 Requirements
 ============
@@ -18,7 +23,7 @@ https://developer.mozilla.org/en-US/Firefox_OS/Debugging/Installing_ADB.
 
 Once installed, add adb to your PATH in your ~/.bashrc
 or equivalent file, by adding the following line to the file
-(replacing $SDK_HOME with the location of the android sdk):
+(replacing $SDK_HOME with the location of the android sdk)::
 
     PATH=$SDK_HOME:$PATH
 
@@ -31,17 +36,18 @@ Enabling ADB
 Furthermore, you must turn on adb access on the device:
 
 **For Firefox OS version 1.3:** Launch *Settings*, and navigate to
-*Device Information* -> *More Information* -> *Developer*, then check
+*Device Information* → *More Information* → *Developer*, then check
 *Remote Debugging*.
 
 **For version 1.4:** Launch *Settings*, and navigate to *Device
-Information* -> *More Information*, then check *Developer Options*.
+Information* → *More Information*, then check *Developer Options*.
 Next, hold down the *Home* button, and close the *Settings* app (press
 the x).  Finally, launch *Settings* again, and navigate to
 *Developer*, then select *ADB only* in *Remote Debugging*.
 
-Once this is done, go to Settings->Display and set the 'Screen Timeout' to
-'never'. You need this because adb will not work when the device is locked.
+Once this is done, go to *Settings* → *Display* and set the *Screen
+Timeout* to “never”.  You need this because adb will not work when the
+device is locked.
 
 Quick Setup and Usage
 =====================
