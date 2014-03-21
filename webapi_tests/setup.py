@@ -7,11 +7,12 @@ from setuptools import find_packages
 
 PACKAGE_VERSION = '0.1'
 deps = ['marionette_client==0.7.1',
-        'moznetwork>=0.24']
+        'moznetwork>=0.24',
+        'tornado>=3.2']
 
 setup(name='webapi_tests',
       version=PACKAGE_VERSION,
-      description="Minimal tests for certification",
+      description='Firefox OS WebAPI certification tests.',
       classifiers=[],
       keywords='mozilla',
       author='Mozilla Automation and Testing Team',
