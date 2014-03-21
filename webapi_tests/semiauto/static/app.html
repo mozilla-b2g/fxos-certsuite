@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<!--
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this file,
+    You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Firefox OS Conformance Tests</title>
+
+    <link rel="stylesheet" href="/look.css" />
+    <script src="app.js"></script>
+  </head>
+
+  <body>
+    <a href="http://mozilla.org/" id="tabzilla">mozilla</a>
+
+    <div id="wrapper">
+      <h1>Test Runner</h1>
+
+      <div id="notification"></div>
+
+      <table id="test_list">
+        <tr>
+          <th>Test</th>
+          <th>Result</th>
+        </tr>
+      </table>
+
+      <div id="overlay" class="overlay hidden">
+        <div class="dialog_box">
+          <p id="dialog_text"></p>
+
+          <p>
+            <input type="text" id="dialog_response" maxlength="140" />
+            <button id="ok">OK</button>
+            <button id="cancel">Cancel</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
