@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from tornado import testing
+import os
 import sys
 import threading
 import tornado
@@ -26,6 +27,8 @@ def test(*args, **kwargs):
 
 
 class TestCase(tornado.testing.AsyncTestCase):
+    app_management = os.path.abspath(os.path.join(
+        os.path.dirname(__file__), "../../webapi_tests/app_management.js"))
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):
@@ -81,7 +84,7 @@ class TestCase(tornado.testing.AsyncTestCase):
     def use_cert_app(self):
         # app management is done in the system app
         self.marionette.switch_to_frame()
-        self.marionette.import_script("semiauto/tests/app_management.js")
+        self.marionette.import_script(TestCase.app_management)
         script = "GaiaApps.launchWithName('CertTest App');"
         try:
             self.cert_test_app = self.marionette.execute_async_script(script, script_timeout=5000)
@@ -99,7 +102,7 @@ class TestCase(tornado.testing.AsyncTestCase):
     # TODO(ato): Cross reference and update against fxos-certsuite
     @tornado.gen.coroutine
     def close_cert_app(self):
-        self.marionette.import_script("semiauto/tests/app_management.js")
+        self.marionette.import_script(TestCase.app_management)
         # app management is done in the system app
         self.marionette.switch_to_frame()
         script = "GaiaApps.kill('%s');" % self.cert_test_app["origin"]
