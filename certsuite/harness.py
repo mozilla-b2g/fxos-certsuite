@@ -9,6 +9,7 @@ import json
 import mozdevice
 import mozprocess
 import os
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -82,6 +83,25 @@ def log_result(results, result):
         'errors': result.errors,
         }
 
+def check_adb():
+    try:
+        dm = mozdevice.DeviceManagerADB()
+    except mozdevice.DMError, e:
+        print "Error connecting to device via adb (error: %s). Please be " \
+            "sure device is connected and 'remote debugging' is enabled." % \
+            e.msg
+        sys.exit(1)
+
+def install_marionette(os_version):
+    script_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "bundles", os_version))
+    try:
+        subprocess.check_call([os.path.join(script_dir, "push_bundles.sh")],
+                              cwd=script_dir)
+    except subprocess.CalledProcessError, e:
+        print "Error installing marionette extension"
+        sys.exit(1)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version',
@@ -92,14 +112,8 @@ def main():
                         help="don't reboot device before running test",
                         action="store_true")
     args = parser.parse_args()
-    try:
-        dm = mozdevice.DeviceManagerADB()
-    except mozdevice.DMError, e:
-        print "Error connecting to device via adb (error: %s). Please be " \
-            "sure device is connected and 'remote debugging' is enabled." % \
-            e.msg
-        sys.exit(1)
-    #TODO: install marionette
+    check_adb()
+    install_marionette(args.version)
 
     results = {}
     output_zipfile = 'firefox-os-certification.zip'
