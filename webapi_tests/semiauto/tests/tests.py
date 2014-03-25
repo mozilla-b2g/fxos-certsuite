@@ -65,8 +65,10 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
         self.handler = self.environment.handler
         self.marionette = self.create_marionette()
         self.io_loop.run_sync(self.use_cert_app)
+        self.use_cert_app()
 
     def tearDown(self):
+        self.close_cert_app()
         self.io_loop.run_sync(self.close_cert_app)
         super(TestCase, self).tearDown()
 
