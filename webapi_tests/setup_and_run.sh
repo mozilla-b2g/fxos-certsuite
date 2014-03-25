@@ -42,9 +42,7 @@ fi
 source webapi_venv/bin/activate
 python setup.py install
 echo "Installing Certified App"
-pushd device_setup
-python device_setup.py
-popd
+fxos_appgen --install --type=certified --version=1.3 --all-permissions "CertTest App"
 adb forward tcp:2828 tcp:2828
 echo "Done, running the suite"
 marionette --address=localhost:2828 webapi_tests/manifest.ini
