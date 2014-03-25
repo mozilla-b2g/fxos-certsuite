@@ -131,10 +131,10 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
             did_vibrate = yield self.confirm("Did you feel a vibration?")
             assert did_vibrate
 
-        :param message: The confirmation to send to the user.
+        If the result of the confirmation is negative (false, no) the
+        test will be failed.
 
-        :returns: A generator which must be yielded.  Once yielded,
-            the return value will be True or False.
+        :param message: The confirmation to send to the user.
 
         """
 
@@ -151,6 +151,9 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
             self.instruct("Rotate the phone 90 degrees")
             assert phone_rotation_changed()
 
+        If the user informs us she failed to perform the instruction,
+        the test will be failed.
+
         This function is a simple wrapper for ``tornado.gen.Task``,
         and is equivalent to the usage of that.
 
@@ -158,4 +161,6 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
 
         """
 
-        yield prompt(message, style=self.handler.instruct_user)
+        successful = yield prompt(message, style=self.handler.instruct_user)
+        if not successful:
+            self.fail("Failed on instruction: %s" % message)
