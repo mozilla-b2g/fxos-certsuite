@@ -30,6 +30,10 @@ or equivalent file, by adding the following line to the file
 The device and the host machine running the tests must also be on the
 same Wi-Fi network.
 
+Furthermore, the device must have a SIM card with a functioning phone
+subscription to receive SMS messages for a subset of the tests to
+pass.
+
 Enabling ADB
 ------------
 
