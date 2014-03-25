@@ -1,1 +1,1 @@
-include webapi_tests/app_management.js
+include certapp/app_management.js
