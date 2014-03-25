@@ -91,8 +91,8 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
         return self.io_loop
 
     def prompt(self, message, style=None):
-        """Prompt the user for an arbitrary response.  Returns a future
-        which must be yielded.
+        """Prompt the user for a response.  Returns a future which must be
+        yielded.
 
         This will trigger an overlay in the host browser window which
         can be used to tell the user to perform an action or to input
@@ -112,7 +112,7 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
             user.
 
         :returns: A generator which must be yielded.  Once yielded,
-            the return value will be the value of the prompt, or False
+            the return value will be the input from the user, or False
             if the user hit "Cancel".
 
         """

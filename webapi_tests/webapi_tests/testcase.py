@@ -22,8 +22,7 @@ class MinimalTestCase(MarionetteTestCase, CertAppMixin):
         super(MinimalTestCase, self).tearDown()
 
     def prompt(self, message, question=None, message_type=None):
-        """Prompt the user for an arbitrary response.  Returns the users's
-        input.
+        """Prompt the user for a response.  Returns the users's input.
 
         This will block until the user responds.
 
@@ -35,7 +34,7 @@ class MinimalTestCase(MarionetteTestCase, CertAppMixin):
         :param message: The question to ask or message to give the
             user.
 
-        :returns: The response the user enters as a string.
+        :returns: The input from the user as a string.
 
         """
 
