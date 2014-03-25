@@ -2,16 +2,19 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from tornado import testing
 import os
 import sys
 import threading
+
+from tornado import testing
 import tornado
 
 from marionette import Marionette, MarionetteException
 
 from semiauto import environment
 from semiauto.environment import InProcessTestEnvironment
+
+from certapp import CertAppMixin
 
 
 """The default time to wait for a user to respond to a prompt or
@@ -26,7 +29,7 @@ def test(*args, **kwargs):
     return tornado.testing.gen_test(timeout=timeout, *args, **kwargs)
 
 
-class TestCase(tornado.testing.AsyncTestCase):
+class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
     app_management = os.path.abspath(os.path.join(
         os.path.dirname(__file__), "../../webapi_tests/app_management.js"))
     stored = threading.local()
@@ -80,44 +83,6 @@ class TestCase(tornado.testing.AsyncTestCase):
 
         return TestCase.stored.marionette
 
-    @tornado.gen.coroutine
-    def use_cert_app(self):
-        # app management is done in the system app
-        self.marionette.switch_to_frame()
-        self.marionette.import_script(TestCase.app_management)
-        script = "GaiaApps.launchWithName('CertTest App');"
-        try:
-            self.cert_test_app = self.marionette.execute_async_script(script, script_timeout=5000)
-            self.marionette.switch_to_frame(self.cert_test_app["frame"])
-            self.assertTrue('certtest' in self.marionette.get_url())
-        except MarionetteException as e:
-            ok = yield self.instruct("Could not launch CertTest app automatically." \
-                                     "Please launch by hand then hit OK to continue.")
-            self.assertTrue(ok, "Could not launch CertTest app")
-        except Exception as e:
-            message = "Unexpected exception: %s" % e
-            yield self.instruct(message)
-            self.fail(message)
-
-    # TODO(ato): Cross reference and update against fxos-certsuite
-    @tornado.gen.coroutine
-    def close_cert_app(self):
-        self.marionette.import_script(TestCase.app_management)
-        # app management is done in the system app
-        self.marionette.switch_to_frame()
-        script = "GaiaApps.kill('%s');" % self.cert_test_app["origin"]
-        try:
-            self.marionette.execute_async_script(script, script_timeout=5000)
-            self.assertTrue('certtest' not in self.marionette.get_url())
-        except MarionetteException as e:
-            ok = yield self.instruct("Could not close CertTest app automatically." \
-                                     "Please close by hand then hit OK to continue.")
-            self.assertTrue(ok, "Could not close CertTest app")
-        except Exception as e:
-            message = "Unexpected exception: %s" % e
-            yield self.instruct(message)
-            self.fail(message)
-
     def get_new_ioloop(self):
         """Retreives the singleton ``tornado.ioloop.IOLoop`` instance."""
 
@@ -125,55 +90,77 @@ class TestCase(tornado.testing.AsyncTestCase):
             self.io_loop = tornado.ioloop.IOLoop.instance()
         return self.io_loop
 
-    def prompt(self, message):
-        """Prompt the user for a reply.  Returns a future which must be
+    def prompt(self, message, style=None):
+        """Prompt the user for a response.  Returns a future which must be
         yielded.
 
-        This will trigger an overlay  in the host browser window
-        which can be used to tell the user to perform an action or to
-        input some manual data for us to work on.
+        This will trigger an overlay in the host browser window which
+        can be used to tell the user to perform an action or to input
+        some manual data for us to work on.
+
+        This will block until the user responds.
 
         Sample usage::
 
-            answer = yield prompt("What's the meaning of life?")
-            assert answer == 42
+            answer = yield self.prompt("What's the meaning of life?")
+            assert answer == "42"
 
-        This function is a simple wrapper for ``tornado.gen.Task``,
-        and is equivalent to the usage of that.
+        This function is a wrapper for ``tornado.gen.Task``, and is
+        equivalent to the usage of that.
 
         :param message: The question to ask or message to give the
             user.
 
-        :returns: A generator which must be yielded. Once yielded,
-                  the return value will be the value of the prompt,
-                  or False if the user hit 'Cancel'
+        :returns: A generator which must be yielded.  Once yielded,
+            the return value will be the input from the user, or False
+            if the user hit "Cancel".
 
         """
 
-        return tornado.gen.Task(self.handler.get_user_input, message)
+        if not style:
+            style = self.handler.get_user_input
+        return tornado.gen.Task(style, message)
+
+    def confirm(self, message):
+        """Ask user to confirm a physical aspect about the device or the
+        testing environment that cannot be checked by the test.
+
+        An example of this would be the phone vibrating::
+
+            vibrate()
+            did_vibrate = yield self.confirm("Did you feel a vibration?")
+            assert did_vibrate
+
+        If the result of the confirmation is negative (false, no) the
+        test will be failed.
+
+        :param message: The confirmation to send to the user.
+
+        """
+
+        raise NotImplemented
 
     def instruct(self, message):
-        """Presents the user with an instruction.  Returns a future which
-        must be yielded.
+        """Instruct the user to do an action, such as rotating the phone.
 
-        This will trigger an overlay in the host browser window
-        which can be used to tell the user to perform an action or to
-        input some manual data for us to work on.
+        This will trigger an overlay in the host browser window which
+        can be used to tell the user to perform an action.
 
         Sample usage::
 
-            answer = yield prompt("What's the meaning of life?")
-            assert answer == 42
+            self.instruct("Rotate the phone 90 degrees")
+            assert phone_rotation_changed()
+
+        If the user informs us she failed to perform the instruction,
+        the test will be failed.
 
         This function is a simple wrapper for ``tornado.gen.Task``,
         and is equivalent to the usage of that.
 
-        :param message: The instruction you want to give the user
-
-        :returns: A generator which must be yielded. Once yielded,
-                  the reutrn value will be either True if they
-                  succeeded or False if they did not.
+        :param message: The instruction you want to give the user.
 
         """
 
-        return tornado.gen.Task(self.handler.instruct_user, message)
+        successful = yield prompt(message, style=self.handler.instruct_user)
+        if not successful:
+            self.fail("Failed on instruction: %s" % message)
