@@ -3,6 +3,8 @@ import os
 import tornado
 from tornado import gen
 
+from marionette import MarionetteException
+
 
 class CertAppMixin(object):
     app_management = os.path.join(os.path.dirname(__file__), "app_management.js")
