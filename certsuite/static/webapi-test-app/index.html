@@ -15,6 +15,41 @@
     <script>
       setup({explicit_done:true, timeout_multiplier:10});
 
+      function getTheNames(obj, visited) {
+        var orig_obj = obj;
+
+        var result = {};
+        visited[obj.toString()] = result;
+
+        while (obj) {
+          for (var name of Object.getOwnPropertyNames(obj)) {
+            try {
+              var value = orig_obj[name];
+              var value_name = value.toString();
+              var type = typeof(value);
+            } catch(err) {
+              result[name] = err;
+              continue;
+            }
+
+            if (value === null) {
+              result[name] = null;
+            } else if (type === "object") {
+              if (!visited[value_name]) {
+                getTheNames(value, visited);
+              }
+              result[name] = value_name;
+            } else {
+              result[name] = true;
+            }
+          }
+
+          obj = Object.getPrototypeOf(obj);
+        }
+
+        return result;
+      }
+
       function runTest() {
 
         var webIDLResults = []
@@ -45,6 +80,7 @@
           idl = JSON.parse(text);
           idl_array.internal_add_idls([idl]);
         });
+        TESTED_IDL = null;
 
         UNTESTED_IDL.forEach(function (text) {
           idl = JSON.parse(text);
@@ -56,43 +92,23 @@
           }
           idl_array.internal_add_idls([idl]);
         });
+        UNTESTED_IDL = null;
 
         idl_array.test();
         done();
 
-        var navList = [];
-        var navNullList = [];
-        var windowList = [];
 
-        function getTheNames(obj, list, nullList) {
-          var orig_obj = obj;
-          while (obj) {
-            for (var name of Object.getOwnPropertyNames(obj)) {
-              if (nullList === undefined) {
-                list.push(name);
-              }
-              else {
-                // we care if a value is null or not if we get here
-                if (orig_obj[name] === null) {
-                  nullList.push(name);
-                }
-                else {
-                  list.push(name);
-                }
-              }
-            }
-            obj = Object.getPrototypeOf(obj);
-          }
-        }
-  
-        getTheNames(navigator, navList, navNullList);
-        getTheNames(window, windowList);
+        var navResults = {};
+        getTheNames(navigator, navResults);
+
+        var winResults = {};
+        getTheNames(window, winResults);
 
         var results = {};
-        results.navList = navList;
-        results.navNullList = navNullList;
-        results.windowList = windowList;
+        results.navList = navResults;
+        results.windowList = winResults;
         results.webIDLResults = webIDLResults;
+
         var xmlHttp = null;
         xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "POST", location.origin + "/webapi_results", true );
