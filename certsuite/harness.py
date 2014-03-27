@@ -95,9 +95,10 @@ def check_adb():
 def install_marionette(os_version):
     script_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "bundles", os_version))
+    script_path = os.path.join(script_dir, "push_bundles.sh")
+    os.chmod(script_path, 0744)
     try:
-        subprocess.check_call([os.path.join(script_dir, "push_bundles.sh")],
-                              cwd=script_dir)
+        subprocess.check_call([script_path], cwd=script_dir)
     except subprocess.CalledProcessError, e:
         print "Error installing marionette extension"
         sys.exit(1)
