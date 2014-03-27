@@ -16,14 +16,21 @@ class TestSmsIncoming(TestCase, SmsTestCommon):
 
     @test
     def test_sms_incoming(self):
-        self.user_guided_incoming_sms()
+        self.setup_onreceived_listener()
+        self.instruct("From a different phone, send an SMS to the Firefox OS device and wait for it to arrive")
+        self.verify_sms_received()
+        self.remove_onreceived_listener()
+
+        # verify text content
+        self.confirm("Received SMS with text '%s'; does this text match what was sent to the Firefox OS phone?" %self.in_sms['body'])
 
         # verify the other message fields
         self.assertEqual(self.in_sms['type'], 'sms', "Received SMS MozSmsMessage.type should be 'sms'")
         self.assertTrue(self.in_sms['id'] > 0, "Received SMS MozSmsMessage.id should be > 0")
         self.assertTrue(self.in_sms['threadId'] > 0, "Received SMS MozSmsMessage.threadId should be > 0")
         self.assertEqual(self.in_sms['delivery'], 'received', "Received SMS MozSmsMessage.delivery should be 'received'")
-        self.assertEqual(self.in_sms['deliveryStatus'], 'success', "Received SMS MozSmsMessage.deliveryStatus should be 'success'")
+        self.assertTrue((self.in_sms['deliveryStatus'] == 'success') | (self.in_sms['deliveryStatus'] == 'not-applicable'),
+                        "Sent SMS MozSmsMessage.deliveryStatus should be 'success' or 'not-applicable'")
         # cannot guarantee end-user didn't read message; test that specifically in a different test
         self.assertTrue(((self.in_sms['read'] == False) or (self.in_sms['read'] == True)),
                         "Received SMS MozSmsMessage.read field should be False or True")

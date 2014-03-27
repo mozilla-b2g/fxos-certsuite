@@ -16,7 +16,13 @@ class TestSmsIncomingDelete(TestCase, SmsTestCommon):
 
     @test
     def test_sms_incoming_delete(self):
-        self.user_guided_incoming_sms()
+        self.setup_onreceived_listener()
+        self.instruct("From a different phone, send an SMS to the Firefox OS device and wait for it to arrive")
+        self.verify_sms_received()
+        self.remove_onreceived_listener()
+
+        # verify text content
+        self.confirm("Received SMS with text '%s'; does this text match what was sent to the Firefox OS phone?" %self.in_sms['body'])
 
         # delete fails sometimes without a sleep (because of the msg notification?)
         time.sleep(5)

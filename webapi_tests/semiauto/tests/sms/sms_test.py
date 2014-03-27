@@ -8,14 +8,14 @@ import time
 class SmsTestCommon(object):
     def __init__(self):
         self.in_sms = None
+        self.out_sms = None
         self.marionette.execute_async_script("""        
         SpecialPowers.setBoolPref("dom.sms.enabled", true);
         SpecialPowers.addPermission("sms", true, document);
         marionetteScriptFinished(1);
         """, special_powers=True)
 
-    def user_guided_incoming_sms(self):
-        # setup listener for incoming SMS
+    def setup_onreceived_listener(self):
         self.marionette.execute_async_script("""
         // Bug 952875
         var mm = window.navigator.mozMobileMessage;
@@ -32,9 +32,7 @@ class SmsTestCommon(object):
         marionetteScriptFinished(1);
         """, special_powers=True)
 
-        self.instruct("From a different phone, send an SMS to the Firefox OS device, and wait for it to arrive")
-
-        # verify message was received
+    def verify_sms_received(self):
         received = self.marionette.execute_script("return window.wrappedJSObject.receivedSms")
         self.assertTrue(received, "SMS message not received (mozMobileMessage.onreceived event not found)")
 
@@ -42,11 +40,10 @@ class SmsTestCommon(object):
         self.in_sms = self.marionette.execute_script("return window.wrappedJSObject.in_sms")
         print "Received SMS (id: %s)" %self.in_sms['id']
         self.assertTrue(len(self.in_sms['body']) > 0, "Received SMS has no message body (was text included in the sent SMS message?)")
-        self.confirm("Received SMS with text '%s'; does this text match what was sent to the Firefox OS phone?" %self.in_sms['body'])
 
-        # don't need listener
+    def remove_onreceived_listener(self):
         self.marionette.execute_script("window.navigator.mozMobileMessage.onreceived = null")
-
+    
     def get_message(self, sms_id, expect_found=True, error_message="mozMobileMessage.getMessage returned unexpected value"):
         # get the sms for the given id and verify it was or wasn't found, as expected
         self.marionette.execute_async_script("""
@@ -57,13 +54,13 @@ class SmsTestCommon(object):
         let requestRet = mm.getMessage(arguments[0]);
 
         requestRet.onsuccess = function(event) {
-          if(event.target.result){
-            window.wrappedJSObject.sms_found = true;
-            ok(event.target.result, "smsrequest event.target.result");
-            window.wrappedJSObject.event_sms = event.target.result;
-          } else {
-            window.wrappedJSObject.sms_found = false;
-          }
+            if(event.target.result){
+              window.wrappedJSObject.sms_found = true;
+              ok(event.target.result, "smsrequest event.target.result");
+              window.wrappedJSObject.event_sms = event.target.result;
+            } else {
+              window.wrappedJSObject.sms_found = false;
+            }
         };
 
         requestRet.onerror = function(event) {
@@ -86,11 +83,11 @@ class SmsTestCommon(object):
         let requestRet = mm.delete(arguments[0]);
 
         requestRet.onsuccess = function(event) {
-          if(event.target.result){
-            window.wrappedJSObject.sms_deleted = true;
-          } else {
-            window.wrappedJSObject.sms_deleted = false;
-          }
+            if(event.target.result){
+              window.wrappedJSObject.sms_deleted = true;
+            } else {
+              window.wrappedJSObject.sms_deleted = false;
+            }
         };
 
         requestRet.onerror = function(event) {
@@ -104,9 +101,8 @@ class SmsTestCommon(object):
         deleted = self.marionette.execute_script("return window.wrappedJSObject.sms_deleted")
         self.assertTrue(deleted, "MozMobileMessage.delete returned unexpected error and failed to delete the SMS")
 
-    def send_message(self, destination, body):
-        # use the webapi to send a text to the destination number
-        # setup listener for sent SMS
+    def setup_onsent_listener(self):
+        # setup listener for sent sms
         self.marionette.execute_async_script("""
         SpecialPowers.setBoolPref("dom.sms.enabled", true);
         SpecialPowers.addPermission("sms", true, document);
@@ -116,51 +112,48 @@ class SmsTestCommon(object):
             log("Received 'onsent' mozMobileMessage event");
             window.wrappedJSObject.gotSmsOnsent = true;
             window.wrappedJSObject.out_sms = event.message;
-            if (gotSmsOnsent && gotReqOnsuccess) { window.wrappedJSObject.sentSms = true; }
+            if (window.wrappedJSObject.gotSmsOnsent && window.wrappedJSObject.gotReqOnsuccess) { window.wrappedJSObject.sentSms = true; }
         };
         marionetteScriptFinished(1);
         """, special_powers=True)
 
-        # send the SMS
+    def send_message(self, destination, body):
+        # use the webapi to send an sms to the specified number, with specified text
         self.marionette.execute_async_script("""
         let requestRet = window.navigator.mozMobileMessage.send(arguments[0], arguments[1]);
         ok(requestRet, "smsrequest obj returned");
 
         requestRet.onsuccess = function(event) {
-          log("Received 'onsuccess' smsrequest event.");
-          gotReqOnsuccess = true;
-          if(event.target.result){
-            if (gotSmsOnsent && gotReqOnsuccess) { window.wrappedJSObject.sentSms = true; }
-          } else {
-            log("smsrequest returned false for manager.send");
-            ok(false,"SMS send failed");
-            cleanUp();
-          }
+            log("Received 'onsuccess' smsrequest event.");
+            window.wrappedJSObject.gotReqOnsuccess = true;
+            if(event.target.result){
+                if (window.wrappedJSObject.gotSmsOnsent && window.wrappedJSObject.gotReqOnsuccess) { window.wrappedJSObject.sentSms = true; }
+            } else {
+                log("smsrequest returned false for manager.send");
+                ok(false,"SMS send failed");
+                cleanUp();
+            }
         };
 
         requestRet.onerror = function(event) {
-          log("Received 'onerror' smsrequest event.");
-          ok(event.target.error, "domerror obj");
-          ok(false, "manager.send request returned unexpected error: "
-              + event.target.error.name );
-          cleanUp();
+            log("Received 'onerror' smsrequest event.");
+            ok(event.target.error, "domerror obj");
+            ok(false, "manager.send request returned unexpected error: "
+                + event.target.error.name );
+            cleanUp();
         };
         marionetteScriptFinished(1);
         """, script_args=[destination, body], special_powers=True)
 
+        time.sleep(5)
+
+    def verify_message_sent(self):
         # verify message was sent
         sent = self.marionette.execute_script("return window.wrappedJSObject.sentSms")
-        self.assertTrue(sent, "SMS message not sent (mozMobileMessage.onsent event or send request.onsuccess not found)")
+        self.assertTrue(sent, "SMS should have been sent (expected mozMobileMessage.onsent event and send request.onsuccess)")
 
-        # verify message body
+        # get message event
         self.out_sms = self.marionette.execute_script("return window.wrappedJSObject.out_sms")
-        print "Sent SMS (id: %s)" %self.out_sms['id']
 
-        # user verification that it was received on target
-        self.confirm("SMS has been sent from the Firefox OS phone to %s. Was it received on the target phone?" %destination)
-
-        self.assertTrue(len(self.out_sms['body']) > 0, "Sent SMS event message has no message body")
-        self.confirm("Sent SMS with text '%s'; does this text match what was received on the target phone?" %self.out_sms['body'])
-
-        # don't need listener anymore        
+    def remove_onsent_listener(self):
         self.marionette.execute_script("window.navigator.mozMobileMessage.onsent = null")
