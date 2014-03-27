@@ -9,6 +9,9 @@ from marionette import MarionetteException
 class CertAppMixin(object):
     app_management = os.path.join(os.path.dirname(__file__), "app_management.js")
 
+    def __init__(self):
+        self.app = None
+
     # App management is done in the system app, so switch to that
     # context.
     def _switch_to_app_management(self):
@@ -24,9 +27,9 @@ class CertAppMixin(object):
         try:
             # NOTE: if the app is already launched, this doesn't launch a new app, it will return
             # a reference to the existing app
-            self.cert_test_app = self.marionette.execute_async_script(script, script_timeout=5000)
-            self.assertTrue(self.cert_test_app, "Could not launch CertTest App")
-            self.marionette.switch_to_frame(self.cert_test_app["frame"])
+            self.app = self.marionette.execute_async_script(script, script_timeout=5000)
+            self.assertTrue(self.app, "Could not launch CertTest App")
+            self.marionette.switch_to_frame(self.app["frame"])
         except MarionetteException as e:
             self.instruct("Could not launch CertTest app automatically. "
                           "Please launch by hand.")
@@ -51,13 +54,14 @@ class CertAppMixin(object):
         if tries == 0:
             self.fail("CertTest app did not load in time")
         self.assertTrue("certtest" in self.marionette.get_url())
+        self.app = None
 
     @tornado.gen.coroutine
     def close_cert_app(self):
         self._switch_to_app_management()
-        if self.cert_test_app and "origin" in self.cert_test_app:
+        if self.app and "origin" in self.app:
             try:
-                script = "GaiaApps.kill('%s');" % self.cert_test_app["origin"]
+                script = "GaiaApps.kill('%s');" % self.app["origin"]
                 self.marionette.execute_async_script(script, script_timeout=5000)
                 self.assertTrue('certtest' not in self.marionette.get_url())
             except MarionetteException as e:
@@ -72,8 +76,8 @@ class CertAppMixin(object):
         instruction = "Could not close CertTest app automatically. " \
                       "Please close the app manually by holding down the Home button " \
                       "and pressing the X above the CertTest app card."
-        self.instruct(instruction)
-        if response == 'n':
+        response = self.instruct(instruction)
+        if response == 'n' or response == False:
             print "Must reboot"
             dm = mozdevice.DeviceManagerADB()
             dm.reboot(wait=True)
