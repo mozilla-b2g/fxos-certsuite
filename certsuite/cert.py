@@ -270,9 +270,47 @@ def cli():
         webapi_passed = False
     else:
         logger.test_status('webapi', 'added-window-functions', 'PASS')
-    logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
 
-    report['webIDLResults'] = webapi_results['webIDLResults']
+    # compute differences in WebIDL results
+    expected_webidl = {}
+    for result in expected_results['webIDLResults']:
+        expected_webidl[result['name']] = result
+
+    unexpected_webidl_results = []
+    added_webidl_results = []
+    for result in webapi_results['webIDLResults']:
+        try:
+            if expected_webidl[result['name']]['result'] != result['result']:
+                unexpected_webidl_results.append(result)
+            del expected_webidl[result['name']]
+        except KeyError:
+            added_webidl_results.append(result)
+
+    # since we delete found results above, anything here is missing
+    missing_webidl_results = list(expected_webidl.values())
+
+    if unexpected_webidl_results:
+        report['unexpected_webidl_results'] = unexpected_webidl_results
+        logger.test_status('webapi', 'unexpected-webidl-results', 'FAIL', message=','.join([result['name'] for result in unexpected_webidl_results]))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'unexpected-webidl-results', 'PASS')
+
+    if added_webidl_results:
+        report['added_webidl_results'] = added_webidl_results
+        logger.test_status('webapi', 'added-webidl-results', 'FAIL', message=','.join([result['name'] for result in added_webidl_results]))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'added-webidl-results', 'PASS')
+
+    if missing_webidl_results:
+        report['missing_webidl_results'] = missing_webidl_results
+        logger.test_status('webapi', 'missing-webidl-results', 'FAIL', message=','.join([result['name'] for result in missing_webidl_results]))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'missing-webidl-results', 'PASS')
+
+    logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
 
     result_file_path = args.result_file
     if not result_file_path:
