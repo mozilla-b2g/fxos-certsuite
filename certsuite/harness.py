@@ -6,6 +6,7 @@
 
 import argparse
 import json
+import marionette_extension
 import mozdevice
 import mozprocess
 import os
@@ -93,13 +94,10 @@ def check_adb():
         sys.exit(1)
 
 def install_marionette(os_version):
-    script_dir = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..", "bundles", os_version))
     try:
-        subprocess.check_call([os.path.join(script_dir, "push_bundles.sh")],
-                              cwd=script_dir)
+        marionette_extension.install()
     except subprocess.CalledProcessError, e:
-        print "Error installing marionette extension"
+        print "Error installing marionette extension: %s" % e
         sys.exit(1)
 
 def main():
