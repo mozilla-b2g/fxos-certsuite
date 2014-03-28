@@ -9,5 +9,5 @@ echo "Installing Certified App"
 fxos_appgen --install --type=certified --version=1.3 --all-permissions "CertTest App"
 adb forward tcp:2828 tcp:2828
 echo "Done, running the suite"
-marionette --address=localhost:2828 webapi_tests/manifest.ini
+python -m semiauto discover sms
 deactivate
