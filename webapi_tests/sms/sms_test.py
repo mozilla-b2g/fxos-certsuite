@@ -9,7 +9,7 @@ class SmsTestCommon(object):
     def __init__(self):
         self.in_sms = None
         self.out_sms = None
-        self.marionette.execute_async_script("""        
+        self.marionette.execute_async_script("""
         SpecialPowers.setBoolPref("dom.sms.enabled", true);
         SpecialPowers.addPermission("sms", true, document);
         marionetteScriptFinished(1);
@@ -38,12 +38,12 @@ class SmsTestCommon(object):
 
         # verify message body
         self.in_sms = self.marionette.execute_script("return window.wrappedJSObject.in_sms")
-        print "Received SMS (id: %s)" %self.in_sms['id']
+        print "Received SMS (id: %s)" % self.in_sms['id']
         self.assertTrue(len(self.in_sms['body']) > 0, "Received SMS has no message body (was text included in the sent SMS message?)")
 
     def remove_onreceived_listener(self):
         self.marionette.execute_script("window.navigator.mozMobileMessage.onreceived = null")
-    
+
     def get_message(self, sms_id, expect_found=True, error_message="mozMobileMessage.getMessage returned unexpected value"):
         # get the sms for the given id and verify it was or wasn't found, as expected
         self.marionette.execute_async_script("""

@@ -4,7 +4,7 @@
 
 import unittest
 
-from tests import TestCase
+from testcase import TestCase
 
 
 class Smoketests(TestCase):

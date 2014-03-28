@@ -2,8 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from tests import TestCase, test
-from tests.sms import SmsTestCommon
+from semiauto import TestCase
+from sms import SmsTestCommon
 
 
 class TestSmsOutgoing(TestCase, SmsTestCommon):
@@ -14,7 +14,6 @@ class TestSmsOutgoing(TestCase, SmsTestCommon):
         """)
         TestCase.tearDown(self)
 
-    @test
     def test_sms_outgoing(self):
         # ask user to input destination phone number
         destination = yield self.prompt("Please enter a destination phone number where a test SMS will be sent (not the Firefox OS device)")

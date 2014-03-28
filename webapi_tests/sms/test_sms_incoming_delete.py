@@ -2,8 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from tests import TestCase, test
-from tests.sms import SmsTestCommon
+from semiauto import TestCase
+from sms import SmsTestCommon
 
 
 class TestSmsIncomingDelete(TestCase, SmsTestCommon):
@@ -14,7 +14,6 @@ class TestSmsIncomingDelete(TestCase, SmsTestCommon):
         """)
         TestCase.tearDown(self)
 
-    @test
     def test_sms_incoming_delete(self):
         self.setup_onreceived_listener()
         self.instruct("From a different phone, send an SMS to the Firefox OS device and wait for it to arrive")
