@@ -21,8 +21,6 @@ prompt_timeout = 600  # 10 minutes
 
 
 class TestCase(unittest.TestCase, CertAppMixin):
-    app_management = os.path.abspath(os.path.join(
-        os.path.dirname(__file__), "../../webapi_tests/app_management.js"))
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):

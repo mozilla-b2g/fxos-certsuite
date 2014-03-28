@@ -2,6 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from tests.tests import TestCase
+from testcase import TestCase
 from main import main
-from loader import *
+from loader import TestLoader
