@@ -157,6 +157,7 @@ Dialog.prototype = {
 function Client(addr) {
   this.addr = addr;
   this.ws, this.testList = null;
+  this.notificationEl = $("#notification");
 }
 
 Client.prototype = {
@@ -212,37 +213,48 @@ Client.prototype = {
   connect: function() {
     var cancel = $("#cancel");
     cancel.onclick = function() { this.emit("cancelPrompt"); }.bind(this);
+
     this.ws = new WebSocket("ws://" + this.addr + "/tests");
+
     this.ws.onopen = function(e) { console.log("open", e); }.bind(this);
     this.ws.onclose = function(e) { console.log("close", e); }.bind(this);
+
     this.ws.onmessage = function(e) {
       var data = JSON.parse(e.data);
+      var command = Object.keys(data)[0];
       console.log("recv", data);
-      if (data.testList) {
+
+      switch (command) {
+      case "testList":
         // set up the test_list table
         this.testList = new TestListView($("#test_list"), data.testList);
         this.testList.resetTable();
-      }
-      else if (data.testRunStart) {
-        // TODO: I don't receive this message for some reason
-        document.getElementById("notification").innerHTML = "Running tests";
-      }
-      else if (data.testRunStop) {
-        // TODO: I don't receive this message for some reason
-        document.getElementById("notification").innerHTML = "Done";
-      }
-      else if (data.prompt) {
+        break;
+
+      case "testRunStart":
+        this.notificationEl.innerHTML = "Running tests";
+        break;
+
+      case "testRunStop":
+        this.notificationEl.innerHTML = "Done";
+        break;
+
+      case "prompt":
         this.promptUser(data.prompt);
-      }
-      else if (data.instructPrompt) {
+        break;
+
+      case "instructPrompt":
         this.instructUser(data.instructPrompt);
-      }
-      else if (data.confirmPrompt) {
+        break;
+
+      case "confirmPrompt":
         this.confirmPrompt(data.confirmPrompt);
-      }
-      else if (data.updateTest){
+        break;
+
+      case "updateTest":
         // TODO: this assumes any other request will be to update the table
         this.testList.updateTest(data.updateTest);
+        break;
       }
     }.bind(this);
   },
