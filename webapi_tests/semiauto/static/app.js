@@ -252,6 +252,12 @@ Client.prototype = {
         // TODO: this assumes any other request will be to update the table
         this.testList.updateTest(data.updateTest);
         break;
+
+      default:
+        console.log("unkwn", data);
+        this.ws.close();
+        this.notificationEl.innerHTML = "Received unknown command from server";
+        break;
       }
     }.bind(this);
   },
