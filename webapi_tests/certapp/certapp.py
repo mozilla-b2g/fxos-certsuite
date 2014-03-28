@@ -54,7 +54,6 @@ class CertAppMixin(object):
         if tries == 0:
             self.fail("CertTest app did not load in time")
         self.assertTrue("certtest" in self.marionette.get_url())
-        self.app = None
 
     @tornado.gen.coroutine
     def close_cert_app(self):
