@@ -211,9 +211,6 @@ Client.prototype = {
   },
 
   connect: function() {
-    var cancel = $("#cancel");
-    cancel.onclick = function() { this.emit("cancelPrompt"); }.bind(this);
-
     this.ws = new WebSocket("ws://" + this.addr + "/tests");
 
     this.ws.onopen = function(e) { console.log("open", e); }.bind(this);
