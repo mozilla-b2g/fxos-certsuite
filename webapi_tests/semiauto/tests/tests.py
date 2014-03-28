@@ -117,7 +117,7 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
 
         resp = self.handler.prompt(question)
         if type(resp) == bool and not resp:
-            self.fail("Failed on prompt cancel: %s" % message)
+            self.fail("Failed on prompt cancel: %s" % question)
         return resp
 
     def confirm(self, message):
