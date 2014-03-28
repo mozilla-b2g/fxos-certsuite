@@ -5,9 +5,7 @@
 import os
 import sys
 import threading
-
-from tornado import testing
-import tornado
+import unittest
 
 from marionette import Marionette, MarionetteException
 
@@ -22,14 +20,7 @@ instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
 
-# TODO(ato): Find better name: interaction_test? interact?
-def test(*args, **kwargs):
-    """Wraps ``tornado.testing.gen_test``."""
-    timeout = kwargs.get("timeout", prompt_timeout)
-    return tornado.testing.gen_test(timeout=timeout, *args, **kwargs)
-
-
-class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
+class TestCase(unittest.TestCase, CertAppMixin):
     app_management = os.path.abspath(os.path.join(
         os.path.dirname(__file__), "../../webapi_tests/app_management.js"))
     stored = threading.local()
@@ -37,10 +28,8 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
     def __init__(self, *args, **kwargs):
         self.config = kwargs.pop("config")
         #self.handler = kwargs.pop('handler')
-        #self.io_loop = kwargs.pop('io_loop')
 
         super(TestCase, self).__init__(*args, **kwargs)
-        self.io_loop = self.get_new_ioloop()
         self.stored.handler = None
         self.stored.marionette = None
 
@@ -84,13 +73,6 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
             TestCase.stored.marionette = m
 
         return TestCase.stored.marionette
-
-    def get_new_ioloop(self):
-        """Retreives the singleton ``tornado.ioloop.IOLoop`` instance."""
-
-        if not hasattr(self, "io_loop"):
-            self.io_loop = tornado.ioloop.IOLoop.instance()
-        return self.io_loop
 
     def prompt(self, question):
         """Prompt the user for a response.  Returns a future which must be
