@@ -61,7 +61,8 @@ def run(suite, spawn_browser=True, verbosity=1, quiet=False,
     # TestCase's setUp.
     #
     # Generally a lot of this code should live in TestCase.setUp.
-    env = environment.get(environment.InProcessTestEnvironment)
+    env = environment.get(environment.InProcessTestEnvironment,
+                          verbose=(verbosity > 1))
 
     # TODO(ato): Only spawn a browser when asked to.
     if spawn_browser:

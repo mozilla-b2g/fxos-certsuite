@@ -8,7 +8,7 @@ from tests import TestCase, test
 class TestSms(TestCase):
     @test
     def test_life(self):
-        answer = yield self.prompt("What's the meaning of life?")
+        answer = self.prompt("What's the meaning of life?")
         self.assertEqual(answer, "42")
 
     # @test

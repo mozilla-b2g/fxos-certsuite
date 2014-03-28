@@ -92,7 +92,7 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
             self.io_loop = tornado.ioloop.IOLoop.instance()
         return self.io_loop
 
-    def prompt(self, message, style=None):
+    def prompt(self, question):
         """Prompt the user for a response.  Returns a future which must be
         yielded.
 
@@ -104,24 +104,21 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
 
         Sample usage::
 
-            answer = yield self.prompt("What's the meaning of life?")
+            answer = self.prompt("What's the meaning of life?")
             assert answer == "42"
-
-        This function is a wrapper for ``tornado.gen.Task``, and is
-        equivalent to the usage of that.
 
         :param message: The question to ask or message to give the
             user.
 
-        :returns: A generator which must be yielded.  Once yielded,
-            the return value will be the input from the user, or False
-            if the user hit "Cancel".
+        :returns: The input from the user as a string, or False if the
+            user hit "Cancel".
 
         """
 
-        if not style:
-            style = self.handler.get_user_input
-        return tornado.gen.Task(style, message)
+        resp = self.handler.prompt(question)
+        if type(resp) == bool and not resp:
+            self.fail("Failed on prompt cancel: %s" % message)
+        return resp
 
     def confirm(self, message):
         """Ask user to confirm a physical aspect about the device or the
@@ -130,7 +127,7 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
         An example of this would be the phone vibrating::
 
             vibrate()
-            did_vibrate = yield self.confirm("Did you feel a vibration?")
+            did_vibrate = self.confirm("Did you feel a vibration?")
             assert did_vibrate
 
         If the result of the confirmation is negative (false, no) the
@@ -140,13 +137,16 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
 
         """
 
-        raise NotImplemented
+        success = self.handler.confirmation(message)
+        if not success:
+            self.fail("Failed on confirmation: %s" % message)
 
     def instruct(self, message):
-        """Instruct the user to do an action, such as rotating the phone.
+        """Instruct the user to perform an action, such as rotating the phone.
 
-        This will trigger an overlay in the host browser window which
-        can be used to tell the user to perform an action.
+        This will present an overlay in the host browser window where
+        the user can indicate whether she was successful in carrying
+        out the instruction.
 
         Sample usage::
 
@@ -156,13 +156,10 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
         If the user informs us she failed to perform the instruction,
         the test will be failed.
 
-        This function is a simple wrapper for ``tornado.gen.Task``,
-        and is equivalent to the usage of that.
-
         :param message: The instruction you want to give the user.
 
         """
 
-        successful = yield prompt(message, style=self.handler.instruct_user)
-        if not successful:
+        success = self.handler.instruction(message)
+        if not success:
             self.fail("Failed on instruction: %s" % message)

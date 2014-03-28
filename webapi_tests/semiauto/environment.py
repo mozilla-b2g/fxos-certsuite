@@ -25,7 +25,7 @@ def get(environ, *args, **kwargs):
 
 class InProcessTestEnvironment(object):
     def __init__(self, addr=("localhost", 6666), server_cls=None,
-                 io_loop=None):
+                 io_loop=None, verbose=False):
         self.addr = addr
         self.io_loop = io_loop or IOLoop()
         self.started = False
@@ -33,7 +33,8 @@ class InProcessTestEnvironment(object):
 
         if server_cls is None:
             server_cls = FrontendServer
-        self.server = server_cls(addr, io_loop=self.io_loop)
+        self.server = server_cls(addr, io_loop=self.io_loop,
+                                 verbose=verbose)
 
     def start(self, block=False):
         """Start the test environment.

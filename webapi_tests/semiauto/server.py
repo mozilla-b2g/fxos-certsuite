@@ -27,14 +27,15 @@ def static_path(path):
 
 
 class FrontendServer(object):
-    def __init__(self, addr, io_loop=None):
+    def __init__(self, addr, io_loop=None, verbose=False):
         self.addr = addr
         self.io_loop = io_loop or IOLoop.instance()
         self.started = False
+        if verbose:
+            logger.setLevel(logging.DEBUG)
 
         self.routes = tornado.web.Application(
             [(r"/tests", TestHandler),
-             (r"/resp", ResponseHandler),
              (r"/", web.RedirectHandler, {"url": "/app.html"}),
              (r"/(.*[html|css|js])$", web.StaticFileHandler,
               {"path": static_dir})])
@@ -43,7 +44,6 @@ class FrontendServer(object):
 
     def start(self):
         """Start blocking FrontendServer."""
-
         self.started = True
         self.server.listen(self.addr[1])
         self.io_loop.start()
@@ -55,20 +55,6 @@ class FrontendServer(object):
 
     def is_alive(self):
         return self.started
-
-
-class ResponseHandler(tornado.websocket.WebSocketHandler):
-    def on_message(self, payload):
-        message = json.loads(payload)
-        global test_callback
-        logger.info("Received %s" % payload)
-
-        if "prompt" in message:
-            test_callback(message["prompt"])
-        elif "cancelPrompt" in message:
-            test_callback(False)
-        elif "instructPromptOk" in message:
-            test_callback(True)
 
 
 # Not currently in use, but offers a more foolproof way of emitting
@@ -88,7 +74,32 @@ class HandlerMixin(object):
             cb(event, data)
 
 
-class TestHandler(tornado.websocket.WebSocketHandler, HandlerMixin):
+class BlockingPromptMixin(object):
+    def __init__(self):
+        self.response = Queue.Queue()
+
+    def get_response(self):
+        # TODO(ato): Use timeout from tests
+        return self.response.get(block=True, timeout=sys.maxint)
+
+    def confirmation(self, question):
+        self.emit("confirmPrompt", question)
+        resp = self.get_response()
+        return True if "confirmPromptOk" in resp else False
+
+    def prompt(self, question):
+        self.emit("prompt", question)
+        resp = self.get_response()
+        return resp["prompt"] if "prompt" in resp else False
+
+    def instruction(self, instruction):
+        self.emit("instructPrompt", instruction)
+        resp = self.get_response()
+        return True if "instructPromptOk" in resp else False
+
+
+class TestHandler(tornado.websocket.WebSocketHandler,
+                  BlockingPromptMixin, HandlerMixin):
     def __init__(self, *args, **kwargs):
         super(TestHandler, self).__init__(*args, **kwargs)
         self.id = None
@@ -109,27 +120,12 @@ class TestHandler(tornado.websocket.WebSocketHandler, HandlerMixin):
         logger.info("Sending %s" % payload)
         self.write_message(payload)
 
+    # TODO(ato): What does this do?
     def handle_event(self, event, data):
         print("event: %r" % event)
         print(" data: %s" % data)
 
-    # TODO(ato): Is this in use now that we have the ResponseHandler?
     def on_message(self, payload):
         message = json.loads(payload)
         logger.info("Received %s" % payload)
-
-    # TODO(ato): Using a global and a second WS seems hacky, but I'm
-    # not sure there's a better way.
-    def get_user_input(self, question, callback):
-        self.write_message({"prompt": question})
-        global test_callback
-        test_callback = callback
-
-    def instruct_user(self, instruction, callback):
-        self.write_message({"instructPrompt": instruction})
-        global test_callback
-        test_callback = callback
-
-    def run_tests(self):
-        logger.info("runtest")
-        main(self, IOLoop.instance())
+        self.response.put(message)

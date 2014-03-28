@@ -91,6 +91,69 @@ TestListView.prototype = {
   }
 };
 
+// Represents a dialogue overlay.  Type can either be "prompt",
+// "instruct", "confirm".  Message is the question or confirmation to
+// pose to the user.
+//
+// A prompt will show a dialogue with a question, text input, and two
+// buttons: "OK" and "Cancel".  An instruction will show a dialogue
+// with an instruction, and two buttons: "OK" and "Cancel".  A
+// confirmation will show a dialogue with a question, and two buttons:
+// "Yes" and "No".
+function Dialog(msg, type) {
+  this.overlayEl = $("#overlay");
+  this.textEl = $("#dialog_text");
+  this.responseEl = $("#dialog_response");
+  this.okEl = $("#ok");
+  this.cancelEl = $("#cancel");
+
+  this.okEl.onclick = function() { this.onok(); this.close(); }.bind(this);
+  this.cancelEl.onclick = function() { this.oncancel(); this.close(); }.bind(this);
+
+  this.message = msg || "";
+  this.type = type || "prompt";
+  //this.value = this.responseEl.value;
+
+  // Assume prompt is default
+  switch (this.type) {
+  case "instruct":
+    this.responseEl.addClass("hidden");
+    break;
+  case "confirm":
+    this.responseEl.addClass("hidden");
+    this.okEl.value = "Yes";
+    this.cancelEl.value = "No";
+    break;
+  }
+}
+
+Dialog.prototype = {
+  show: function() {
+    this.textEl.innerHTML = this.message;
+    this.overlayEl.removeClass("hidden");
+  },
+
+  close: function() {
+    this.overlayEl.addClass("hidden");
+    this.reset();
+  },
+
+  value: function() {
+    return this.responseEl.value;
+  },
+
+  // TODO(ato): Because we're reusing the same Dialog construct, we
+  // have to reset it.
+  reset: function() {
+    this.responseEl.removeClass("hidden");
+    this.okEl.value = "OK";
+    this.cancelEl.value = "Cancel";
+  },
+
+  onok: function() {},
+  oncancel: function() {}
+};
+
 function Client(addr) {
   this.addr = addr;
   this.ws, this.testList = null;
@@ -103,8 +166,6 @@ Client.prototype = {
       respWs.send(payload);
       console.log("sent: " + payload);
       respWs.close();
-      var overlay = $("#overlay");
-      overlay.className = "overlay hidden";
     };
   },
 
@@ -114,36 +175,43 @@ Client.prototype = {
     this.sendResponse(payload);
   },
 
-  cancelPrompt: function() {
-    var payload = JSON.stringify({"cancelPrompt": ""});
-    this.sendResponse(payload);
-  },
-
-  showOverlay: function(text) {
-    var dialogText = $("#dialog_text");
-    var overlay = $("#overlay");
-    dialogText.innerHTML = text;
-    overlay.removeClass("hidden");
-  },
-
+  // Prompt the user for a response.  Return input to server.
+  //
+  // This will present the user with an overlay and the ability to
+  // enter a text string which will be returned to the server.
   promptUser: function(text) {
-    this.showOverlay(text);
-    var ok = $("#ok");
-    ok.onclick = function() { this.sendUserData(); }.bind(this);
+    var dialog = new Dialog(text);
+    dialog.onok = function() { this.emit("prompt", dialog.value()); }.bind(this);
+    dialog.oncancel = function() { this.emit("promptCancel"); }.bind(this);
+    dialog.show();
   },
 
+  // Instruct the user perform an action, such as rotating the phone.
+  //
+  // This will present the user with an ok/cancel dialogue to indicate
+  // whether she was successful in carrying out the instruction.
   instructUser: function(text) {
-    var dialogResponse = $("#dialog_response");
-    dialogResponse.className = "hidden";
-    this.showOverlay(text);
-    var ok = $("#ok");
-    var payload = JSON.stringify({"instructPromptOk": ""});
-    ok.onclick = function() { this.sendResponse(payload); }.bind(this);
+    var dialog = new Dialog(text, "instruct");
+    dialog.onok = function() { this.emit("instructPromptOk"); }.bind(this);
+    dialog.oncancel = function() { this.emit("instructPromptCancel"); }.bind(this);
+    dialog.show();
+  },
+
+  // Ask user to confirm a physical aspect about the device or the
+  // testing environment that cannot be checked by the test.
+  //
+  // This will present the user with an ok/cancel dialogue to indicate
+  // whether the question posed was true or false.
+  confirmPrompt: function(question) {
+    var dialog = new Dialog(question, "confirm");
+    dialog.onok = function() { this.emit("confirmPromptOk"); }.bind(this);
+    dialog.oncancel = function() { this.emit("confirmPromptCancel"); }.bind(this);
+    dialog.show();
   },
 
   connect: function() {
     var cancel = $("#cancel");
-    cancel.onclick = function() {this.cancelPrompt()}.bind(this);
+    cancel.onclick = function() { this.emit("cancelPrompt"); }.bind(this);
     this.ws = new WebSocket("ws://" + this.addr + "/tests");
     this.ws.onopen = function(e) { console.log("opened"); }.bind(this);
     this.ws.onclose = function(e) { console.log("closed"); }.bind(this);
@@ -163,11 +231,13 @@ Client.prototype = {
         document.getElementById("notification").innerHTML = "Done";
       }
       else if (data.prompt) {
-        // handle request for user data
         this.promptUser(data.prompt);
       }
       else if (data.instructPrompt) {
         this.instructUser(data.instructPrompt);
+      }
+      else if (data.confirmPrompt) {
+        this.confirmPrompt(data.confirmPrompt);
       }
       else if (data.updateTest){
         // TODO: this assumes any other request will be to update the table
@@ -177,7 +247,9 @@ Client.prototype = {
   },
 
   emit: function(event, data) {
-    var payload = JSON.stringify({event: data});
+    var command = {};
+    command[event] = data || null;
+    var payload = JSON.stringify(command);
     console.log("Sending " + payload);
     this.ws.send(payload);
   }
