@@ -79,7 +79,7 @@ class BlockingPromptMixin(object):
         self.response = Queue.Queue()
 
     def get_response(self):
-        # TODO(ato): Use timeout from tests
+        # TODO(ato): Use timeout from semiauto.testcase
         return self.response.get(block=True, timeout=sys.maxint)
 
     def confirmation(self, question):
