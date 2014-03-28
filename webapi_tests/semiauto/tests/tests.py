@@ -66,7 +66,6 @@ class TestCase(tornado.testing.AsyncTestCase, CertAppMixin):
         self.server = self.environment.server
         self.handler = self.environment.handler
         self.marionette = self.create_marionette()
-        self.io_loop.run_sync(self.use_cert_app)
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
