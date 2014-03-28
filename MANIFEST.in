@@ -1,4 +1,3 @@
 recursive-include certsuite/static *
 recursive-include certsuite/expected_webapi_results *
 recursive-include certsuite/expected_omni_results *
-recursive-include bundles *
