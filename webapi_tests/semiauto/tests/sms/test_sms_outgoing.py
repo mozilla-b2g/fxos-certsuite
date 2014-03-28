@@ -17,7 +17,7 @@ class TestSmsOutgoing(TestCase, SmsTestCommon):
     @test
     def test_sms_outgoing(self):
         # ask user to input destination phone number
-        destination = yield self.prompt("Please enter a destination phone number where a test SMS will be sent (not the Firefox OS device)")
+        destination = self.prompt("Please enter a destination phone number where a test SMS will be sent (not the Firefox OS device)")
         destination = str(destination)
         # can't check format as different around the world, make sure not empty
         self.assertTrue(len(destination) > 1, "Destination phone number must be entered")
@@ -26,7 +26,7 @@ class TestSmsOutgoing(TestCase, SmsTestCommon):
         self.confirm("You entered destination number '%s', is this correct?" %destination)
 
         # ask user to input sms body text
-        body = yield self.prompt("Please enter some text to be sent in the SMS message")
+        body = self.prompt("Please enter some text to be sent in the SMS message")
         self.assertTrue(len(body) > 0 & len(body) < 161,
                          "SMS message text entered must be between 1 and 160 characters long")
 
