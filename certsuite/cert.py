@@ -79,6 +79,28 @@ routes = [("GET", "/", connect_handler),
           ("POST", "/webapi_results", webapi_results_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
+def diff_results(a, b, checkNull):
+
+    a_set = set(a.keys())
+    b_set = set(b.keys())
+
+    if checkNull:
+        a_nullset = set([key for key in a.keys() if a[key] is None])
+        b_nullset = set([key for key in b.keys() if b[key] is None])
+        result = list(b_nullset.difference(a_nullset))
+    else:
+        result = list(b_set.difference(a_set))
+
+    same_keys = a_set.intersection(b_set)
+    for key in same_keys:
+        if type(a[key]) is dict:
+            if type(b[key]) is not dict:
+                result.extend(key)
+            else:
+                result.extend([key + '.' + item for item in diff_results(a[key], b[key], checkNull)])
+
+    return result
+
 def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-reboot",
@@ -193,21 +215,21 @@ def cli():
     expected_results_json = open(file_path, 'r').read()
     expected_results = json.loads(expected_results_json)
     #compute difference in navigator functions
-    expected_nav = set(expected_results["navList"])
-    nav = set(webapi_results["navList"])
+    expected_nav = expected_results["navList"]
+    nav = webapi_results["navList"]
 
     logger.test_start('webapi')
     webapi_passed = True
-    missing_nav = expected_nav.difference(nav)
+    missing_nav = diff_results(expected_nav, nav, False)
     if missing_nav:
-        report['missing_navigator_functions'] = list(missing_nav)
+        report['missing_navigator_functions'] = missing_nav
         logger.test_status('webapi', 'missing-navigator-functions', 'FAIL', message=','.join(missing_nav))
         webapi_passed = False
     else:
         logger.test_status('webapi', 'missing-navigator-functions', 'PASS')
-    added_nav = nav.difference(expected_nav)
+    added_nav = diff_results(nav, expected_nav, False)
     if added_nav:
-        report['added_navigator_functions'] = list(added_nav)
+        report['added_navigator_functions'] = added_nav
         logger.test_status('webapi', 'added-navigator-functions', 'FAIL', message=','.join(added_nav))
         webapi_passed = False
     else:
@@ -215,45 +237,80 @@ def cli():
 
     # NOTE: privileged functions in an unprivileged app are null
     # compute difference in navigator "null" functions, ie: privileged functions
-    expected_nav_null = set(expected_results["navNullList"])
-    nav_null = set(webapi_results["navNullList"])
-
-    missing_nav_null = expected_nav_null.difference(nav_null)
+    missing_nav_null = diff_results(expected_nav, nav, True)
     if missing_nav_null:
-        report['missing_navigator_unprivileged_functions'] = list(missing_nav_null)
+        report['missing_navigator_unprivileged_functions'] = missing_nav_null
         logger.test_status('webapi', 'missing-navigator-unprivileged-functions', 'FAIL', message=','.join(missing_nav_null))
         webapi_passed = False
     else:
         logger.test_status('webapi', 'missing-navigator-unprivileged-functions', 'PASS')
-    added_nav_null = nav_null.difference(expected_nav_null)
+    added_nav_null = diff_results(nav, expected_nav, True)
     if added_nav_null:
-        report['added_navigator_privileged_functions'] = list(added_nav_null)
+        report['added_navigator_privileged_functions'] = added_nav_null
         logger.test_status('webapi', 'added-navigator-unprivileged-functions', 'FAIL', message=','.join(added_nav_null))
         webapi_passed = False
     else:
         logger.test_status('webapi', 'added-navigator-unprivileged-functions', 'PASS')
 
     #computer difference in window functions
-    expected_window = set(expected_results["windowList"])
-    window = set(webapi_results["windowList"])
+    expected_window = expected_results["windowList"]
+    window = webapi_results["windowList"]
 
-    missing_window = expected_window.difference(window)
+    missing_window = diff_results(expected_window, window, False)
     if missing_window:
-        report['missing_window_functions'] = list(missing_window)
+        report['missing_window_functions'] = missing_window
         logger.test_status('webapi', 'missing-window-functions', 'FAIL', message=','.join(missing_window))
         webapi_passed = False
     else:
         logger.test_status('webapi', 'missing-window-functions', 'PASS')
-    added_window = window.difference(expected_window)
+    added_window = diff_results(window, expected_window, False)
     if added_window:
-        report['added_window_functions'] = list(added_window)
+        report['added_window_functions'] = added_window
         logger.test_status('webapi', 'added-window-functions', 'FAIL', message=','.join(added_window))
         webapi_passed = False
     else:
         logger.test_status('webapi', 'added-window-functions', 'PASS')
-    logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
 
-    report['webIDLResults'] = webapi_results['webIDLResults']
+    # compute differences in WebIDL results
+    expected_webidl = {}
+    for result in expected_results['webIDLResults']:
+        expected_webidl[result['name']] = result
+
+    unexpected_webidl_results = []
+    added_webidl_results = []
+    for result in webapi_results['webIDLResults']:
+        try:
+            if expected_webidl[result['name']]['result'] != result['result']:
+                unexpected_webidl_results.append(result)
+            del expected_webidl[result['name']]
+        except KeyError:
+            added_webidl_results.append(result)
+
+    # since we delete found results above, anything here is missing
+    missing_webidl_results = list(expected_webidl.values())
+
+    if unexpected_webidl_results:
+        report['unexpected_webidl_results'] = unexpected_webidl_results
+        logger.test_status('webapi', 'unexpected-webidl-results', 'FAIL', message=','.join([result['name'] for result in unexpected_webidl_results]))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'unexpected-webidl-results', 'PASS')
+
+    if added_webidl_results:
+        report['added_webidl_results'] = added_webidl_results
+        logger.test_status('webapi', 'added-webidl-results', 'FAIL', message=','.join([result['name'] for result in added_webidl_results]))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'added-webidl-results', 'PASS')
+
+    if missing_webidl_results:
+        report['missing_webidl_results'] = missing_webidl_results
+        logger.test_status('webapi', 'missing-webidl-results', 'FAIL', message=','.join([result['name'] for result in missing_webidl_results]))
+        webapi_passed = False
+    else:
+        logger.test_status('webapi', 'missing-webidl-results', 'PASS')
+
+    logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
 
     result_file_path = args.result_file
     if not result_file_path:
