@@ -213,10 +213,11 @@ Client.prototype = {
     var cancel = $("#cancel");
     cancel.onclick = function() { this.emit("cancelPrompt"); }.bind(this);
     this.ws = new WebSocket("ws://" + this.addr + "/tests");
-    this.ws.onopen = function(e) { console.log("opened"); }.bind(this);
-    this.ws.onclose = function(e) { console.log("closed"); }.bind(this);
+    this.ws.onopen = function(e) { console.log("open", e); }.bind(this);
+    this.ws.onclose = function(e) { console.log("close", e); }.bind(this);
     this.ws.onmessage = function(e) {
       var data = JSON.parse(e.data);
+      console.log("recv", data);
       if (data.testList) {
         // set up the test_list table
         this.testList = new TestListView($("#test_list"), data.testList);
@@ -250,7 +251,7 @@ Client.prototype = {
     var command = {};
     command[event] = data || null;
     var payload = JSON.stringify(command);
-    console.log("Sending " + payload);
+    console.log("send", command);
     this.ws.send(payload);
   }
 };
