@@ -15,13 +15,8 @@ class TestSmsIncomingGetMessage(TestCase, SmsTestCommon):
         TestCase.tearDown(self)
 
     def test_sms_incoming_get_message(self):
-        self.setup_onreceived_listener()
-        self.instruct("From a different phone, send an SMS to the Firefox OS device and wait for it to arrive")
-        self.verify_sms_received()
-        self.remove_onreceived_listener()
-
-        # verify text content
-        self.confirm("Received SMS with text '%s'; does this text match what was sent to the Firefox OS phone?" %self.in_sms['body'])
+        # have user send sms to the Firefox OS device, verify body
+        self.user_guided_incoming_sms()
 
         # test mozMobileMessage.getMessage with valid id
         sms_to_get = self.in_sms['id']
