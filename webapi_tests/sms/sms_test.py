@@ -9,6 +9,7 @@ class SmsTestCommon(object):
     def __init__(self):
         self.in_sms = None
         self.out_sms = None
+        self.out_destination = None
         self.marionette.execute_async_script("""        
         SpecialPowers.setBoolPref("dom.sms.enabled", true);
         SpecialPowers.addPermission("sms", true, document);
@@ -38,12 +39,20 @@ class SmsTestCommon(object):
 
         # verify message body
         self.in_sms = self.marionette.execute_script("return window.wrappedJSObject.in_sms")
-        print "Received SMS (id: %s)" %self.in_sms['id']
         self.assertTrue(len(self.in_sms['body']) > 0, "Received SMS has no message body (was text included in the sent SMS message?)")
 
     def remove_onreceived_listener(self):
         self.marionette.execute_script("window.navigator.mozMobileMessage.onreceived = null")
-    
+
+    def user_guided_incoming_sms(self):
+        self.setup_onreceived_listener()
+        self.instruct("From a different phone, send an SMS to the Firefox OS device and wait for it to arrive")
+        self.verify_sms_received()
+
+        # verify body text
+        self.confirm("Received SMS with text '%s'; does this text match what was sent to the Firefox OS phone?" %self.in_sms['body'])
+        self.remove_onreceived_listener()
+
     def get_message(self, sms_id, expect_found=True, error_message="mozMobileMessage.getMessage returned unexpected value"):
         # get the sms for the given id and verify it was or wasn't found, as expected
         self.marionette.execute_async_script("""
@@ -157,3 +166,32 @@ class SmsTestCommon(object):
 
     def remove_onsent_listener(self):
         self.marionette.execute_script("window.navigator.mozMobileMessage.onsent = null")
+
+    def user_guided_outgoing_sms(self):
+        # ask user to input destination phone number
+        destination = self.prompt("Please enter a destination phone number where a test SMS will be sent (not the Firefox OS device)")
+        destination = str(destination)
+
+        # can't check format as different around the world, just ensure not empty
+        self.assertTrue(len(destination) > 1, "Destination phone number must be entered")
+        # ask user to confirm destination number
+        self.confirm("You entered destination number '%s', is this correct?" %destination)
+        self.out_destination = destination
+
+        # ask user to input sms body text
+        body = self.prompt("Please enter some text to be sent in the SMS message")
+        self.assertTrue(len(body) > 0 & len(body) < 161,
+                         "SMS message text entered must be between 1 and 160 characters long")
+
+        # setup listener and send the sms via webapi
+        self.setup_onsent_listener()
+        self.send_message(destination, body)
+
+        # user verification that it was received on target, before continue
+        self.confirm("SMS has been sent to '%s'. Was it received on the target phone?" %destination)
+        self.verify_message_sent()
+
+        # verify sms body
+        self.assertTrue(len(self.out_sms['body']) > 0, "Sent SMS event message has no message body")
+        self.confirm("Sent SMS with text '%s'; does this text match what was received on the target phone?" %self.out_sms['body'])
+        self.remove_onsent_listener()

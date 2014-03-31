@@ -15,35 +15,10 @@ class TestSmsOutgoing(TestCase, SmsTestCommon):
         TestCase.tearDown(self)
 
     def test_sms_outgoing(self):
-        # ask user to input destination phone number
-        destination = self.prompt("Please enter a destination phone number where a test SMS will be sent (not the Firefox OS device)")
-        destination = str(destination)
-        # can't check format as different around the world, make sure not empty
-        self.assertTrue(len(destination) > 1, "Destination phone number must be entered")
+        # send sms via the webapi and verify body
+        self.user_guided_outgoing_sms()
 
-        # ask user to confirm destination number
-        self.confirm("You entered destination number '%s', is this correct?" %destination)
-
-        # ask user to input sms body text
-        body = self.prompt("Please enter some text to be sent in the SMS message")
-        self.assertTrue(len(body) > 0 & len(body) < 161,
-                         "SMS message text entered must be between 1 and 160 characters long")
-
-        self.setup_onsent_listener()
-        # use the webapi to send an sms
-        self.send_message(destination, body)
-
-        # user verification that it was received on target, before continue
-        self.confirm("SMS has been sent to '%s'. Was it received on the target phone?" %destination)
-
-        self.verify_message_sent()
-        self.remove_onsent_listener()
-
-        # verify message body
-        self.assertTrue(len(self.out_sms['body']) > 0, "Sent SMS event message has no message body")
-        self.confirm("Sent SMS with text '%s'; does this text match what was received on the target phone?" %self.out_sms['body'])
-
-        # verify the other message fields
+        # verify other fields
         self.assertEqual(self.out_sms['type'], 'sms', "Sent SMS MozSmsMessage.type should be 'sms'")
         self.assertTrue(self.out_sms['id'] > 0, "Sent SMS MozSmsMessage.id should be > 0")
         self.assertTrue(self.out_sms['threadId'] > 0, "Sent SMS MozSmsMessage.threadId should be > 0")
@@ -54,7 +29,8 @@ class TestSmsOutgoing(TestCase, SmsTestCommon):
         self.assertTrue(((self.out_sms['read'] == False) or (self.out_sms['read'] == True)),
                         "Sent SMS MozSmsMessage.read field should be False or True")
         # can check receiver number as the user provided it above
-        self.assertTrue(destination in self.out_sms['receiver'], "Sent SMS MozSmsMessage.receiver field should be %s" %destination)
+        self.assertTrue(self.out_destination in self.out_sms['receiver'],
+                        "Sent SMS MozSmsMessage.receiver field should be %s" %self.out_destination)
         # for privacy, don't print/check the actual sender's number; just ensure it is not empty
         self.assertTrue(len(self.out_sms['sender']) > 0, "Sent SMS MozSmsMessage.sender field should not be empty")
         # timezones and different SMSC's, don't check timestamp value; just ensure non-zero
