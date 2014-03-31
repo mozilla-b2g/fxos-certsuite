@@ -130,3 +130,7 @@ tr.success {
   width: 20em;
   position: fixed;
 }
+
+@media screen and (max-width: 760px) {
+  table { width: 100%; }
+}
