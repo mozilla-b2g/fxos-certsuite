@@ -229,11 +229,11 @@ Client.prototype = {
         break;
 
       case "testRunStart":
-        this.notificationEl.innerHTML = "Running tests";
+        this.notificationEl.innerHTML = "Running tests…";
         break;
 
       case "testRunStop":
-        this.notificationEl.innerHTML = "Done";
+        this.notificationEl.innerHTML = "Done!";
         break;
 
       case "prompt":
@@ -256,7 +256,7 @@ Client.prototype = {
       default:
         console.log("unkwn", data);
         this.ws.close();
-        this.notificationEl.innerHTML = "Received unknown command from server";
+        this.notificationEl.innerHTML = "Received unknown command from server )-:";
         break;
       }
     }.bind(this);
