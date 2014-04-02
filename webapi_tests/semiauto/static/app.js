@@ -146,6 +146,7 @@ Dialog.prototype = {
   // have to reset it.
   reset: function() {
     this.responseEl.removeClass("hidden");
+    this.responseEl.value = "";
     this.okEl.value = "OK";
     this.cancelEl.value = "Cancel";
   },
