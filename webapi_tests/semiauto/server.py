@@ -7,13 +7,11 @@ import json
 import logging
 import os
 import sys
-import threading
 import unittest
 import uuid
 
 from tornado import web
 from tornado.ioloop import IOLoop
-from tornado.websocket import WebSocketClosedError
 import tornado.httpserver
 import tornado.websocket
 
