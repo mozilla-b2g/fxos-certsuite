@@ -9,7 +9,7 @@ import unittest
 
 from marionette import Marionette, MarionetteException
 
-from semiauto import environment
+from semiauto import environment, server
 from semiauto.environment import InProcessTestEnvironment
 
 from certapp import CertAppMixin
@@ -18,6 +18,20 @@ from certapp import CertAppMixin
 """The default time to wait for a user to respond to a prompt or
 instruction in a test."""
 prompt_timeout = 600  # 10 minutes
+
+
+class ConnectionHandler(server.TestHandlerCallback):
+    """Updates the `connected` property on ``semiauto.TestCase`` when the
+    client browser connects or disconnects."""
+
+    def __init__(self, testcase):
+        self.test = testcase
+
+    def on_open(self):
+        self.test.connected = True
+
+    def on_close(self):
+        self.test.connected = False
 
 
 class TestCase(unittest.TestCase, CertAppMixin):
@@ -31,6 +45,10 @@ class TestCase(unittest.TestCase, CertAppMixin):
         self.stored.handler = None
         self.stored.marionette = None
 
+        ch = ConnectionHandler(self)
+        self.handler.add_callback(ch)
+
+        # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.close_cert_app)
 
     def setUp(self):
@@ -52,12 +70,23 @@ class TestCase(unittest.TestCase, CertAppMixin):
         self.environment = environment.get(InProcessTestEnvironment)
         self.server = self.environment.server
         self.handler = self.environment.handler
+
+        self.assert_browser_connected()
+
         self.marionette = self.create_marionette()
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
         self.close_cert_app()
         self.use_cert_app()
+
+    def assert_browser_connected(self):
+        """Asserts (and consequently fails the test if not true) that the
+        browser is connected to the semiauto test harness.
+
+        """
+
+        self.assertTrue(self.handler.connected, "Browser disconnected")
 
     @staticmethod
     def create_marionette():

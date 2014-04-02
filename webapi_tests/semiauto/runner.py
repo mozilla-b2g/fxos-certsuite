@@ -188,8 +188,10 @@ class TestStateUpdater(TestEvents):
 
         """
 
+        if not self.client.connected:
+            return
+
         payload = kwargs
-        testInfo = {}
 
         # TODO(ato): Serialization of socket.error, etc.
         if test:
