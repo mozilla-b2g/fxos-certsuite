@@ -31,6 +31,7 @@ class TestCase(unittest.TestCase, CertAppMixin):
         self.stored.handler = None
         self.stored.marionette = None
 
+        # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.close_cert_app)
 
     def setUp(self):
@@ -52,12 +53,23 @@ class TestCase(unittest.TestCase, CertAppMixin):
         self.environment = environment.get(InProcessTestEnvironment)
         self.server = self.environment.server
         self.handler = self.environment.handler
+
+        self.assert_browser_connected()
+
         self.marionette = self.create_marionette()
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
         self.close_cert_app()
         self.use_cert_app()
+
+    def assert_browser_connected(self):
+        """Asserts (and consequently fails the test if not true) that the
+        browser is connected to the semiauto test harness.
+
+        """
+
+        self.assertTrue(self.handler.connected, "Browser disconnected")
 
     @staticmethod
     def create_marionette():

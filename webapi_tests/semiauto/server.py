@@ -104,17 +104,24 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         super(TestHandler, self).__init__(*args, **kwargs)
         self.id = None
         self.suite = unittest.TestSuite()
+        self.connected = False
 
     def open(self, *args):
         self.id = uuid.uuid4()
         self.stream.set_nodelay(True)
         self.add(self, self.async_callback(self.emit))
-        logger.info("Accepted new client: %s" % self.id)
+        self.connected = True
+        logger.info("Accepted new client: %s" % self)
 
     def on_close(self):
-        logger.info("Client left: %s" % self.id)
+        self.connected = False
+        # Confirmation prompts blocks the handler, and this will
+        # release the blocking queue get in
+        # BlockingPromptMixin.get_response.
+        self.response.put({})
+        logger.info("Client left: %s" % self)
 
-    def emit(self, event, data):
+    def emit(self, event, data=None):
         command = {event: data}
         payload = json.dumps(command)
         logger.info("Sending %s" % payload)
@@ -127,5 +134,8 @@ class TestHandler(tornado.websocket.WebSocketHandler,
 
     def on_message(self, payload):
         message = json.loads(payload)
-        logger.info("Received %s" % payload)
         self.response.put(message)
+        logger.info("Received %s" % payload)
+
+    def __str__(self):
+        return str(self.id)
