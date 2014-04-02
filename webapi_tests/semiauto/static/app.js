@@ -131,6 +131,16 @@ Dialog.prototype = {
   show: function() {
     this.textEl.innerHTML = this.message;
     this.overlayEl.removeClass("hidden");
+
+    switch (this.type) {
+    case "instruct":
+    case "confirm":
+      this.okEl.focus();
+      break;
+    case "confirm":
+    default:
+      this.responseEl.focus();
+    }
   },
 
   close: function() {
