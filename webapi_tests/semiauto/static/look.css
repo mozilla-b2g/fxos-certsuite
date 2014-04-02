@@ -25,6 +25,7 @@ body {
   color: #333;
   line-height: 1.5;
   border-top: 3px solid white;
+  margin-bottom: 4em;
 }
 
 #tabzilla {
@@ -67,6 +68,8 @@ table {
   width: 80%;
 }
 
+tr { border-bottom: 1px solid rgba(0,0,0,.2); }
+
 th {
   border-top: 0;
   font-size: 16px;
@@ -78,7 +81,6 @@ th {
 td {
   height: 50px;
   padding: .5em 1.8em;
-  border-top: 1px solid rgba(0,0,0,.2);
   min-width: 70%;
 }
 
@@ -132,5 +134,6 @@ tr.success {
 }
 
 @media screen and (max-width: 760px) {
+  body { margin-bottom: 0; }
   table { width: 100%; }
 }
