@@ -106,33 +106,22 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         super(TestHandler, self).__init__(*args, **kwargs)
         self.id = None
         self.suite = unittest.TestSuite()
-        self.events = Queue.Queue()
         self.connected = False
-        self.cbs = set()
 
     def open(self, *args):
         self.id = uuid.uuid4()
         self.stream.set_nodelay(True)
         self.add(self, self.async_callback(self.emit))
-        self.events.put({"open", self})
         self.connected = True
-
         logger.info("Accepted new client: %s" % self)
-        for cb in self.cbs:
-            cb.on_open(*args)
 
     def on_close(self):
-        self.events.put({"close", self})
         self.connected = False
-
         # Confirmation prompts blocks the handler, and this will
         # release the blocking queue get in
         # BlockingPromptMixin.get_response.
         self.response.put({})
-
         logger.info("Client left: %s" % self)
-        for cb in self.cbs:
-            cb.on_close()
 
     def emit(self, event, data=None):
         command = {event: data}
@@ -149,32 +138,6 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         message = json.loads(payload)
         self.response.put(message)
         logger.info("Received %s" % payload)
-        for cb in self.cbs:
-            cb.on_message(payload)
-
-    def add_callback(self, cb):
-        cbs = list(self.cbs)
-        cbs.append(cb)
-        self.cbs = set(cbs)
 
     def __str__(self):
         return str(self.id)
-
-
-class TestHandlerCallback(object):
-    """Allows callbacks to be registered for various ``TestHandler``
-    events such as ``open``, ``on_close``, and ``on_message``.
-
-    See ``tornado.websocket.WebSocketHandler`` for documentation on
-    the callbacks' arguments.
-
-    """
-
-    def on_open(self, *args):
-        pass
-
-    def on_close(self):
-        pass
-
-    def on_message(self, payload):
-        pass

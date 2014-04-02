@@ -9,7 +9,7 @@ import unittest
 
 from marionette import Marionette, MarionetteException
 
-from semiauto import environment, server
+from semiauto import environment
 from semiauto.environment import InProcessTestEnvironment
 
 from certapp import CertAppMixin
@@ -18,20 +18,6 @@ from certapp import CertAppMixin
 """The default time to wait for a user to respond to a prompt or
 instruction in a test."""
 prompt_timeout = 600  # 10 minutes
-
-
-class ConnectionHandler(server.TestHandlerCallback):
-    """Updates the `connected` property on ``semiauto.TestCase`` when the
-    client browser connects or disconnects."""
-
-    def __init__(self, testcase):
-        self.test = testcase
-
-    def on_open(self):
-        self.test.connected = True
-
-    def on_close(self):
-        self.test.connected = False
 
 
 class TestCase(unittest.TestCase, CertAppMixin):
@@ -44,9 +30,6 @@ class TestCase(unittest.TestCase, CertAppMixin):
         super(TestCase, self).__init__(*args, **kwargs)
         self.stored.handler = None
         self.stored.marionette = None
-
-        ch = ConnectionHandler(self)
-        self.handler.add_callback(ch)
 
         # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.close_cert_app)
