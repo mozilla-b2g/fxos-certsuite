@@ -121,8 +121,8 @@ function Dialog(msg, type) {
     break;
   case "confirm":
     this.responseEl.addClass("hidden");
-    this.okEl.value = "Yes";
-    this.cancelEl.value = "No";
+    this.okEl.innerHTML = "Yes";
+    this.cancelEl.innerHTML = "No";
     break;
   }
 }
@@ -147,8 +147,8 @@ Dialog.prototype = {
   reset: function() {
     this.responseEl.removeClass("hidden");
     this.responseEl.value = "";
-    this.okEl.value = "OK";
-    this.cancelEl.value = "Cancel";
+    this.okEl.innerHTML = "OK";
+    this.cancelEl.innerHTML = "Cancel";
   },
 
   onok: function() {},
