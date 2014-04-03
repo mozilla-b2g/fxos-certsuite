@@ -25,6 +25,7 @@ body {
   color: #333;
   line-height: 1.5;
   border-top: 3px solid white;
+  margin-bottom: 4em;
 }
 
 #tabzilla {
@@ -40,7 +41,7 @@ body {
 
 #wrapper {
   clear: both;
-  margin-top: 2em;
+  margin: 2em auto 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -61,11 +62,8 @@ h6 { font-size: 14px; }
 
 p, ul, ol, dl, hgroup { margin: 0 0 20px; }
 
-table {
-  margin: 0 auto;
-  border-collapse: collapse;
-  width: 80%;
-}
+table { border-collapse: collapse; }
+tr { border-bottom: 1px solid rgba(0,0,0,.2); }
 
 th {
   border-top: 0;
@@ -78,7 +76,6 @@ th {
 td {
   height: 50px;
   padding: .5em 1.8em;
-  border-top: 1px solid rgba(0,0,0,.2);
   min-width: 70%;
 }
 
@@ -132,5 +129,6 @@ tr.success {
 }
 
 @media screen and (max-width: 760px) {
-  table { width: 100%; }
+  body { margin-bottom: 0; }
+  #wrapper { width: 100%; }
 }
