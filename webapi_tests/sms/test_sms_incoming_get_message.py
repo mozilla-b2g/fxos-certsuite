@@ -23,10 +23,25 @@ class TestSmsIncomingGetMessage(TestCase, SmsTestCommon):
         error_message = "mozMobileMessage.getMessage should have found the SMS message"
         self.get_message(sms_to_get, True, error_message)
 
-        # verify correct message was found; just check id and body text
+        # verify the other found message fields
         event_sms = self.marionette.execute_script("return window.wrappedJSObject.event_sms")
         self.assertEqual(event_sms['id'], sms_to_get, "MozMobileMessage.id of found SMS should match the received SMS")
         self.assertEqual(event_sms['body'], self.in_sms['body'], "Message body of the found SMS should match the received SMS")
+
+        self.assertEqual(event_sms['type'], self.in_sms['type'], "Found SMS MozSmsMessage.type should match")
+        self.assertEqual(event_sms['id'], self.in_sms['id'], "Found SMS MozSmsMessage.id should match")
+        self.assertEqual(event_sms['threadId'], self.in_sms['threadId'], "Found SMS MozSmsMessage.threadId should match")
+        self.assertEqual(event_sms['delivery'], self.in_sms['delivery'], "Found SMS MozSmsMessage.delivery should match")
+        self.assertEqual(event_sms['deliveryStatus'], self.in_sms['deliveryStatus'],
+                          "Found SMS MozSmsMessage.deliveryStatus should match")
+        # cant guarantee user didn't read message; just ensure is valid
+        self.assertTrue(((event_sms['read'] == False) or (event_sms['read'] == True)),
+                        "Found SMS MozSmsMessage.read field should be False or True")
+        self.assertEqual(event_sms['receiver'], self.in_sms['receiver'], "Found SMS MozSmsMessage.receiver should match")
+        self.assertEqual(event_sms['sender'], self.in_sms['sender'], "Found SMS MozSmsMessage.sender field should match")
+        self.assertEqual(event_sms['timestamp'], self.in_sms['timestamp'], "Found SMS MozSmsMessage.timestamp should match")
+        self.assertEqual(event_sms['messageClass'], self.in_sms['messageClass'],
+                         "Found SMS MozSmsMessage.messageClass should match")
 
         # test mozMobileMessage.getMessage with invalid message object; should fail
         sms_to_get = self.in_sms['id'] + 999 # no chance of receiving 999 more SMS between test cases
