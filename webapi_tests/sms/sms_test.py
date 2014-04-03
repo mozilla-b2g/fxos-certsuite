@@ -4,6 +4,8 @@
 
 import time
 
+from marionette.wait import Wait
+
 
 class SmsTestCommon(object):
     def __init__(self):
@@ -87,7 +89,7 @@ class SmsTestCommon(object):
     def delete_message(self, sms_id):
         self.marionette.execute_async_script("""
         var mm = window.navigator.mozMobileMessage;
-        ok(mm instanceof MozMobileMessageManager, "Failed to create instance of MozMobileMessageManager")       
+        ok(mm instanceof MozMobileMessageManager, "Failed to create instance of MozMobileMessageManager")
         // Bug 952875
         mm.getThreads();
 
@@ -155,7 +157,6 @@ class SmsTestCommon(object):
 
         let requestRet = mm.send(arguments[0], arguments[1]);
         ok(requestRet, "smsrequest obj returned");
-            
         requestRet.onsuccess = function(event) {
             log("Received 'onsuccess' smsrequest event.");
             if(event.target.result){
@@ -180,22 +181,22 @@ class SmsTestCommon(object):
         time.sleep(5)
 
     def verify_message_sent(self):
-        # verify all of the sent message events; give retries in case send fails at first due to bad network
-        gotReqSuccess = self.marionette.execute_script("return window.wrappedJSObject.gotReqOnsuccess")
-        retries = 3
-        while not gotReqSuccess and retries:
-            time.sleep(30)
-            retries-=1
-            gotReqSuccess = self.marionette.execute_script("return window.wrappedJSObject.gotReqOnsuccess")
+        # wait for sent message; possibly could fail because of insufficient network signal
+        wait = Wait(self.marionette, timeout=90, interval=10)
+        try:
+            wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.gotReqOnsuccess"))
+        except:
+            # sms wasn't sent; either the api is broken or mobile network signal is insufficient
+            self.fail("Failed to send SMS; mozMobileMessage.send is broken -or- \
+                        perhaps there is no mobile network signal. Please try again")
 
-        self.assertTrue(gotReqSuccess, "Failed to send SMS; mozMobileMessage.send is broken -or- \
-                        perhaps there is no mobile network signal. Try again")
-        gotFailed = self.marionette.execute_script("return window.wrappedJSObject.gotSmsOnfailed")
-        self.assertFalse(gotFailed, "SMS should not have failed sending (received mozMobileMessage.onfailed event")
-        gotSending = self.marionette.execute_script("return window.wrappedJSObject.gotSmsOnsending")
-        self.assertTrue(gotSending, "SMS should have been sending (expected mozMobileMessage.onsending event")
-        gotSent = self.marionette.execute_script("return window.wrappedJSObject.gotSmsOnsent")
-        self.assertTrue(gotSent, "SMS should have been sent (expected mozMobileMessage.onsent event)")
+        # verify the remaining sms send events
+        got_failed = self.marionette.execute_script("return window.wrappedJSObject.gotSmsOnfailed")
+        self.assertFalse(got_failed, "SMS should not have failed sending (received mozMobileMessage.onfailed event")
+        got_sending = self.marionette.execute_script("return window.wrappedJSObject.gotSmsOnsending")
+        self.assertTrue(got_sending, "SMS should have been sending (expected mozMobileMessage.onsending event")
+        got_sent = self.marionette.execute_script("return window.wrappedJSObject.gotSmsOnsent")
+        self.assertTrue(got_sent, "SMS should have been sent (expected mozMobileMessage.onsent event)")
 
         # get message event
         self.out_sms = self.marionette.execute_script("return window.wrappedJSObject.out_sms")
