@@ -172,21 +172,6 @@ function Client(addr) {
 }
 
 Client.prototype = {
-  sendResponse: function(payload) {
-    var respWs = new WebSocket("ws://" + this.addr + "/resp");
-    respWs.onopen = function(e) {
-      respWs.send(payload);
-      console.log("sent: " + payload);
-      respWs.close();
-    };
-  },
-
-  sendUserData: function() {
-    var dialogResponse = $("#dialog_response");
-    var payload = JSON.stringify({"prompt": dialogResponse.value});
-    this.sendResponse(payload);
-  },
-
   // Prompt the user for a response.  Return input to server.
   //
   // This will present the user with an overlay and the ability to
