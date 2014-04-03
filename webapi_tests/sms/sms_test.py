@@ -182,7 +182,7 @@ class SmsTestCommon(object):
 
     def verify_message_sent(self):
         # wait for sent message; possibly could fail because of insufficient network signal
-        wait = Wait(self.marionette, timeout=90, interval=10)
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
             wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.gotReqOnsuccess"))
         except:
