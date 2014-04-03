@@ -67,25 +67,25 @@ TestListView.prototype = {
     var testData = data.testData;
     switch (testData.event) {
       case "testStart":
-        this.setTestState(testData.id, "start");
+        this.setTestState(testData.id, "running");
         break;
       case "success":
-        this.setTestState(testData.id, "success", "Pass");
+        this.setTestState(testData.id, "pass", "Pass");
         break;
       case "expectedFailure":
-        this.setTestState(testData.id, "success", "Expected failure");
+        this.setTestState(testData.id, "expected_failure", "Expected Failure");
         break;
       case "skip":
-        this.setTestState(testData.id, "success", testData.reason);
+        this.setTestState(testData.id, "skip", testData.reason);
         break;
       case "error":
-        this.setTestState(testData.id, "fail", testData.error);
+        this.setTestState(testData.id, "error", testData.error);
         break;
       case "failure":
         this.setTestState(testData.id, "fail", testData.error);
         break;
       case "expectedSuccess":
-        this.setTestState(testData.id, "fail", "Unexpected success");
+        this.setTestState(testData.id, "expected_success", "Unexpected Success");
         break;
     }
   }
@@ -131,6 +131,16 @@ Dialog.prototype = {
   show: function() {
     this.textEl.innerHTML = this.message;
     this.overlayEl.removeClass("hidden");
+
+    switch (this.type) {
+    case "instruct":
+    case "confirm":
+      this.okEl.focus();
+      break;
+    case "confirm":
+    default:
+      this.responseEl.focus();
+    }
   },
 
   close: function() {
