@@ -39,9 +39,8 @@ def get_test_failures(raw_log):
         if data['status'] == 'FAIL':
             failures.append(data)
     with open(raw_log, 'r') as f:
-        #XXX: bug 985606: map_action is a generator
-        list(reader.map_action(reader.read(f),
-                               {"test_status":test_status}))
+        reader.each_log(reader.read(f),
+                               {"test_status":test_status})
     return failures
 
 def run_test(test, temp_dir, args):
