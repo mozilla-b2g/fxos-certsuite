@@ -81,8 +81,8 @@ class TelephonyTestCommon(object):
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
             if incoming: # only receive 'onconnecting' for incoming call
-                wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.connecting_call_ok"))
-            wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.connected_call_ok"))
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connecting_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connected_call_ok"))
         except:
             # failed to answer call
             self.fail("Failed to answer call")
@@ -133,8 +133,8 @@ class TelephonyTestCommon(object):
         # should have received both events associated with a call hangup
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
-            wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
-            wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
         except:
             # failed to hangup
             self.fail("Failed to hangup call")
@@ -152,19 +152,16 @@ class TelephonyTestCommon(object):
         var destination = arguments[0]
         var out_call = telephony.dial(destination);
 
+        window.wrappedJSObject.received_dialing = false;
+        if (out_call.state == "dialing") {
+            window.wrappedJSObject.received_dialing = true;
+        };
+
         window.wrappedJSObject.received_statechange = false;
         out_call.onstatechange = function onstatechange(event) {
           log("Received TelephonyCall 'onstatechange' event.");
           if (event.call.state == "alerting") {
             window.wrappedJSObject.received_statechange = true;
-          };
-        };
-
-        window.wrappedJSObject.received_dialing = false;
-        out_call.ondialing = function ondialing(event) {
-          log("Received TelephonyCall 'ondialing' event.");
-          if (event.call.state == "dialing") {
-            window.wrappedJSObject.received_dialing = true;
           };
         };
 
@@ -192,10 +189,9 @@ class TelephonyTestCommon(object):
         # should have received all events associated with an outgoing call
         wait = Wait(self.marionette, timeout=30, interval=0.5)
         try:
-            wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.received_statechange"))
-            # for some reason the 'ondialing' event is never received; take this out for now so test passes (under investigation)
-            # wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.received_dialing"))
-            wait.until(lambda x: self.marionette.execute_script("return window.wrappedJSObject.received_alerting"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_dialing"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_alerting"))
         except:
             # failed to initiate call; check if the destination phone's line was busy
             busy = self.marionette.execute_script("return window.wrappedJSObject.received_busy")
