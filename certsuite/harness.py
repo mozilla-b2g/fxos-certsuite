@@ -20,10 +20,9 @@ from collections import OrderedDict
 from mozfile import TemporaryDirectory
 from mozlog.structured import reader
 
-SUBTESTS = [
+SUBTESTS = OrderedDict([
     ('cert', None),
-]
-subtest_opts = dict(SUBTESTS)
+])
 
 class TestResult:
     def __init__(self, test_name, passed, failures, errors, results_file):
@@ -51,7 +50,7 @@ def list_tests():
     Query each subharness for the list of test groups it can run and
     yield a tuple of (subharness, test group) for each one.
     '''
-    for test, _ in SUBTESTS:
+    for test, _ in SUBTESTS.iteritems():
         try:
             for group in subprocess.check_output([test, '--list-test-groups']).splitlines():
                 yield test, group
@@ -62,10 +61,11 @@ def filter_tests(tests):
     '''
     Given a list of tests from the commandline, yield triples of
     (subsuite, options, test groups) of subsuites to run and the
-    test groups to run within them.
+    test groups to run within them. If test groups is an empty list,
+    all tests in the subsuite should be run.
     '''
     if not tests:
-        tests = [s for s, _ in SUBTESTS]
+        tests = SUBTESTS.keys()
     d = OrderedDict()
     for t in tests:
         v = t.split(":", 1)
@@ -73,9 +73,10 @@ def filter_tests(tests):
         if subsuite not in d:
             d[subsuite] = []
         if len(v) == 2:
+            #TODO: verify tests passed against possible tests?
             d[subsuite].append(v[1])
     for subsuite, test_groups in d.iteritems():
-        yield subsuite, subtest_opts[subsuite], test_groups
+        yield subsuite, SUBTESTS[subsuite], test_groups
 
 def run_test(test_name, temp_dir, args, test_groups):
     print 'Running %s' % test_name
