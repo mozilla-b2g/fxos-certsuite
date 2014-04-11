@@ -81,17 +81,19 @@ This section, if present, lists objects descended from the top-level 'window'
 object which are present on the device, but not on a reference version, in
 an (unprivileged|privileged|certified) context.
 
-added_navigator_functions
+[unpriv|priv|cert]_added_navigator_functions
 ======================
 This section, if present, lists objects descended from the top-level 'navigator'
-object which are present on a reference version, but not present on the device.
+object which are present on a reference version, but not present on the device,
+in an (unprivileged|privileged|certified) context.
 
-missing_navigator_functions
+[unpriv|priv|cert]_missing_navigator_functions
 ===========================
 This section, if present, lists objects descended from the top-level 'navigator'
-object which are present on the device, but not on a reference version.
+object which are present on the device, but not on a reference version,
+in an (unprivileged|privileged|certified) context.
 
-added_navigator_privileged_functions
+[unpriv|priv|cert]_added_navigator_unprivileged_functions
 ====================================
 This section, if present, lists objects descended from the top-level 'navigator'
 object which are reported as null on a reference version, but reported
@@ -99,13 +101,14 @@ as not-null on the device.  This could indicate a permissions problem; i.e.,
 the object belongs to an API which a reference version reports as null because
 the API is only available to privileged contexts, and the test is run in an
 unprivileged context, but which is available in an unprivileged context on
-the device.
+the device.  This test is performed in an (unprivileged|privileged|certified)
+context.
 
-missing_navigator_unprivileged_functions
+[unpriv|priv|cert]_missing_navigator_unprivileged_functions
 ========================================
 This section, if present, lists objects descended from the top-level 'navigator'
 object which are reported as not-null on a reference version, but reported
 as null on the device.  This could indicate a permissions problem; i.e.,
 the object belongs to an API which should be available to unprivileged
 contexts, but which is not available to an unprivileged context on the device.
-
+This test is performed in an (unprivileged|privileged|certified) context.
