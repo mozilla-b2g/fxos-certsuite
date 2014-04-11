@@ -27,15 +27,16 @@ class TelephonyTestCommon(object):
         """, special_powers=True)
 
     def verify_incoming_call(self):
-        received = self.marionette.execute_script("return window.wrappedJSObject.received_incoming")
-        self.assertTrue(received, "Incoming call not received (Telephony.onincoming event not found)")
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call" )
-        self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
-        self.assertEqual(self.incoming_call['state'], "incoming", "Call state should be 'incoming'")
-        self.assertEqual(self.calls['0'], self.incoming_call)
-        # don't need incoming listener anymore
-        self.marionette.execute_script("window.navigator.mozTelephony.onincoming = null;")
+        try:
+            received = self.marionette.execute_script("return window.wrappedJSObject.received_incoming")
+            self.assertTrue(received, "Incoming call not received (Telephony.onincoming event not found)")
+            self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+            self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call" )
+            self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
+            self.assertEqual(self.incoming_call['state'], "incoming", "Call state should be 'incoming'")
+            self.assertEqual(self.calls['0'], self.incoming_call)
+        finally:
+            self.marionette.execute_script("window.navigator.mozTelephony.onincoming = null;")
 
     def answer_call(self, incoming=True):
         # answer incoming call via the webapi; have user answer outgoing call on target
@@ -84,7 +85,6 @@ class TelephonyTestCommon(object):
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connecting_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connected_call_ok"))
         except:
-            # failed to answer call
             self.fail("Failed to answer call")
 
         # verify the active call
@@ -215,11 +215,10 @@ class TelephonyTestCommon(object):
             self.fail("Must enter a destination phone number")
 
         destination = destination.strip()
-        self.assertTrue(len(destination) > 1, "Destination phone number must be entered")
+        self.assertGreater(len(destination), 3, "Destination phone number entered is incomplete")
 
         # ask user to confirm destination number
         self.confirm('Warning: A test call will be made from the Firefox OS device to "%s" is this number correct?' %destination)
-        self.out_destination = destination
 
         # make the call via webapi
         self.initiate_outgoing_call(destination)
