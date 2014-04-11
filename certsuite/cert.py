@@ -108,8 +108,7 @@ def package_app(path, extrafiles):
             for f in files:
                 if f in extrafiles:
                     continue
-                with open(os.path.join(root, f), 'r') as data:
-                    zip_file.write(os.path.join(root, f), f)
+                zip_file.write(os.path.join(root, f), f)
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
 
@@ -184,8 +183,7 @@ def log_results(diff, logger, report, name):
         logger.test_status('webapi', name, 'PASS')
 
 def parse_results(expected_results_path, results, prefix, logger, report):
-    expected_results_json = open(expected_results_path, 'r').read()
-    expected_results = json.loads(expected_results_json)
+    expected_results = json.loads(open(expected_results_path, 'r').read())
     #compute difference in navigator functions
     expected_nav = expected_results["navList"]
     nav = results["navList"]
