@@ -58,14 +58,11 @@ Quick Setup and Usage
 
 You can setup your environment and run the tests by running::
 
-    ./run.sh --version=<some version> --result-file=<absolute filepath>
+    ./run.sh --version=<some version>
 
-The *--version* and *--result* arguments are optional.  If passed,
+The *--version* argument is optional.  If passed,
 *--version* must be one of our supported release versions, either 1.3
-or 1.4.  If you don't pass a version, 1.3 will be assumed.  The
-*--result-file* option can be used to specify where you want the json
-file to be created.  By default, it will write the file *results.json*
-in the current working directory.
+or 1.4.  If you don't pass a version, 1.3 will be assumed.
 
 This command sets up a virtual environment for you, with all the
 proper packages installed, activates the environment, runs the tests,
@@ -104,5 +101,12 @@ Submitting Results
 
 Once the tests have completed successfully, they will write a file
 containing the results to disk; by default this file is called
-*results.json* and will be put in your current working directory.
-Please compress this file and e-mail it to fxos-cert@mozilla.com.
+*rfirefox-os-certification.zip* and will be put in your current working
+directory. Please e-mail this file to fxos-cert@mozilla.com.
+
+Known Issues
+============
+* Tests fail if re-run on a device they've already been run on
+[https://bugzilla.mozilla.org/show_bug.cgi?id=995455].  Workaround:
+re-install gaia or re-flash the device before re-running the tests.
+
