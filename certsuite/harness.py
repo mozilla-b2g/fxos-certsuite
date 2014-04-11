@@ -18,101 +18,133 @@ import zipfile
 
 from collections import OrderedDict
 from mozfile import TemporaryDirectory
-from mozlog.structured import reader
+from mozlog.structured import structuredlog, reader, handlers, formatters
 
-SUBTESTS = OrderedDict([
-    ('cert', None),
-])
+logger = None
 
-class TestResult:
-    def __init__(self, test_name, passed, failures, errors, results_file):
-        self.test_name = test_name
-        self.passed = passed
-        self.failures = failures
-        self.errors = errors
-        self.results_file = results_file
+def setup_logging(log_f):
+    global logger
+    logger = structuredlog.StructuredLogger("firefox-os-cert-suite")
+    logger.add_handler(handlers.StreamHandler(sys.stderr,
+                                              formatters.MachFormatter()))
 
-def get_test_failures(raw_log):
-    '''
-    Return the list of test failures contained within a structured log file.
-    '''
-    failures = []
-    def test_status(data):
-        if data['status'] == 'FAIL':
-            failures.append(data)
-    with open(raw_log, 'r') as f:
-        reader.each_log(reader.read(f),
-                               {'test_status':test_status})
-    return failures
+    logger.add_handler(handlers.StreamHandler(log_f,
+                                              formatters.JSONFormatter()))
 
-def list_tests():
+
+def load_config(path):
+    with open(path) as f:
+        config = json.load(f)
+    config["suites"] = OrderedDict(config["suites"])
+    return config
+
+def iter_test_lists(suites_config):
     '''
     Query each subharness for the list of test groups it can run and
     yield a tuple of (subharness, test group) for each one.
     '''
-    for test, _ in SUBTESTS.iteritems():
+    for name, opts in suites_config.iteritems():
         try:
-            for group in subprocess.check_output([test, '--list-test-groups']).splitlines():
-                yield test, group
+            cmd = [opts["cmd"], '--list-test-groups'] + opts.get("pos_args", [])
+            for group in subprocess.check_output(cmd).splitlines():
+                yield name, group
         except subprocess.CalledProcessError:
-            pass
+            print >> sys.stderr("Failed to run command %s" % " ".join(cmd))
+            sys.exit(1)
 
-def filter_tests(tests):
-    '''
-    Given a list of tests from the commandline, yield triples of
-    (subsuite, options, test groups) of subsuites to run and the
-    test groups to run within them. If test groups is an empty list,
-    all tests in the subsuite should be run.
-    '''
-    if not tests:
-        tests = SUBTESTS.keys()
-    d = OrderedDict()
-    for t in tests:
-        v = t.split(":", 1)
-        subsuite = v[0]
-        if subsuite not in d:
-            d[subsuite] = []
-        if len(v) == 2:
-            #TODO: verify tests passed against possible tests?
-            d[subsuite].append(v[1])
-    for subsuite, test_groups in d.iteritems():
-        yield subsuite, SUBTESTS[subsuite], test_groups
+class TestRunner(object):
+    def __init__(self, args, config):
+        self.args = args
+        self.config = config
 
-def run_test(test_name, temp_dir, args, test_groups):
-    print 'Running %s' % test_name
-    result = None
-    try:
-        raw_log = os.path.join(temp_dir, 'structured.log')
-        result_file = os.path.join(temp_dir, 'results.json')
-        cmd = [test_name,
-               '--version=%s' % args.version,
-               '--log-raw=%s' % raw_log,
-               '--result-file=%s' % result_file,
-               ]
-        if test_groups:
-            cmd.extend('--include=%s' % g for g in test_groups)
-        if args.no_reboot:
-            cmd.append('--no-reboot')
-        env = dict(os.environ)
-        env['PYTHONUNBUFFERED'] = '1'
-        proc = mozprocess.ProcessHandler(cmd, env=env)
-        #TODO: move timeout handling to here instead of each test?
-        proc.run()
-        passed = proc.wait() == 0
-        failures = get_test_failures(raw_log)
-        if failures:
-            passed = False
-        #TODO: check for errors in the log
-        result = TestResult(test_name, passed, failures, [], result_file)
-    except Exception as e:
-        result = TestResult(test_name, False, [], [traceback.format_exc()], result_file)
-    finally:
-        if result is None:
+    def iter_suites(self):
+        '''
+        Iterate over test suites and groups of tests that are to be run. Returns
+        tuples of the form (suite, [test_groups]) where suite is the name of a
+        test suite and [test_groups] is a list of group names to run in that suite,
+        or the empty list to indicate all tests.
+        '''
+        if not self.args.tests:
+            tests = self.config["suites"].keys()
+        else:
+            tests = self.args.tests
+
+        d = OrderedDict()
+        for t in tests:
+            v = t.split(":", 1)
+            suite = v[0]
+            if suite not in d:
+                d[suite] = []
+
+            if len(v) == 2:
+                #TODO: verify tests passed against possible tests?
+                d[suite].append(v[1])
+
+        for suite, groups in d.iteritems():
+            yield suite, groups
+
+    def run_suite(self, suite, groups, output_zip):
+        with TemporaryDirectory() as temp_dir:
+            result_files = self.run_test(suite, groups, temp_dir)
+
+            for path in result_files:
+                file_name = os.path.split(path)[1]
+                output_zip.write(path, "%s/%s" % (suite, file_name))
+
+    def run_test(self, suite, groups, temp_dir):
+        logger.info('Running suite %s' % suite)
+
+        files = []
+
+        try:
+            cmd, output_files = self.build_command(suite, groups, temp_dir)
+
+            logger.debug(cmd)
+            logger.debug(output_files)
+
+            env = dict(os.environ)
+            env['PYTHONUNBUFFERED'] = '1'
+            proc = mozprocess.ProcessHandler(cmd, env=env)
+            logger.debug("Process '%s' is running" % " ".join(cmd))
+            #TODO: move timeout handling to here instead of each test?
+            proc.run()
+            proc.wait()
+            logger.debug("Process finished")
+
+        except Exception as e:
+            logger.critical("Error running suite %s:\n%s" %(suite, traceback.format_exc()))
+            raise
+        finally:
             try:
                 proc.kill()
             except:
                 pass
-    return result
+
+        return output_files
+
+    def build_command(self, suite, groups, temp_dir):
+        suite_opts = self.config["suites"][suite]
+
+        subn = self.config.copy()
+        del subn["suites"]
+        subn.update({"temp_dir": temp_dir})
+
+        cmd = [suite_opts['cmd']]
+        cmd.extend(item % subn for item in suite_opts.get("args", []))
+
+        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
+        cmd.extend(["--log-raw=%s" % log_name,
+                    "--log-mach=-"])
+
+        if groups:
+            cmd.extend('--include=%s' % g for g in groups)
+
+        cmd.extend(item % subn for item in suite_opts.get("pos_args", []))
+
+        output_files = [log_name]
+        output_files += [item % subn for item in suite_opts.get("extra_files", [])]
+
+        return cmd, output_files
 
 def log_result(results, result):
     results[result.test_name] = {
@@ -123,29 +155,83 @@ def log_result(results, result):
 
 def check_adb():
     try:
+        logger.info("Testing ADB connection")
         dm = mozdevice.DeviceManagerADB()
     except mozdevice.DMError, e:
-        print 'Error connecting to device via adb (error: %s). Please be ' \
-            'sure device is connected and "remote debugging" is enabled.' % \
-            e.msg
+        logger.critical('Error connecting to device via adb (error: %s). Please be ' \
+                        'sure device is connected and "remote debugging" is enabled.' % \
+                        e.msg)
         sys.exit(1)
 
-def install_marionette(os_version):
+def install_marionette():
     try:
+        logger.info("Installing marionette extension")
         marionette_extension.install()
     except subprocess.CalledProcessError, e:
-        print 'Error installing marionette extension: %s' % e
+        logger.critical('Error installing marionette extension: %s' % e)
         sys.exit(1)
 
+def list_tests(args, config):
+    print 'Tests available:'
+    for test, group in iter_test_lists(config["suites"]):
+        print "%s:%s" % (test, group)
+    print '''To run a set of tests, pass those test names on the commandline, like:
+runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
+    return 0
+
+def run_tests(args, config):
+    output_zipfile = 'firefox-os-certification.zip'
+    output_logfile = "run.log"
+    error = False
+
+    try:
+        with zipfile.ZipFile(output_zipfile, 'w', zipfile.ZIP_DEFLATED) as zip_f:
+            with open(output_logfile, "w") as log_f:
+                setup_logging(log_f)
+
+                check_adb()
+                install_marionette()
+
+                runner = TestRunner(args, config)
+
+                for suite, groups in runner.iter_suites():
+                    try:
+                        runner.run_suite(suite, groups, zip_f)
+                    except:
+                        logger.critical("Encountered error:\n%s" % traceback.format_exc())
+                        error = True
+
+                if error:
+                    logger.critical("Encountered errors during run")
+
+            zip_f.write(output_logfile)
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except:
+        error = True
+        print "Encountered error at top level:\n%s" % traceback.format_exc()
+
+    sys.stderr.write('Results saved in %s' % output_zipfile)
+
+    return int(error)
+
 def main():
+    parser = get_parser()
+    args = parser.parse_args()
+
+    config = load_config(args.config)
+
+    if args.list_tests:
+        return list_tests(args, config)
+    else:
+        return run_tests(args, config)
+
+def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--version',
-                        help='version of Firefox OS under test',
-                        default='1.3',
-                        action='store')
-    parser.add_argument('--no-reboot',
-                        help='don\'t reboot device before running test',
-                        action='store_true')
+    #TODO make this more robust
+    parser.add_argument('--config',
+                        help='Path to config file', type=os.path.abspath,
+                        action='store', default='certsuite/config.json')
     parser.add_argument('--list-tests',
                         help='list all tests available to run',
                         action='store_true')
@@ -153,30 +239,7 @@ def main():
                         metavar='TEST',
                         help='test to run (use --list-tests to see available tests)',
                         nargs='*')
-    args = parser.parse_args()
-
-    if args.list_tests:
-        print 'Tests available:'
-        for test, group in list_tests():
-            print "%s:%s" % (test, group)
-        print '''To run a set of tests, pass those test names on the commandline, like:
-    runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
-        return 0
-
-    check_adb()
-    install_marionette(args.version)
-
-    results = {}
-    output_zipfile = 'firefox-os-certification.zip'
-    with zipfile.ZipFile(output_zipfile, 'w', zipfile.ZIP_DEFLATED) as f:
-        for test, test_opts, test_groups in filter_tests(args.tests):
-            with TemporaryDirectory() as temp_dir:
-                result = run_test(test, temp_dir, args, test_groups)
-                log_result(results, result)
-                if result.results_file and os.path.exists(result.results_file):
-                    f.write(result.results_file, '%s_results.json' % result.test_name)
-        f.writestr('certsuite-results.json', json.dumps(results))
-    print 'Results saved in %s' % output_zipfile
+    return parser
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
