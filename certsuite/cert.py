@@ -9,12 +9,15 @@ import StringIO
 import argparse
 import json
 import logging
+from marionette import Marionette
 import mozdevice
 import moznetwork
 import os
 import pkg_resources
 import sys
 import wptserve
+from zipfile import ZipFile
+from fxos_appgen import install_app
 
 from mozlog.structured import (
     commandline,
@@ -39,6 +42,8 @@ headers = None
 installed = False
 
 webapi_results = None
+webapi_results_priv = None
+webapi_results_cert = None
 
 supported_versions = ["1.4", "1.3"]
 
@@ -70,6 +75,16 @@ def webapi_results_handler(request, response):
     global webapi_results
     webapi_results = json.loads(request.POST["results"])
 
+@wptserve.handlers.handler
+def webapi_results_priv_handler(request, response):
+    global webapi_results_priv
+    webapi_results_priv = json.loads(request.POST["results"])
+
+@wptserve.handlers.handler
+def webapi_results_cert_handler(request, response):
+    global webapi_results_cert
+    webapi_results_cert = json.loads(request.POST["results"])
+
 static_path = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "static"))
 
@@ -77,7 +92,63 @@ routes = [("GET", "/", connect_handler),
           ("GET", "/headers", headers_handler),
           ("GET", "/installed", installed_handler),
           ("POST", "/webapi_results", webapi_results_handler),
+          ("POST", "/webapi_results_priv", webapi_results_priv_handler),
+          ("POST", "/webapi_results_cert", webapi_results_cert_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
+
+def read_manifest(app):
+    with open(os.path.join(app, 'manifest.webapp')) as f:
+        manifest = f.read()
+    return manifest
+
+def package_app(path, extrafiles):
+    app_path = 'app.zip'
+    with ZipFile(app_path, 'w') as zip_file:
+        for root, dirs, files in os.walk(path):
+            for f in files:
+                if f in extrafiles:
+                    continue
+                zip_file.write(os.path.join(root, f), f)
+        for f in extrafiles:
+            zip_file.writestr(f, extrafiles[f])
+
+# TODO: This local version of install_app can be removed as soon as
+# the version of fxos-appgen on PyPI supports timeout.
+def install_app(app_name, app_path, adb_path=None, timeout=5000):
+    dm = None
+    if adb_path:
+        dm = mozdevice.DeviceManagerADB(adbPath=adb_path)
+    else:
+        dm = mozdevice.DeviceManagerADB()
+
+    #TODO: replace with app name
+    installed_app_name = app_name.lower()
+    installed_app_name = installed_app_name.replace(" ", "-")
+    if dm.dirExists("/data/local/webapps/%s" % installed_app_name):
+        raise Exception("%s is already installed" % app_name)
+        sys.exit(1)
+    app_zip = os.path.basename(app_path)
+    dm.pushFile("%s" % app_path, "/data/local/%s" % app_zip)
+    # forward the marionette port
+    ret = dm.forward("tcp:2828", "tcp:2828")
+    if ret != 0:
+        raise Exception("Can't use localhost:2828 for port forwarding." \
+                        "Is something else using port 2828?")
+
+    # install the app
+    install_js = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                              "app_install.js"))
+    f = open(install_js, "r")
+    script = f.read()
+    f.close()
+    script = script.replace("YOURAPPID", installed_app_name)
+    script = script.replace("YOURAPPZIP", app_zip)
+    m = Marionette()
+    m.start_session()
+    m.set_context("chrome")
+    m.set_script_timeout(timeout)
+    m.execute_async_script(script)
+    m.delete_session()
 
 def diff_results(a, b, checkNull):
 
@@ -100,6 +171,82 @@ def diff_results(a, b, checkNull):
                 result.extend([key + '.' + item for item in diff_results(a[key], b[key], checkNull)])
 
     return result
+
+def log_results(diff, logger, report, name):
+    if diff:
+        report[name.replace('-', '_')] = diff
+        try:
+            logger.test_status('webapi', name, 'FAIL', message=','.join([result['name'] for result in diff]))
+        except TypeError:
+            logger.test_status('webapi', name, 'FAIL', message=','.join(diff))
+    else:
+        logger.test_status('webapi', name, 'PASS')
+
+def parse_results(expected_results_path, results, prefix, logger, report):
+    expected_results = json.loads(open(expected_results_path, 'r').read())
+    #compute difference in navigator functions
+    expected_nav = expected_results["navList"]
+    nav = results["navList"]
+
+    logger.test_start('webapi')
+    webapi_passed = True
+
+    missing_nav = diff_results(expected_nav, nav, False)
+    log_results(missing_nav, logger, report, prefix + 'missing-navigator-functions')
+
+    added_nav = diff_results(nav, expected_nav, False)
+    log_results(added_nav, logger, report, prefix + 'added-navigator-functions')
+    if missing_nav or added_nav:
+        webapi_passed = False
+
+    # NOTE: privileged functions in an unprivileged app are null
+    # compute difference in navigator "null" functions, ie: privileged functions
+    missing_nav_null = diff_results(expected_nav, nav, True)
+    log_results(missing_nav_null, logger, report, prefix + 'missing-navigator-unprivileged-functions')
+
+    added_nav_null = diff_results(nav, expected_nav, True)
+    log_results(added_nav_null, logger, report, prefix + 'added-navigator-unprivileged-functions')
+    if missing_nav_null or added_nav_null:
+        webapi_passed = False
+
+    #computer difference in window functions
+    expected_window = expected_results["windowList"]
+    window = results["windowList"]
+
+    missing_window = diff_results(expected_window, window, False)
+    log_results(missing_window, logger, report, prefix + 'missing-window-functions')
+
+    added_window = diff_results(window, expected_window, False)
+    log_results(added_window, logger, report, prefix + 'added-window-functions')
+    if missing_window or added_window:
+        webapi_passed = False
+
+    # compute differences in WebIDL results
+    expected_webidl = {}
+    for result in expected_results['webIDLResults']:
+        expected_webidl[result['name']] = result
+
+    unexpected_webidl_results = []
+    added_webidl_results = []
+    for result in results['webIDLResults']:
+        try:
+            if expected_webidl[result['name']]['result'] != result['result']:
+                unexpected_webidl_results.append(result)
+            del expected_webidl[result['name']]
+        except KeyError:
+            added_webidl_results.append(result)
+
+    # since we delete found results above, anything here is missing
+    missing_webidl_results = list(expected_webidl.values())
+
+    log_results(unexpected_webidl_results, logger, report, prefix + 'unexpected-webidl-results')
+    log_results(added_webidl_results, logger, report, prefix + 'added-webidl-results')
+    log_results(missing_webidl_results, logger, report, prefix + 'missing-webidl-results')
+    if added_webidl_results or unexpected_webidl_results or missing_webidl_results:
+        webapi_passed = False
+
+    return webapi_passed
+
 
 def cli():
     parser = argparse.ArgumentParser()
@@ -124,6 +271,9 @@ def cli():
                         help="absolute file path to store the resulting json." \
                              "Defaults to results.json on your current path",
                         action="store")
+    parser.add_argument("--generate-reference",
+                        help="Generate expected result files",
+                        action="store_true")
     commandline.add_logging_group(parser)
 
     args = parser.parse_args()
@@ -166,9 +316,6 @@ def cli():
               (args.version, supported_versions)
         sys.exit(1)
 
-    file_path = pkg_resources.resource_filename(
-                        __name__, os.path.sep.join(['expected_webapi_results', '%s.json' % args.version]))
-
     # get build properties
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
     for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
@@ -203,7 +350,8 @@ def cli():
         omni_analyzer = OmniAnalyzer(vfile=omni_verify_file, results=omni_results_path, dir=omni_work_dir, logger=logger)
         omni_results = open(omni_results_path, 'r').read()
         report["omni_result"] = json.loads(omni_results)
-        os.remove(omni_results_path)
+        if not args.generate_reference:
+            os.remove(omni_results_path)
 
     # Step 2: Navigate to local hosted web server to install app for
     # WebIDL iteration and fetching HTTP headers
@@ -226,108 +374,67 @@ def cli():
         Wait().until(lambda: installed is True)
 
         print "\n#4: Please follow the instructions to install the app, then launch " \
-            "WebAPIVerifier from the homescreen. This will start the WebAPI tests " \
-            "and may take a couple minutes to complete. The app will load when " \
-            "it is complete."
+            "WebAPI Verifier from the homescreen. This will start the WebAPI tests " \
+            "and may take a couple minutes to complete."
         Wait(timeout=600).until(lambda: webapi_results is not None)
+
+        if args.generate_reference:
+            with open('webapi_results.json', 'w') as f:
+                f.write(json.dumps(webapi_results))
+
         print "Processing results..."
-        expected_results_json = open(file_path, 'r').read()
-        expected_results = json.loads(expected_results_json)
-        #compute difference in navigator functions
-        expected_nav = expected_results["navList"]
-        nav = webapi_results["navList"]
+        file_path = pkg_resources.resource_filename(
+                            __name__, os.path.sep.join(['expected_webapi_results', '%s.json' % args.version]))
 
-        logger.test_start('webapi')
-        webapi_passed = True
-        missing_nav = diff_results(expected_nav, nav, False)
-        if missing_nav:
-            report['missing_navigator_functions'] = missing_nav
-            logger.test_status('webapi', 'missing-navigator-functions', 'FAIL', message=','.join(missing_nav))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'missing-navigator-functions', 'PASS')
-        added_nav = diff_results(nav, expected_nav, False)
-        if added_nav:
-            report['added_navigator_functions'] = added_nav
-            logger.test_status('webapi', 'added-navigator-functions', 'FAIL', message=','.join(added_nav))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'added-navigator-functions', 'PASS')
+        webapi_passed = parse_results(file_path, webapi_results, 'unpriv-', logger, report)
 
-        # NOTE: privileged functions in an unprivileged app are null
-        # compute difference in navigator "null" functions, ie: privileged functions
-        missing_nav_null = diff_results(expected_nav, nav, True)
-        if missing_nav_null:
-            report['missing_navigator_unprivileged_functions'] = missing_nav_null
-            logger.test_status('webapi', 'missing-navigator-unprivileged-functions', 'FAIL', message=','.join(missing_nav_null))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'missing-navigator-unprivileged-functions', 'PASS')
-        added_nav_null = diff_results(nav, expected_nav, True)
-        if added_nav_null:
-            report['added_navigator_privileged_functions'] = added_nav_null
-            logger.test_status('webapi', 'added-navigator-unprivileged-functions', 'FAIL', message=','.join(added_nav_null))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'added-navigator-unprivileged-functions', 'PASS')
+        # Run privileged app
+        print "\n#5: Installing the privileged app. This will take a minute... "
 
-        #computer difference in window functions
-        expected_window = expected_results["windowList"]
-        window = webapi_results["windowList"]
+        apppath = os.path.join(static_path, 'webapi-test-app')
+        apppath_priv = os.path.join(static_path, 'webapi-test-app-priv')
+        manifest = read_manifest(apppath_priv)
+        appname = json.loads(manifest)['name']
+        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_priv";' % addr,
+                              'manifest.webapp': manifest})
+        install_app(appname, 'app.zip', timeout=30000)
 
-        missing_window = diff_results(expected_window, window, False)
-        if missing_window:
-            report['missing_window_functions'] = missing_window
-            logger.test_status('webapi', 'missing-window-functions', 'FAIL', message=','.join(missing_window))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'missing-window-functions', 'PASS')
-        added_window = diff_results(window, expected_window, False)
-        if added_window:
-            report['added_window_functions'] = added_window
-            logger.test_status('webapi', 'added-window-functions', 'FAIL', message=','.join(added_window))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'added-window-functions', 'PASS')
+        print "Done. Please run the Privileged WebAPI Verifier from the home screen."
 
-        # compute differences in WebIDL results
-        expected_webidl = {}
-        for result in expected_results['webIDLResults']:
-            expected_webidl[result['name']] = result
+        Wait(timeout=600).until(lambda: webapi_results_priv is not None)
 
-        unexpected_webidl_results = []
-        added_webidl_results = []
-        for result in webapi_results['webIDLResults']:
-            try:
-                if expected_webidl[result['name']]['result'] != result['result']:
-                    unexpected_webidl_results.append(result)
-                del expected_webidl[result['name']]
-            except KeyError:
-                added_webidl_results.append(result)
+        if args.generate_reference:
+            with open('webapi_results_priv.json', 'w') as f:
+                f.write(json.dumps(webapi_results_priv))
 
-        # since we delete found results above, anything here is missing
-        missing_webidl_results = list(expected_webidl.values())
+        print "Processing results..."
+        file_path = pkg_resources.resource_filename(
+                            __name__, os.path.sep.join(['expected_webapi_results', '%s.priv.json' % args.version]))
+        webapi_passed = parse_results(file_path, webapi_results_priv, 'priv-', logger, report) and webapi_passed
 
-        if unexpected_webidl_results:
-            report['unexpected_webidl_results'] = unexpected_webidl_results
-            logger.test_status('webapi', 'unexpected-webidl-results', 'FAIL', message=','.join([result['name'] for result in unexpected_webidl_results]))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'unexpected-webidl-results', 'PASS')
+        # Run certified app
+        print "\n#6: Installing the certified app. This will take a minute... "
 
-        if added_webidl_results:
-            report['added_webidl_results'] = added_webidl_results
-            logger.test_status('webapi', 'added-webidl-results', 'FAIL', message=','.join([result['name'] for result in added_webidl_results]))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'added-webidl-results', 'PASS')
+        apppath = os.path.join(static_path, 'webapi-test-app')
+        apppath_cert = os.path.join(static_path, 'webapi-test-app-cert')
+        manifest = read_manifest(apppath_cert)
+        appname = json.loads(manifest)['name']
+        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_cert";' % addr,
+                              'manifest.webapp': manifest})
+        install_app(appname, 'app.zip', timeout=30000)
+        os.remove('app.zip')
+        print "Done. Please run the Certified WebAPI Verifier from the home screen."
 
-        if missing_webidl_results:
-            report['missing_webidl_results'] = missing_webidl_results
-            logger.test_status('webapi', 'missing-webidl-results', 'FAIL', message=','.join([result['name'] for result in missing_webidl_results]))
-            webapi_passed = False
-        else:
-            logger.test_status('webapi', 'missing-webidl-results', 'PASS')
+        Wait(timeout=600).until(lambda: webapi_results_cert is not None)
+
+        if args.generate_reference:
+            with open('webapi_results_cert.json', 'w') as f:
+                f.write(json.dumps(webapi_results_cert))
+
+        print "Processing results..."
+        file_path = pkg_resources.resource_filename(
+                            __name__, os.path.sep.join(['expected_webapi_results', '%s.cert.json' % args.version]))
+        webapi_passed = parse_results(file_path, webapi_results_cert, 'cert-', logger, report) and webapi_passed
 
         logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
 
