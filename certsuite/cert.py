@@ -113,6 +113,8 @@ def package_app(path, extrafiles):
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
 
+# TODO: This local version of install_app can be removed as soon as
+# the version of fxos-appgen on PyPI supports timeout.
 def install_app(app_name, app_path, adb_path=None, timeout=5000):
     dm = None
     if adb_path:
@@ -173,10 +175,10 @@ def diff_results(a, b, checkNull):
 
 def log_results(diff, logger, report, name):
     if diff:
-        report[name.replace('-', '_')] = diff 
+        report[name.replace('-', '_')] = diff
         try:
             logger.test_status('webapi', name, 'FAIL', message=','.join([result['name'] for result in diff]))
-        except TypeError: 
+        except TypeError:
             logger.test_status('webapi', name, 'FAIL', message=','.join(diff))
     else:
         logger.test_status('webapi', name, 'PASS')
