@@ -279,7 +279,7 @@ def cli():
     args = parser.parse_args()
 
     test_groups = [
-        'omnijar-analyzer',
+        'omni-analyzer',
         'webapi',
         ]
     if args.list_test_groups:

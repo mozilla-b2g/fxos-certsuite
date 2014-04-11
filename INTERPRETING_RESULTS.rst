@@ -27,7 +27,7 @@ Differences in omni.ja files are not failures; they are simply changes that
 should be reviewed in order to verify that they are harmless, from a 
 branding perspective.
 
-application.ini
+application_ini
 ===============
 This section contains the details inside the application.ini on the device.
 This section is informative.
@@ -53,11 +53,12 @@ processes_running
 This section contains a list of all the processes that were running on the
 device at the time the test was performed.  This section is informative.
 
-unexpected_webidl_results
+[unpriv|priv|cert]_unexpected_webidl_results
 =========================
 This section, if present, represents differences in how interfaces defined
 in WebIDL files in a reference version differ from the interfaces found
-on the device.  For example:
+on the device in an (unprivileged|privileged|certified) context.
+For example:
 
     {
       "message": "assert_true: The prototype object must have a property \"textTracks\" expected true got false", 
@@ -68,15 +69,17 @@ on the device.  For example:
 This means that the HTMLMediaElement interface was expected to expose
 a textTracks attribute, but that attribute was not found on the device.
 
-added_window_functions
+[unpriv|priv|cert]_added_window_functions
 ======================
 This section, if present, lists objects descended from the top-level 'window'
-object which are present on a reference version, but not present on the device.
+object which are present on a reference version, but not present on the device,
+in an (unprivileged|privileged|certified) context.
 
-missing_window_functions
+[unpriv|priv|cert]_missing_window_functions
 ========================
 This section, if present, lists objects descended from the top-level 'window'
-object which are present on the device, but not on a reference version.
+object which are present on the device, but not on a reference version, in
+an (unprivileged|privileged|certified) context.
 
 added_navigator_functions
 ======================
