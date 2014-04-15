@@ -12,7 +12,8 @@ deps = ['fxos-appgen',
         'mozlog >= 1.6',
         'moznetwork >= 0.24',
         'mozprocess >= 0.18',
-        'wptserve >= 1.0.1']
+        'wptserve >= 1.0.1',
+        'wptrunner >= 0.2.1']
 
 setup(name='fxos-certsuite',
       version=PACKAGE_VERSION,
