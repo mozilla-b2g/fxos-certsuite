@@ -8,6 +8,7 @@ from semiauto import TestCase
 
 
 class Smoketests(TestCase):
+
     def test_prompt(self):
         answer = self.prompt("Enter \"foo\"")
         self.assertEqual(answer, "foo")
@@ -33,3 +34,9 @@ class Smoketests(TestCase):
     @unittest.expectedFailure
     def test_confirm_no(self):
         self.confirm("Click No")
+
+    def test_long_response(self):
+        msg = "o" * 200
+        resp = self.prompt(
+            "Copy this exact string into the text field below: \"%s\"" % msg)
+        self.assertEqual(resp, msg)
