@@ -17,7 +17,7 @@ import pkg_resources
 import sys
 import wptserve
 from zipfile import ZipFile
-from fxos_appgen import install_app
+import fxos_appgen
 
 from mozlog.structured import (
     commandline,
@@ -111,44 +111,6 @@ def package_app(path, extrafiles):
                 zip_file.write(os.path.join(root, f), f)
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
-
-# TODO: This local version of install_app can be removed as soon as
-# the version of fxos-appgen on PyPI supports timeout.
-def install_app(app_name, app_path, adb_path=None, timeout=5000):
-    dm = None
-    if adb_path:
-        dm = mozdevice.DeviceManagerADB(adbPath=adb_path)
-    else:
-        dm = mozdevice.DeviceManagerADB()
-
-    #TODO: replace with app name
-    installed_app_name = app_name.lower()
-    installed_app_name = installed_app_name.replace(" ", "-")
-    if dm.dirExists("/data/local/webapps/%s" % installed_app_name):
-        raise Exception("%s is already installed" % app_name)
-        sys.exit(1)
-    app_zip = os.path.basename(app_path)
-    dm.pushFile("%s" % app_path, "/data/local/%s" % app_zip)
-    # forward the marionette port
-    ret = dm.forward("tcp:2828", "tcp:2828")
-    if ret != 0:
-        raise Exception("Can't use localhost:2828 for port forwarding." \
-                        "Is something else using port 2828?")
-
-    # install the app
-    install_js = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                              "app_install.js"))
-    f = open(install_js, "r")
-    script = f.read()
-    f.close()
-    script = script.replace("YOURAPPID", installed_app_name)
-    script = script.replace("YOURAPPZIP", app_zip)
-    m = Marionette()
-    m.start_session()
-    m.set_context("chrome")
-    m.set_script_timeout(timeout)
-    m.execute_async_script(script)
-    m.delete_session()
 
 def diff_results(a, b, checkNull):
 
@@ -391,13 +353,14 @@ def cli():
         # Run privileged app
         print "\n#5: Installing the privileged app. This will take a minute... "
 
+        appname = 'Privileged WebAPI Verifier'
+        details = fxos_appgen.create_details(args.version, all_perms=True)
+        manifest = json.dumps(fxos_appgen.create_manifest(appname, details, 'privileged', args.version))
+
         apppath = os.path.join(static_path, 'webapi-test-app')
-        apppath_priv = os.path.join(static_path, 'webapi-test-app-priv')
-        manifest = read_manifest(apppath_priv)
-        appname = json.loads(manifest)['name']
         package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_priv";' % addr,
                               'manifest.webapp': manifest})
-        install_app(appname, 'app.zip', timeout=30000)
+        fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
 
         print "Done. Please run the Privileged WebAPI Verifier from the home screen."
 
@@ -415,13 +378,13 @@ def cli():
         # Run certified app
         print "\n#6: Installing the certified app. This will take a minute... "
 
+        appname = 'Certified WebAPI Verifier'
+        details = fxos_appgen.create_details(args.version, all_perms=True)
+        manifest = json.dumps(fxos_appgen.create_manifest(appname, details, 'certified', args.version))
         apppath = os.path.join(static_path, 'webapi-test-app')
-        apppath_cert = os.path.join(static_path, 'webapi-test-app-cert')
-        manifest = read_manifest(apppath_cert)
-        appname = json.loads(manifest)['name']
         package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_cert";' % addr,
                               'manifest.webapp': manifest})
-        install_app(appname, 'app.zip', timeout=30000)
+        fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
         os.remove('app.zip')
         print "Done. Please run the Certified WebAPI Verifier from the home screen."
 

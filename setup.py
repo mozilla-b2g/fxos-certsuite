@@ -5,7 +5,7 @@
 from setuptools import setup
 
 PACKAGE_VERSION = '0.1'
-deps = ['fxos-appgen',
+deps = ['fxos-appgen>=0.2.3',
         'marionette_client>=0.7.1.1',
         'marionette_extension >= 0.1',
         'mozdevice >= 0.33',
