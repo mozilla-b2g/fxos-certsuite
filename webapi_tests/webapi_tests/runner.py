@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import argparse
+import importlib
+import inspect
+import os
+import sys
+
+from fnmatch import fnmatch
+
+import semiauto
+
+
+def iter_tests(start_dir, pattern="test_*.py"):
+    """List available Web API tests and yield a tuple of (group, tests), where tests is a list of test names."""
+
+    start_dir = os.path.abspath(start_dir)
+    visited = []
+
+    for root, dirs, files in os.walk(start_dir, followlinks=True):
+        if root in visited:
+            raise ImportError("Recursive symlink: %r" % root)
+        visited.append(root)
+
+        group = os.path.relpath(root, start_dir)
+
+        tests = []
+        for file in files:
+            path = os.path.abspath(os.path.join(root, file))
+            if not fnmatch(file, pattern) or not os.path.exists(path):
+                continue
+
+            relpath = os.path.relpath(path, start_dir)
+            if relpath.endswith(".py"):
+                relpath = relpath[:-3]
+            name = relpath.replace(os.path.sep, ".")
+            module = None
+            try:
+                module = importlib.import_module(name)
+            except ImportError:
+                # Module has import problems which shouldn't affect listing
+                # tests
+                continue
+
+            members = inspect.getmembers(module)
+            ks = [t for t in zip(*members)[1] if isinstance(t, type)]
+
+            # Include only semiauto tests
+            if semiauto.testcase.TestCase not in ks:
+                continue
+
+            for k in ks:
+                if getattr(k, "__module__", None) != name:
+                    continue
+                tests.extend(
+                    [m[0] for m in inspect.getmembers(k) if m[0].startswith("test_")])
+
+        if len(tests) > 0:
+            yield group, tests
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Runner for Web API tests.")
+    parser.add_argument("-l", "--list-test-groups", action="store_true",
+                        help="List all logical test groups.")
+    parser.add_argument("-a", "--list-all-tests", action="store_true",
+                        help="List all tests.")
+    parser.add_argument("-i", "--include", metavar="GROUP", action="append", default=[],
+                        help="Only include specified group(s) in run. Include several groups by repeating flag.")
+    args = parser.parse_args(sys.argv[1:])
+    if args.list_test_groups and len(args.include) > 0:
+        print >> sys.stderr("%s: error: cannot list and include test "
+                            "groups at the same time" % sys.argv[0])
+        parser.print_usage()
+        sys.exit(1)
+
+    testgen = iter_tests(os.path.join(__file__, "../.."))
+    if args.list_test_groups:
+        for group, _ in testgen:
+            print(group)
+        return 0
+    elif args.list_all_tests:
+        for group, tests in testgen:
+            for test in tests:
+                print("%s.%s" % (group, test))
+        return 0
+
+    test_loader = semiauto.TestLoader(config={})
+    tests = test_loader.loadTestsFromNames(
+        args.include or [g for g, _ in testgen], None)
+    results = semiauto.run(tests)
+    return 0 if results.wasSuccessful() else 1
+
+if __name__ == "__main__":
+    sys.exit(main())
