@@ -101,11 +101,11 @@ TestListView.prototype = {
 // confirmation will show a dialogue with a question, and two buttons:
 // "Yes" and "No".
 function Dialog(msg, type) {
-  this.overlayEl = $("#overlay");
-  this.textEl = $("#dialog_text");
-  this.responseEl = $("#dialog_response");
-  this.okEl = $("#ok");
-  this.cancelEl = $("#cancel");
+  this.el = $("#dialog");
+  this.textEl = $("#dialog .content");
+  this.responseEl = $("#dialog .controls input[type=text]");
+  this.okEl = $("#dialog .controls #ok");
+  this.cancelEl = $("#dialog .controls #cancel");
 
   this.okEl.onclick = function() { this.onok(); this.close(); }.bind(this);
   this.cancelEl.onclick = function() { this.oncancel(); this.close(); }.bind(this);
@@ -130,7 +130,7 @@ function Dialog(msg, type) {
 Dialog.prototype = {
   show: function() {
     this.textEl.innerHTML = this.message;
-    this.overlayEl.removeClass("hidden");
+    this.el.removeClass("hidden");
 
     switch (this.type) {
     case "instruct":
@@ -144,7 +144,7 @@ Dialog.prototype = {
   },
 
   close: function() {
-    this.overlayEl.addClass("hidden");
+    this.el.addClass("hidden");
     this.reset();
   },
 
