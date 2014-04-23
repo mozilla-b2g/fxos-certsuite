@@ -146,30 +146,8 @@ def log_results(diff, logger, report, name):
 
 def parse_results(expected_results_path, results, prefix, logger, report):
     expected_results = json.loads(open(expected_results_path, 'r').read())
-    #compute difference in navigator functions
-    expected_nav = expected_results["navList"]
-    nav = results["navList"]
 
-    logger.test_start('webapi')
     webapi_passed = True
-
-    missing_nav = diff_results(expected_nav, nav, False)
-    log_results(missing_nav, logger, report, prefix + 'missing-navigator-functions')
-
-    added_nav = diff_results(nav, expected_nav, False)
-    log_results(added_nav, logger, report, prefix + 'added-navigator-functions')
-    if missing_nav or added_nav:
-        webapi_passed = False
-
-    # NOTE: privileged functions in an unprivileged app are null
-    # compute difference in navigator "null" functions, ie: privileged functions
-    missing_nav_null = diff_results(expected_nav, nav, True)
-    log_results(missing_nav_null, logger, report, prefix + 'missing-navigator-unprivileged-functions')
-
-    added_nav_null = diff_results(nav, expected_nav, True)
-    log_results(added_nav_null, logger, report, prefix + 'added-navigator-unprivileged-functions')
-    if missing_nav_null or added_nav_null:
-        webapi_passed = False
 
     #computer difference in window functions
     expected_window = expected_results["windowList"]
@@ -181,6 +159,16 @@ def parse_results(expected_results_path, results, prefix, logger, report):
     added_window = diff_results(window, expected_window, False)
     log_results(added_window, logger, report, prefix + 'added-window-functions')
     if missing_window or added_window:
+        webapi_passed = False
+
+    # NOTE: privileged functions in an unprivileged app are null
+    # compute difference in navigator "null" functions, ie: privileged functions
+    missing_window_null = diff_results(window, expected_window, True)
+    log_results(missing_window_null, logger, report, prefix + 'missing-window-unprivileged-functions')
+
+    added_window_null = diff_results(window, expected_window, True)
+    log_results(added_window_null, logger, report, prefix + 'added-window-unprivileged-functions')
+    if missing_window_null or added_window_null:
         webapi_passed = False
 
     # compute differences in WebIDL results
