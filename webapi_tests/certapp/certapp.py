@@ -62,7 +62,7 @@ class CertAppMixin(object):
         self.assertTrue("certtest" in self.marionette.get_url())
 
         # Request that screen never dims or switch off.  Acquired wake locks
-        # are implicitly released # when the window object is closed or
+        # are implicitly released when the window object is closed or
         # destroyed.
         self.marionette.execute_script("""
             var wakeLock = window.navigator.requestWakeLock("screen");
