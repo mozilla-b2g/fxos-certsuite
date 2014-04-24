@@ -94,7 +94,9 @@ tr.skip { opacity: .7; }
 tr.error { background: rgb(255,255,0); }
 
 #dialog {
-  position: absolute;
+  position: fixed;  /* the document's height will expand as tests
+                       are run, and this will ensure the overlay
+                       stays in position whilst the user scrolls */
   top: 0;
   left: 0;
   width: 100%;
