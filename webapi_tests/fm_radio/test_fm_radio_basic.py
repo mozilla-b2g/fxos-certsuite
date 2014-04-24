@@ -11,17 +11,17 @@ from fm_radio import FMRadioTestCommon
 class TestFMRadioBasic(TestCase, FMRadioTestCommon):
     def tearDown(self):
         # ensure fm radio is off and listeners removed
-        if (self.is_radio_enabled()):
-            self.change_radio_state(False)
+        if self.is_radio_enabled():
+            self.turn_radio_off()
         self.remove_antenna_change_listener()
         self.remove_radio_change_listeners()
-        TestCase.tearDown(self)
+        super(TestFMRadioBasic, self).tearDown()
 
     def test_insert_antenna(self):
         # ensure antenna is not attached at start
-        self.ensure_antenna_connected(False)
+        if self.is_antenna_available():
+            self.user_detach_antenna()
         # user insert headset; verify via api
-        self.ensure_antenna_connected(False)
         self.setup_antenna_change_listener()
         self.instruct("Insert the headset into the Firefox OS device, then click 'OK'")
         self.wait_for_antenna_change()
@@ -30,29 +30,33 @@ class TestFMRadioBasic(TestCase, FMRadioTestCommon):
 
     def test_turn_radio_on(self):
         # ensure radio is off at start
-        if (self.is_radio_enabled()):
-            self.change_radio_state(False)
-        self.ensure_antenna_connected()
+        if self.is_radio_enabled():
+            self.turn_radio_off()
+        # antenna must be connected
+        if not self.is_antenna_available():
+            self.user_connect_antenna()
         # turn radio on
         self.setup_radio_change_listeners()
-        self.change_radio_state(True)
-        self.assertTrue(self.got_radio_on())
+        self.turn_radio_on()
+        self.assertTrue(self.rcvd_radio_on())
         self.assertTrue(self.is_radio_enabled())
         self.remove_radio_change_listeners()
         self.confirm("The fm radio is ON. There may just be static. Turn up the device \
                     volume and listen in the headphones. Do you hear the radio audio?")
         # turn radio off
-        self.change_radio_state(False)
+        self.turn_radio_off()
 
     def test_turn_radio_off(self):
-        self.ensure_antenna_connected()
+        # antenna must be connected
+        if not self.is_antenna_available():
+            self.user_connect_antenna()
         # ensure radio is on at start
-        if (not self.is_radio_enabled()):
-            self.change_radio_state(True)
+        if not self.is_radio_enabled():
+            self.turn_radio_on()
         # turn radio off
         self.setup_radio_change_listeners()
-        self.change_radio_state(False)
-        self.assertTrue(self.got_radio_off())
+        self.turn_radio_off()
+        self.assertTrue(self.rcvd_radio_off())
         self.assertFalse(self.is_radio_enabled())
         self.remove_radio_change_listeners()
         self.confirm("The fm radio is OFF. Turn up the device volume and listen in the headphones. \
@@ -60,9 +64,10 @@ class TestFMRadioBasic(TestCase, FMRadioTestCommon):
 
     def test_remove_antenna(self):
         # ensure antenna is attached at start
-        self.ensure_antenna_connected()
+        if not self.is_antenna_available:
+            self.user_connect_antenna()
         # remove headset and verify
-        self.setup_antenna_change_listener()        
+        self.setup_antenna_change_listener()
         self.instruct("Remove the headset from the Firefox OS device, then click 'OK'")
         self.wait_for_antenna_change()
         self.assertFalse(self.is_antenna_available(), "Expected FMRadio.antennaAvailable to return false")
