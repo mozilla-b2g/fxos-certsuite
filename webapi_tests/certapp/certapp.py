@@ -1,8 +1,5 @@
 import os
 
-import tornado
-from tornado import gen
-
 from marionette import MarionetteException
 
 
@@ -10,7 +7,8 @@ class CertAppMixin(object):
     app_management = os.path.join(os.path.dirname(__file__), "app_management.js")
     timeout = 5000  # ms
 
-    def __init__(self):
+    def __init__(self, *args ,**kwargs):
+        super(CertAppMixin, self).__init__(*args, **kwargs)
         self.app = None
 
     # App management is done in the system app, so switch to that
@@ -21,7 +19,6 @@ class CertAppMixin(object):
         # we'll be installing this as a package
         self.marionette.import_script(CertAppMixin.app_management)
 
-    @tornado.gen.coroutine
     def use_cert_app(self):
         self._switch_to_app_management()
         script = "GaiaApps.launchWithName('CertTest App');"
@@ -69,9 +66,12 @@ class CertAppMixin(object):
             wakeLock.unlock();
             """)
 
-    @tornado.gen.coroutine
     def close_cert_app(self):
+        if not self.app:
+            return  
+
         self._switch_to_app_management()
+
         if "origin" in self.app:
             try:
                 script = "GaiaApps.kill('%s');" % self.app["origin"]
