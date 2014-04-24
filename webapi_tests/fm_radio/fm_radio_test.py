@@ -71,8 +71,6 @@ class FMRadioTestCommon(object):
         """)
 
     def remove_radio_change_listeners(self):
-        #self.marionette.execute_script("window.navigator.mozFMRadio.onenabled = null")
-        #self.marionette.execute_script("window.navigator.mozFMRadio.ondisabled = null")
         self.marionette.execute_script("""
         window.navigator.mozFMRadio.onenabled = null;
         window.navigator.mozFMRadio.ondisabled = null;
