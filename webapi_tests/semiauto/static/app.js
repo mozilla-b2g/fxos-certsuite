@@ -33,6 +33,11 @@ HTMLElement.prototype.removeClass = function(toRemove) {
   this.className = newClasses.trim();
 };
 
+// Capitalizes every word in string.
+String.prototype.titleize = function() {
+  return this.replace(/(?:^|\s)\S/g, function (c) { return c.toUpperCase(); });
+};
+
 // Represents tests in a table in the document.
 function TestListView(el, tests) {
   this.el = el;
@@ -54,12 +59,18 @@ TestListView.prototype = {
     }
   },
 
-  setTestState: function(testId, outcome, result) {
+  setTestState: function(testId, outcome, message) {
     var el = $("#test" + testId);
+    var outcomeEl = el.getElementsByClassName("result")[0];
+
     el.className = outcome;
-    if (result) {
-      var resultCell = el.getElementsByClassName("result")[0];
-      resultCell.innerHTML = result;
+    if (outcome !== "running")
+      outcomeEl.innerHTML = outcome.replace("_", " ").titleize();
+
+    if (message) {
+      var messageEl = document.createElement("code");
+      messageEl.innerHTML = "<pre>" + message + "</pre>";
+      el.getElementsByTagName("td")[0].appendChild(messageEl);
     }
   },
 
@@ -70,10 +81,10 @@ TestListView.prototype = {
         this.setTestState(testData.id, "running");
         break;
       case "success":
-        this.setTestState(testData.id, "pass", "Pass");
+        this.setTestState(testData.id, "pass");
         break;
       case "expectedFailure":
-        this.setTestState(testData.id, "expected_failure", "Expected Failure");
+        this.setTestState(testData.id, "expected_failure");
         break;
       case "skip":
         this.setTestState(testData.id, "skip", testData.reason);
@@ -85,7 +96,7 @@ TestListView.prototype = {
         this.setTestState(testData.id, "fail", testData.error);
         break;
       case "expectedSuccess":
-        this.setTestState(testData.id, "expected_success", "Unexpected Success");
+        this.setTestState(testData.id, "expected_success");
         break;
     }
   }
