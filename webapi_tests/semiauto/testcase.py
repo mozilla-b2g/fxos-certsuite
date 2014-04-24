@@ -57,6 +57,8 @@ class TestCase(unittest.TestCase, CertAppMixin):
         self.assert_browser_connected()
 
         self.marionette = self.create_marionette()
+        turn_screen_on(self.marionette)
+        unlock_screen(self.marionette)
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
@@ -155,3 +157,17 @@ class TestCase(unittest.TestCase, CertAppMixin):
         success = self.handler.instruction(message)
         if not success:
             self.fail("Failed on instruction: %s" % message)
+
+
+def turn_screen_on(marionette):
+    marionette.execute_script("""
+        var screenManager = window.wrappedJSObject.ScreenManager;
+        screenManager.turnScreenOn();
+	""")
+
+
+def unlock_screen(marionette):
+    marionette.execute_script("""
+        var lockScreen = window.wrappedJSObject.LockScreen;
+        lockScreen.unlock();
+	""")
