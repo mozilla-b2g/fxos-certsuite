@@ -20,7 +20,8 @@ instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
 
-class TestCase(unittest.TestCase, CertAppMixin):
+#class TestCase(unittest.TestCase, CertAppMixin):
+class TestCase(CertAppMixin, unittest.TestCase):
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):
