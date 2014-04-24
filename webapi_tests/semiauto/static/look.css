@@ -63,7 +63,7 @@ h6 { font-size: 14px; }
 
 p, ul, ol, dl, hgroup { margin: 0 0 20px; }
 
-table { border-collapse: collapse; width: 100% }
+table { border-collapse: collapse; width: 100%; word-break: break-all; }
 tr { border-bottom: 1px solid rgba(0,0,0,.2); }
 
 th {
