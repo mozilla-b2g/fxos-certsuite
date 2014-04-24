@@ -3,6 +3,8 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import collections
+import traceback
+import types
 import unittest
 
 
@@ -191,13 +193,24 @@ class TestStateUpdater(TestEvents):
         if not self.client.connected:
             return
 
-        payload = kwargs
+        def marshal(k,v):
+	    """Cast everything except integers and floats to their
+	    string representation, special casing any value connected
+	    to the "error" key which is treated as an exception and
+	    passed to ``traceback.format_exc``.
 
-        # TODO(ato): Serialization of socket.error, etc.
+            """
+
+            if k == "error":
+                return traceback.format_exc(v)
+            elif isinstance(v, types.IntType) or isinstance(v, types.FloatType):
+                return v
+            return str(v)
+
+        payload = dict(map(lambda (k,v): (k, marshal(k,v)), kwargs.iteritems()))
+
         if test:
             payload["id"] = hash(test)
-            if "error" in payload:
-                payload["error"] = str(payload["error"])
             payload["event"] = event
             self.client.emit("updateTest", {"testData": payload})
         else:
