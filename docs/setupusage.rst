@@ -1,43 +1,12 @@
-==================================
-Firefox OS Certification Testsuite
-==================================
+Setup and usage
+===============
 
-Tests and tools to verify the functionality and characteristics of
-Firefox OS on real devices.
-
-The test suite is designed to run on unprivileged devices and does not
-rely on high level instrumentation.  Instead human interaction is
-needed throughout the test suite to perform various instructions in
-order to assert that conditions are met on the device.
-
-Requirements
-============
-
-The certification test suite is intended to run on a host computer
-attached to the device via USB cable.  Currently the host requires the
-Linux or Mac OS operating systems with *adb* (Android Debug Bridge)
-installed.
-
-If you need to install adb, see
-https://developer.mozilla.org/en-US/Firefox_OS/Debugging/Installing_ADB.
-
-Once installed, add adb to your PATH in your ~/.bashrc
-or equivalent file, by adding the following line to the file
-(replacing $SDK_HOME with the location of the android sdk)::
-
-    PATH=$SDK_HOME:$PATH
-
-The device and the host machine running the tests must also be on the
-same Wi-Fi network.
-
-Furthermore, the device must have a SIM card with a functioning phone
-subscription to receive SMS messages for a subset of the tests to
-pass.
+There are two methods for setting up and running the test suite: the
+"quick" method and the "virtualenv". For either to work, you must turn
+on adb access on the device
 
 Enabling ADB
 ------------
-
-Furthermore, you must turn on adb access on the device:
 
 **For Firefox OS version 1.3:** Launch *Settings*, and navigate to
 *Device Information* → *More Information* → *Developer*, then check
@@ -53,8 +22,8 @@ Once this is done, go to *Settings* → *Display* and set the *Screen
 Timeout* to “never”.  You need this because adb will not work when the
 device is locked.
 
-Quick Setup and Usage
-=====================
+Quick setup and usage
+---------------------
 
 You can setup your environment and run the tests by running::
 
@@ -71,8 +40,8 @@ and lastly deactivates the environment.
 You may call *run.sh* as many times as you like, and it will run the
 tests using its previously set up virtual environment.
 
-Setup Using virtualenv
-======================
+Setup and usage with virtualenv
+-------------------------------
 
 If the quick setup doesn't work, then follow these instructions.  You
 can set up and run this tool inside a virtual environment.  From the
@@ -85,10 +54,8 @@ Then activate the virtualenv::
 
     source bin/activate
 
-Usage
-=====
-
-The certification test suite can be run simply by executing::
+Once the virtualenv is activated, the certification test suite can be
+run by executing::
 
     cert
 
@@ -96,8 +63,29 @@ To get a list of command-line arguments, use::
 
     cert --help
 
+WIP: Running Guided WebAPI Tests
+--------------------------------
+
+This test tool will eventually contain a full suite of guided WebAPI tests
+that allow a tester to interact with the phone to perform functional
+testing of WebAPI's.
+
+This semi-auto harness is in development (and is thus not runnable
+using the process above), but you can run a prototype of these tests
+now. To do so:
+
+    cd webapi_tests
+    ./setup_and_run.sh <directory>
+
+where <directory> is one of the directory names under webapi_tests that contains
+tests, one of: sms, proximity, tcp_socket, telephony, orientation, or
+vibration.
+
+This will install a test app on your device, and then open a web page on
+your host browser (*not* on the device), which will lead you through the tests.
+
 Submitting Results
-==================
+------------------
 
 Once the tests have completed successfully, they will write a file
 containing the results to disk; by default this file is called
@@ -105,7 +93,7 @@ containing the results to disk; by default this file is called
 directory. Please e-mail this file to fxos-cert@mozilla.com.
 
 Known Issues
-============
+------------
 * Tests fail if re-run on a device they've already been run on
 [https://bugzilla.mozilla.org/show_bug.cgi?id=995455].  Workaround:
 re-install gaia or re-flash the device before re-running the tests.
