@@ -4,7 +4,7 @@ Interpreting CertSuite Results
 
 After running the FxOS Certification Suite, a result file will be generated
 (firefox-os-certification.zip by default) in the current directory.  Inside
-this file you will find a file named cert_results.json.  It contains a number
+this file you will find a file named cert/results.json.  It contains a number
 of top-level fields, which are explained below.
 
 omni_results
