@@ -33,6 +33,72 @@ HTMLElement.prototype.removeClass = function(toRemove) {
   this.className = newClasses.trim();
 };
 
+var Keys = (function() {
+  function Keys() {
+    var arr = [];
+    arr.push.apply(arr, arguments);
+    arr.__proto__ = Keys.prototype;
+    return arr;
+  }
+
+  Keys.prototype = new Array;
+
+  // Install keybinding for given key and callback.  When user
+  // presses that key, the callback is called.
+  Keys.prototype.bind = function(key, cb) {
+    for (var entry of this) {
+      if (entry.hasOwnProperty(key)) {
+        return false;
+      }
+    }
+
+    var ne = {};
+    ne[key] = cb;
+    this.push(ne);
+
+    return true;
+  };
+
+  // Remove key binding associated with key.  Returns true if
+  // the binding is found and removed, false otherwise in which
+  // case this function didn't do anything.
+  Keys.prototype.unbind = function(key) {
+    for (var i = 0; i < this.length; ++i) {
+      if (this[i].hasOwnProperty(key)) {
+        this.splice(i, 1);
+        return true;
+      }
+    }
+    return false; 
+  };
+
+  // Run callback function associated with the event's key.
+  // Returns true if key binding was found and called, or false
+  // if no binding could be found for the key.
+
+  Keys.prototype.triggerEvent = function(ev) {
+    return this.trigger(ev.key);
+  };
+
+  // Run callback function associated with key.  Returns true if
+  // key binding was found and called, or false if no binding
+  // could be found for the key.
+
+  Keys.prototype.trigger = function(key) {
+    for (var e of this) {
+      if (e.hasOwnProperty(key)) {
+        e[key]();
+        return true;
+      }
+    }
+    return false;
+  };
+
+  var instance = new Keys();
+  window.onkeypress = function(ev) { instance.triggerEvent(ev); }
+  return instance;
+})();
+
 // Represents tests in a table in the document.
 function TestListView(el, tests) {
   this.el = el;
@@ -107,12 +173,12 @@ function Dialog(msg, type) {
   this.okEl = $("#dialog .controls #ok");
   this.cancelEl = $("#dialog .controls #cancel");
 
+  // Mouse event listeners
   this.okEl.onclick = function() { this.onok(); this.close(); }.bind(this);
   this.cancelEl.onclick = function() { this.oncancel(); this.close(); }.bind(this);
 
   this.message = msg || "";
   this.type = type || "prompt";
-  //this.value = this.responseEl.value;
 
   // Assume prompt is default
   switch (this.type) {
@@ -141,9 +207,23 @@ Dialog.prototype = {
     default:
       this.responseEl.focus();
     }
+
+    function skipEl(el, fn) {
+      return function() {
+        if (document.activeElement === el) {
+          return;
+        }
+        fn();
+      }
+    }
+
+    Keys.bind("y", skipEl(this.responseEl, this.okEl.onclick));
+    Keys.bind("n", skipEl(this.responseEl, this.cancelEl.onclick));
   },
 
   close: function() {
+    Keys.unbind("y");
+    Keys.unbind("n");
     this.el.addClass("hidden");
     this.reset();
   },
