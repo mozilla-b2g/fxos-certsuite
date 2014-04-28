@@ -95,8 +95,8 @@ TestListView.prototype = {
       case "failure":
         this.setTestState(testData.id, "fail", testData.error);
         break;
-      case "expectedSuccess":
-        this.setTestState(testData.id, "expected_success");
+      case "unexpectedSuccess":
+        this.setTestState(testData.id, "unexpected_success");
         break;
     }
   }
