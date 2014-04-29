@@ -91,7 +91,7 @@ td.result {
 
 tr.running { background: -moz-linear-gradient(left, transparent 0, rgba(250,250,250,.5) 100%); }
 tr.fail { background: rgb(255,179,179); }
-tr.pass, tr.expected_failure, tr.expected_success { background: rgb(153,214,153); }
+tr.pass, tr.expected_failure, tr.unexpected_success { background: rgb(153,214,153); }
 tr.skip { opacity: .7; }
 tr.error { background: rgb(255,255,0); }
 
