@@ -145,7 +145,8 @@ def log_results(diff, logger, report, name):
         logger.test_status('webapi', name, 'PASS')
 
 def parse_results(expected_results_path, results, prefix, logger, report):
-    expected_results = json.loads(open(expected_results_path, 'r').read())
+    with open(expected_results_path) as f:
+        expected_results = json.load(f)
 
     webapi_passed = True
 
@@ -306,6 +307,8 @@ def cli():
     # Step 2: Navigate to local hosted web server to install app for
     # WebIDL iteration and fetching HTTP headers
     if 'webapi' in test_groups:
+        logger.test_start('webapi')
+
         addr = (moznetwork.get_ip(), 8080)
         httpd = wptserve.server.WebTestHttpd(
             host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
