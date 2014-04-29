@@ -80,6 +80,8 @@ td {
   min-width: 70%;
 }
 
+td code { margin-top: .5em; display: block; }
+
 td.result {
   text-transform: uppercase;
   width: 25%;
