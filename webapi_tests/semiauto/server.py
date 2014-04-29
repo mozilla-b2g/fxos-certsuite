@@ -26,6 +26,11 @@ def static_path(path):
     return os.path.join(static_dir, path)
 
 
+class NoCacheStaticFileHandler(web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        self.set_header("Cache-control", "no-cache")
+
+
 class FrontendServer(object):
     def __init__(self, addr, io_loop=None, verbose=False):
         self.addr = addr
@@ -37,7 +42,7 @@ class FrontendServer(object):
         self.routes = tornado.web.Application(
             [(r"/tests", TestHandler),
              (r"/", web.RedirectHandler, {"url": "/app.html"}),
-             (r"/(.*[html|css|js])$", web.StaticFileHandler,
+             (r"/(.*[html|css|js])$", NoCacheStaticFileHandler,
               {"path": static_dir})])
         self.server = tornado.httpserver.HTTPServer(
             self.routes, io_loop=self.io_loop)
