@@ -100,7 +100,7 @@ def main(argv):
     generates a file containing javascript arrays of json objects for
     each webidl file.
 
-    usage: process_idl.py manifest.json ~/B2G ~/B2G/objdir-gecko
+    usage: process_idl.py manifest.json ~/B2G/gecko ~/B2G/objdir-gecko
 
     The generated js file can then be included with the test app.
     """
@@ -114,6 +114,7 @@ def main(argv):
     with open(args.manifest, 'r') as f:
         manifest = json.loads(f.read())
 
+    # import WebIDL using a path relative to the gecko tree
     sys.path.append(os.path.join(args.gecko, 'dom', 'bindings', 'parser'))
     import WebIDL
 
