@@ -318,6 +318,7 @@ def cli():
             "http://%s:%d/" % (httpd.host, httpd.port)
         Wait(timeout=600).until(lambda: connected is True)
 
+
         print "\n#2: On the web page that's loaded, please click the 'Click me' link"
         Wait().until(lambda: headers is not None)
         report["headers"] = headers
@@ -330,6 +331,7 @@ def cli():
             "WebAPI Verifier from the homescreen. This will start the WebAPI tests " \
             "and may take a couple minutes to complete."
         Wait(timeout=600).until(lambda: webapi_results is not None)
+        fxos_appgen.uninstall_app('WebAPI Verification App')
 
         if args.generate_reference:
             with open('webapi_results.json', 'w') as f:
@@ -356,6 +358,7 @@ def cli():
         print "Done. Please run the Privileged WebAPI Verifier from the home screen."
 
         Wait(timeout=600).until(lambda: webapi_results_priv is not None)
+        fxos_appgen.uninstall_app(appname)
 
         if args.generate_reference:
             with open('webapi_results_priv.json', 'w') as f:
@@ -380,6 +383,7 @@ def cli():
         print "Done. Please run the Certified WebAPI Verifier from the home screen."
 
         Wait(timeout=600).until(lambda: webapi_results_cert is not None)
+        fxos_appgen.uninstall_app(appname)
 
         if args.generate_reference:
             with open('webapi_results_cert.json', 'w') as f:
