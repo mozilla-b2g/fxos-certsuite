@@ -390,7 +390,7 @@ def cli():
                             __name__, os.path.sep.join(['expected_webapi_results', '%s.cert.json' % args.version]))
         webapi_passed = parse_results(file_path, webapi_results_cert, 'cert-', logger, report) and webapi_passed
 
-        logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
+        logger.test_end('webapi', 'OK' if webapi_passed else 'ERROR')
 
     result_file_path = args.result_file
     if not result_file_path:

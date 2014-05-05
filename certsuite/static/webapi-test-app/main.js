@@ -13,18 +13,19 @@ function getTheNames(obj, visited)
     for (var name of Object.getOwnPropertyNames(obj)) {
       try {
         var value = orig_obj[name];
-        var value_name = value.toString();
-        var type = typeof(value);
+        var value_visited = visited[value];
       } catch(err) {
-        //catch e.g. "NS_ERROR_XPC_BAD_OP_ON_WN_PROTO: Illegal operation on WrappedNative prototype object
+        // We can hit a few exceptions here:
+        // * some objects will throw "NS_ERROR_XPC_BAD_OP_ON_WN_PROTO: Illegal operation on WrappedNative prototype object" for the prototype property
+        // * some objects will throw "Method not implemented" or similar when trying to access them by name 
         result[name] = err;
         continue;
       }
 
       if (value === null) {
         result[name] = null;
-      } else if (type === "object") {
-        if (visited[value] === undefined) {
+      } else if (typeof value === "object") {
+        if (value_visited === undefined) {
           result[name] = getTheNames(value, visited);
         } else {
           result[name] = true;
