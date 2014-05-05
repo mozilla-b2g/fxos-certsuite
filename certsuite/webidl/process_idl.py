@@ -10,8 +10,6 @@ import os
 import re
 import sys
 
-import WebIDL
-
 # Map to types recognized by the idlharness.js tests
 typenames = {
     "Boolean" : "boolean",
@@ -102,28 +100,31 @@ def main(argv):
     generates a file containing javascript arrays of json objects for
     each webidl file.
 
-    usage: process_idl.py manifest.json ~/B2G/objdir-gecko/dom/bindings/webidl
+    usage: process_idl.py manifest.json ~/B2G/gecko ~/B2G/objdir-gecko
 
     The generated js file can then be included with the test app.
     """
 
     argparser = argparse.ArgumentParser()
     argparser.add_argument("manifest", help="Manifest file for the idl")
-    argparser.add_argument("webidlpath", help="Path to webidl directory (e.g. gecko/dom/webidl")
+    argparser.add_argument("gecko", help="Path to gecko directory (e.g. B2G/gecko")
+    argparser.add_argument("objdir", help="Path to gecko objdir directory (e.g. B2G/objdir-gecko")
     args = argparser.parse_args(argv[1:])
 
     with open(args.manifest, 'r') as f:
         manifest = json.loads(f.read())
 
+    # import WebIDL using a path relative to the gecko tree
+    sys.path.append(os.path.join(args.gecko, 'dom', 'bindings', 'parser'))
+    import WebIDL
+
     parser = WebIDL.Parser()
 
-    # generate empty interfaces for missing interfaces 
-    #for interface in manifest['missing']:
-    #    parser.parse('interface ' + interface + ' {};')
+    webidl_path = os.path.join(args.objdir, 'dom', 'bindings')
 
     # embed idl files in individual script tags
     for filename in manifest['files']:
-        path = os.path.realpath(os.path.join(args.webidlpath, filename))
+        path = os.path.realpath(os.path.join(webidl_path, filename))
         with open(path, 'r') as f:
             parser.parse(f.read())
 

@@ -145,31 +145,10 @@ def log_results(diff, logger, report, name):
         logger.test_status('webapi', name, 'PASS')
 
 def parse_results(expected_results_path, results, prefix, logger, report):
-    expected_results = json.loads(open(expected_results_path, 'r').read())
-    #compute difference in navigator functions
-    expected_nav = expected_results["navList"]
-    nav = results["navList"]
+    with open(expected_results_path) as f:
+        expected_results = json.load(f)
 
-    logger.test_start('webapi')
     webapi_passed = True
-
-    missing_nav = diff_results(expected_nav, nav, False)
-    log_results(missing_nav, logger, report, prefix + 'missing-navigator-functions')
-
-    added_nav = diff_results(nav, expected_nav, False)
-    log_results(added_nav, logger, report, prefix + 'added-navigator-functions')
-    if missing_nav or added_nav:
-        webapi_passed = False
-
-    # NOTE: privileged functions in an unprivileged app are null
-    # compute difference in navigator "null" functions, ie: privileged functions
-    missing_nav_null = diff_results(expected_nav, nav, True)
-    log_results(missing_nav_null, logger, report, prefix + 'missing-navigator-unprivileged-functions')
-
-    added_nav_null = diff_results(nav, expected_nav, True)
-    log_results(added_nav_null, logger, report, prefix + 'added-navigator-unprivileged-functions')
-    if missing_nav_null or added_nav_null:
-        webapi_passed = False
 
     #computer difference in window functions
     expected_window = expected_results["windowList"]
@@ -181,6 +160,16 @@ def parse_results(expected_results_path, results, prefix, logger, report):
     added_window = diff_results(window, expected_window, False)
     log_results(added_window, logger, report, prefix + 'added-window-functions')
     if missing_window or added_window:
+        webapi_passed = False
+
+    # NOTE: privileged functions in an unprivileged app are null
+    # compute difference in navigator "null" functions, ie: privileged functions
+    missing_window_null = diff_results(window, expected_window, True)
+    log_results(missing_window_null, logger, report, prefix + 'missing-window-unprivileged-functions')
+
+    added_window_null = diff_results(window, expected_window, True)
+    log_results(added_window_null, logger, report, prefix + 'added-window-unprivileged-functions')
+    if missing_window_null or added_window_null:
         webapi_passed = False
 
     # compute differences in WebIDL results
@@ -318,6 +307,8 @@ def cli():
     # Step 2: Navigate to local hosted web server to install app for
     # WebIDL iteration and fetching HTTP headers
     if 'webapi' in test_groups:
+        logger.test_start('webapi')
+
         addr = (moznetwork.get_ip(), 8080)
         httpd = wptserve.server.WebTestHttpd(
             host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
@@ -399,7 +390,7 @@ def cli():
                             __name__, os.path.sep.join(['expected_webapi_results', '%s.cert.json' % args.version]))
         webapi_passed = parse_results(file_path, webapi_results_cert, 'cert-', logger, report) and webapi_passed
 
-        logger.test_end('webapi', 'PASS' if webapi_passed else 'FAIL')
+        logger.test_end('webapi', 'OK' if webapi_passed else 'ERROR')
 
     result_file_path = args.result_file
     if not result_file_path:
