@@ -112,17 +112,12 @@ def package_app(path, extrafiles):
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
 
-def diff_results(a, b, checkNull):
+def diff_results(a, b):
 
     a_set = set(a.keys())
     b_set = set(b.keys())
 
-    if checkNull:
-        a_nullset = set([key for key in a.keys() if a[key] is None])
-        b_nullset = set([key for key in b.keys() if b[key] is None])
-        result = list(b_nullset.difference(a_nullset))
-    else:
-        result = list(b_set.difference(a_set))
+    result = list(b_set.difference(a_set))
 
     same_keys = a_set.intersection(b_set)
     for key in same_keys:
@@ -130,7 +125,7 @@ def diff_results(a, b, checkNull):
             if type(b[key]) is not dict:
                 result.extend(key)
             else:
-                result.extend([key + '.' + item for item in diff_results(a[key], b[key], checkNull)])
+                result.extend([key + '.' + item for item in diff_results(a[key], b[key])])
 
     return result
 
@@ -154,22 +149,12 @@ def parse_results(expected_results_path, results, prefix, logger, report):
     expected_window = expected_results["windowList"]
     window = results["windowList"]
 
-    missing_window = diff_results(expected_window, window, False)
+    missing_window = diff_results(expected_window, window)
     log_results(missing_window, logger, report, prefix + 'missing-window-functions')
 
-    added_window = diff_results(window, expected_window, False)
+    added_window = diff_results(window, expected_window)
     log_results(added_window, logger, report, prefix + 'added-window-functions')
     if missing_window or added_window:
-        webapi_passed = False
-
-    # NOTE: privileged functions in an unprivileged app are null
-    # compute difference in navigator "null" functions, ie: privileged functions
-    missing_window_null = diff_results(window, expected_window, True)
-    log_results(missing_window_null, logger, report, prefix + 'missing-window-unprivileged-functions')
-
-    added_window_null = diff_results(window, expected_window, True)
-    log_results(added_window_null, logger, report, prefix + 'added-window-unprivileged-functions')
-    if missing_window_null or added_window_null:
         webapi_passed = False
 
     # compute differences in WebIDL results
