@@ -126,6 +126,9 @@ def diff_results(a, b):
                 result.extend(key)
             else:
                 result.extend([key + '.' + item for item in diff_results(a[key], b[key])])
+        elif a[key] != b[key]:
+            # using 'name' key avoids another special case in log_results 
+            result.append({'name': key, 'value': b[key]})
 
     return result
 
@@ -145,7 +148,7 @@ def parse_results(expected_results_path, results, prefix, logger, report):
 
     webapi_passed = True
 
-    #computer difference in window functions
+    #compute difference in window functions
     expected_window = expected_results["windowList"]
     window = results["windowList"]
 
@@ -179,6 +182,14 @@ def parse_results(expected_results_path, results, prefix, logger, report):
     log_results(added_webidl_results, logger, report, prefix + 'added-webidl-results')
     log_results(missing_webidl_results, logger, report, prefix + 'missing-webidl-results')
     if added_webidl_results or unexpected_webidl_results or missing_webidl_results:
+        webapi_passed = False
+
+    # compute differences in permissions results
+    expected_permissions = expected_results["permissionsResults"]
+    permissions = results["permissionsResults"]
+    unexpected_permissions_results = diff_results(expected_permissions, permissions)
+    log_results(unexpected_permissions_results, logger, report, prefix + 'unexpected-permissions-results')
+    if unexpected_permissions_results:
         webapi_passed = False
 
     return webapi_passed
@@ -320,7 +331,7 @@ def cli():
 
         if args.generate_reference:
             with open('webapi_results.json', 'w') as f:
-                f.write(json.dumps(webapi_results))
+                f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
 
         print "Processing results..."
         file_path = pkg_resources.resource_filename(
@@ -347,7 +358,7 @@ def cli():
 
         if args.generate_reference:
             with open('webapi_results_priv.json', 'w') as f:
-                f.write(json.dumps(webapi_results_priv))
+                f.write(json.dumps(webapi_results_priv, sort_keys=True, indent=2))
 
         print "Processing results..."
         file_path = pkg_resources.resource_filename(
@@ -372,7 +383,7 @@ def cli():
 
         if args.generate_reference:
             with open('webapi_results_cert.json', 'w') as f:
-                f.write(json.dumps(webapi_results_cert))
+                f.write(json.dumps(webapi_results_cert, sort_keys=True, indent=2))
 
         print "Processing results..."
         file_path = pkg_resources.resource_filename(
