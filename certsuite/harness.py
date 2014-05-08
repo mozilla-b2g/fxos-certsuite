@@ -15,6 +15,7 @@ import sys
 import tempfile
 import traceback
 import zipfile
+import shutil
 
 from collections import OrderedDict
 from mozfile import TemporaryDirectory
@@ -52,6 +53,33 @@ def iter_test_lists(suites_config):
             print >> sys.stderr("Failed to run command %s" % " ".join(cmd))
             sys.exit(1)
 
+class DeviceBackup(object):
+    def __init__(self):
+        self.device = mozdevice.DeviceManagerADB()
+        self.backup_dirs = ["/data/local",
+                            "/data/b2g/mozilla",
+                            "/system/etc"]
+
+    def local_dir(self, remote):
+        return os.path.join(self.backup_path, remote.lstrip("/"))
+
+    def __enter__(self):
+        logger.info("Saving device state")
+        self.backup_path = tempfile.mkdtemp()
+
+        for remote in self.backup_dirs:
+            local = self.local_dir(remote)
+            self.device.getDirectory(remote, local)
+
+    def __exit__(self, *args, **kwargs):
+        logger.info("Restoring device state")
+        for remote in self.backup_dirs:
+            local = self.local_dir(remote)
+            self.device.removeDir(remote)
+            self.device.pushDir(local, remote)
+
+        shutil.rmtree(self.backup_path)
+
 class TestRunner(object):
     def __init__(self, args, config):
         self.args = args
@@ -85,11 +113,12 @@ class TestRunner(object):
 
     def run_suite(self, suite, groups, output_zip):
         with TemporaryDirectory() as temp_dir:
-            result_files = self.run_test(suite, groups, temp_dir)
+            with DeviceBackup():
+                result_files = self.run_test(suite, groups, temp_dir)
 
-            for path in result_files:
-                file_name = os.path.split(path)[1]
-                output_zip.write(path, "%s/%s" % (suite, file_name))
+                for path in result_files:
+                    file_name = os.path.split(path)[1]
+                    output_zip.write(path, "%s/%s" % (suite, file_name))
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
