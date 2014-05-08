@@ -10,6 +10,9 @@ from telephony import TelephonyTestCommon
 
 class TestTelephonyIncoming(TestCase, TelephonyTestCommon):
     def test_telephony_incoming(self):
+        # disable the default dialer manager so it doesn't grab our calls
+        self.disable_dialer()
+
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
 
@@ -18,3 +21,6 @@ class TestTelephonyIncoming(TestCase, TelephonyTestCommon):
 
         # disconnect the call
         self.hangup_active_call()
+
+        # re-enable the default dialer manager
+        self.enable_dialer()
