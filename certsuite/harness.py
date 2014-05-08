@@ -15,6 +15,7 @@ import sys
 import tempfile
 import traceback
 import zipfile
+import shutil
 
 from collections import OrderedDict
 from mozfile import TemporaryDirectory
@@ -51,6 +52,37 @@ def iter_test_lists(suites_config):
         except subprocess.CalledProcessError:
             print >> sys.stderr("Failed to run command %s" % " ".join(cmd))
             sys.exit(1)
+
+class DeviceBackup(object):
+    def __init__(self):
+        self.device = mozdevice.DeviceManagerADB()
+        self.backup_dirs = ["/data/local",
+                            "/data/b2g/mozilla",
+                            "/system/etc"]
+
+    def local_dir(self, remote):
+        return os.path.join(self.backup_path, remote.lstrip("/"))
+
+    def __enter__(self):
+        logger.info("Saving device state")
+        self.backup_path = tempfile.mkdtemp()
+
+        for remote in self.backup_dirs:
+            local = self.local_dir(remote)
+            self.device.getDirectory(remote, local)
+
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        shutil.rmtree(self.backup_path)
+
+    def restore(self):
+        logger.info("Restoring device state")
+        for remote in self.backup_dirs:
+            local = self.local_dir(remote)
+            self.device.removeDir(remote)
+            self.device.pushDir(local, remote)
+
 
 class TestRunner(object):
     def __init__(self, args, config):
@@ -192,14 +224,17 @@ def run_tests(args, config):
                 check_adb()
                 install_marionette()
 
-                runner = TestRunner(args, config)
+                with DeviceBackup() as device:
+                    runner = TestRunner(args, config)
 
-                for suite, groups in runner.iter_suites():
-                    try:
-                        runner.run_suite(suite, groups, zip_f)
-                    except:
-                        logger.critical("Encountered error:\n%s" % traceback.format_exc())
-                        error = True
+                    for suite, groups in runner.iter_suites():
+                        try:
+                            runner.run_suite(suite, groups, zip_f)
+                        except:
+                            logger.critical("Encountered error:\n%s" % traceback.format_exc())
+                            error = True
+                        finally:
+                            device.restore()
 
                 if error:
                     logger.critical("Encountered errors during run")
