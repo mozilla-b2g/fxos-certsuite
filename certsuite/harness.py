@@ -71,14 +71,18 @@ class DeviceBackup(object):
             local = self.local_dir(remote)
             self.device.getDirectory(remote, local)
 
+        return self
+
     def __exit__(self, *args, **kwargs):
+        shutil.rmtree(self.backup_path)
+
+    def restore(self):
         logger.info("Restoring device state")
         for remote in self.backup_dirs:
             local = self.local_dir(remote)
             self.device.removeDir(remote)
             self.device.pushDir(local, remote)
 
-        shutil.rmtree(self.backup_path)
 
 class TestRunner(object):
     def __init__(self, args, config):
@@ -113,12 +117,11 @@ class TestRunner(object):
 
     def run_suite(self, suite, groups, output_zip):
         with TemporaryDirectory() as temp_dir:
-            with DeviceBackup():
-                result_files = self.run_test(suite, groups, temp_dir)
+            result_files = self.run_test(suite, groups, temp_dir)
 
-                for path in result_files:
-                    file_name = os.path.split(path)[1]
-                    output_zip.write(path, "%s/%s" % (suite, file_name))
+            for path in result_files:
+                file_name = os.path.split(path)[1]
+                output_zip.write(path, "%s/%s" % (suite, file_name))
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -221,14 +224,17 @@ def run_tests(args, config):
                 check_adb()
                 install_marionette()
 
-                runner = TestRunner(args, config)
+                with DeviceBackup() as device:
+                    runner = TestRunner(args, config)
 
-                for suite, groups in runner.iter_suites():
-                    try:
-                        runner.run_suite(suite, groups, zip_f)
-                    except:
-                        logger.critical("Encountered error:\n%s" % traceback.format_exc())
-                        error = True
+                    for suite, groups in runner.iter_suites():
+                        try:
+                            runner.run_suite(suite, groups, zip_f)
+                        except:
+                            logger.critical("Encountered error:\n%s" % traceback.format_exc())
+                            error = True
+                        finally:
+                            device.restore()
 
                 if error:
                     logger.critical("Encountered errors during run")
