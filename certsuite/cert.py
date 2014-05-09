@@ -127,18 +127,18 @@ def diff_results(a, b):
             else:
                 result.extend([key + '.' + item for item in diff_results(a[key], b[key])])
         elif a[key] != b[key]:
-            # using 'name' key avoids another special case in log_results 
-            result.append({'name': key, 'value': b[key]})
+            result.append(key)
 
     return result
 
 def log_results(diff, logger, report, name):
     if diff:
         report[name.replace('-', '_')] = diff
-        try:
-            logger.test_status('webapi', name, 'FAIL', message=','.join([result['name'] for result in diff]))
-        except TypeError:
-            logger.test_status('webapi', name, 'FAIL', message=','.join(diff))
+        for result in diff:
+            try:
+                logger.test_status('webapi', name, 'FAIL', message='Unexpected result for: %s' % result['name'])
+            except TypeError:
+                logger.test_status('webapi', name, 'FAIL', message='Unexpected result for: %s' % result)
     else:
         logger.test_status('webapi', name, 'PASS')
 
