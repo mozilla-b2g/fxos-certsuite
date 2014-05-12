@@ -82,6 +82,7 @@ class DeviceBackup(object):
             local = self.local_dir(remote)
             self.device.removeDir(remote)
             self.device.pushDir(local, remote)
+        self.device.reboot(wait=True)
 
 
 class TestRunner(object):
