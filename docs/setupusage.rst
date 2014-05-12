@@ -57,11 +57,11 @@ Then activate the virtualenv::
 Once the virtualenv is activated, the certification test suite can be
 run by executing::
 
-    cert
+    runcertsuite
 
 To get a list of command-line arguments, use::
 
-    cert --help
+    runcertsuite --help
 
 WIP: Running Guided WebAPI Tests
 --------------------------------
