@@ -310,8 +310,9 @@ def cli():
             host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
         httpd.start()
 
-        print "\n#1: On your phone, please launch the browser app and navigate to "\
-            "http://%s:%d/" % (httpd.host, httpd.port)
+        print "\n#1: Ensure that the device is connected to the same Wi-Fi " \
+            "network as this machine.  Then, on the device, please launch the " \
+            "browser app and navigate to http://%s:%d/" % (httpd.host, httpd.port)
         Wait(timeout=600).until(lambda: connected is True)
 
 
