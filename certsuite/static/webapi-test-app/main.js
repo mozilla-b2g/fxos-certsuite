@@ -43,13 +43,6 @@ function getTheNames(obj, visited)
 
 function permissionsTests()
 {
-
-/*
-    for (x in navigator) {
-        console.log('>>>>', x);
-    }
-*/   
-
   // Create one promise for all of the synchronous APIs
   var syncAPIPromise = new Promise(
     function(resolve, reject) {
@@ -232,8 +225,7 @@ function runTest()
   done();
 
   //Recursively get property names on window object
-  var winResults = {};
-  getTheNames(window, winResults);
+  var winResults = getTheNames(window, {});
 
   var results = {};
   results.windowList = winResults;
