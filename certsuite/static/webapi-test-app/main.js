@@ -17,7 +17,7 @@ function getTheNames(obj, visited)
       } catch(err) {
         // We can hit a few exceptions here:
         // * some objects will throw "NS_ERROR_XPC_BAD_OP_ON_WN_PROTO: Illegal operation on WrappedNative prototype object" for the prototype property
-        // * some objects will throw "Method not implemented" or similar when trying to access them by name 
+        // * some objects will throw "Method not implemented" or similar when trying to access them by name
         result[name] = err;
         continue;
       }
@@ -50,6 +50,11 @@ function permissionsTests()
 
       // alarms
       permissionsResults['alarms'] = navigator.mozAlarms !== null;
+
+      // attention
+      // This should only be available to system apps, but we can see
+      // if it shows up here.
+      permissionsResults['attention'] = 'AttentionScreen' in window;
 
       // For audio channel types, if we attempt to assign something for
       // which we do not have permissions, the channel type will remain
@@ -85,10 +90,19 @@ function permissionsTests()
       audio.mozAudioChannelType = 'telephony';
       permissionsResults['audio-channel-telephony'] = audio.mozAudioChannelType;
 
-      // audio-channel-publicnotification 
+      // audio-channel-publicnotification
       var audio = new Audio();
       audio.mozAudioChannelType = 'publicnotification';
       permissionsResults['audio-channel-publicnotification'] = audio.mozAudioChannelType;
+
+      // background-sensors
+      // TODO: it appears this is only a planned feature at the moment
+
+      // backgroundservice
+      // TODO: it appears this is only a planned feature at the moment
+
+      // bluetooth
+      permissionsResults['bluetooth'] = 'mozBluetooth' in navigator;
 
       // browser
       // if mozbrowser is supported, we will see additional methods on the
@@ -96,10 +110,20 @@ function permissionsTests()
       var iframe = document.getElementById('test-mozbrowser');
       permissionsResults['browser'] = 'getScreenshot' in iframe;
 
+      // camera
+      permissionsResults['camera'] = 'mozCameras' in navigator;
+
+      // cellbroadcast
+      permissionsResults['cellbroadcast'] = 'mozCellBroadcast' in navigator;
+
       // contacts
       permissionsResults['contacts'] = navigator.mozContacts !== null;
 
-      // desktop-notification 
+      // deprecated-hwvideo
+      // TODO: it appears this is only available to system apps and isn't
+      //       testable here.
+
+      // desktop-notification
       permissionsResults['desktop-notification'] = window.Notification !== null;
 
       // device-storage
@@ -110,37 +134,150 @@ function permissionsTests()
       permissionsResults['device-storage:music'] = navigator.getDeviceStorage('music') !== null;
       permissionsResults['device-storage:sdcard'] = navigator.getDeviceStorage('sdcard') !== null;
 
-      // fmradio 
+      // downloads
+      // TODO: is there a public api to test here or is this event driven?
+
+      // embed-apps
+      // TODO: not sure how to test whether the app loaded successfully 
+      permissionsResults['embed-apps'] = false;
+
+      // feature-detection
+      // See: https://wiki.mozilla.org/WebAPI/Navigator.hasFeature
+      permissionsResults['feature-detection'] = 'hasFeature' in navigator;
+
+      // fmradio
       permissionsResults['fmradio'] = navigator.mozFMRadio !== null;
 
       // geolocation
       permissionsResults['geolocation'] = navigator.geolocation !== null;
 
+      // idle
+      permissionsResults['idle'] = 'addIdleObserver' in navigator;
+
+      // input
+      // See https://wiki.mozilla.org/WebAPI/KeboardIME
+      permissionsResults['input'] = 'mozInputMethod' in navigator;
+
+      // input-manage
+      if ('mozInputMethod' in navigator) {
+        permissionsResults['input-manage'] = 'mgmt' in navigator.mozInputMethod;
+      } else {
+        permissionsResults['input-manage'] = false;
+      }
+
       // keyboard
       permissionsResults['keyboard'] = navigator.mozKeyboard !== null;
 
-      // mobilenetwork
-      permissionsResults['mobilenetwork'] = navigator.mozMobileConnection !== null;
+      // mobileconnection
+      permissionsResults['mobileconnection'] = navigator.mozMobileConnection !== null;
 
-      // push 
+      // mobilenetwork
+      /* TODO: need sim card to get this working
+      if (navigator.mozMobileConnections !== null) {
+        permissionsResults['mobilenetwork'] = false;
+        for (var i = 0; i < navigator.mozMobileConnections.length; ++i) {
+          var conn = navigator.mozMobileConnections[i];
+          if ('voice' in conn || 'data' in conn) {
+            permissionsResults['mobilenetwork'] = true;
+          }
+        }
+      } else {
+        permissionsResults['mobilenetwork'] = 'no sim';
+      }
+      */
+     
+      // network-events
+      // TODO: Not testable here - we need a suitable source of network events
+
+      // nfc
+      permissionsResults['nfc'] = 'mozNfc' in navigator;
+
+      // nfc-manager
+      if (permissionsResults['nfc']) {
+        //TODO: this seems to allow additional nfc capabilities for the
+        //      system app, but I don't have mozNfc, so I can't verify
+        permissionsResults['nfc-manager'] = false;
+      }
+
+      // networkstats-manage
+      // TODO: this appears to be used internally by the costcontrol app.
+      //       not sure if there is anything to test here.
+
+      // open-remote-window
+      // If a remote window is opened, the returned handle will be null
+      /* TODO: need to close the remote window automagically
+      var win = window.open('about:blank', 'Remote Window', 'remote=true');
+      permissionsResults['open-remote-window'] = win === null;
+      */
+      permissionsResults['open-remote-window'] = false; 
+
+      // permissions
+      permissionsResults['permissions'] = navigator.mozPermissions !== null;
+
+      // phone number service
+      // normalize and fuzzyMatch only exposed if permissions exist
+      permissionsResults['phonenumberservice'] = 'normalize' in navigator.mozPhoneNumberService;
+     
+      // power
+      permissionsResults['power'] = 'mozPower' in navigator;
+
+      // push
       permissionsResults['push'] = navigator.push !== null;
 
-      // storage 
-      // TODO: not sure if this needs to be tested, allowed for all apps
+      // settings
+      permissionsResults['settings'] = navigator.mozSettings !== null;
 
-      // systemXHR 
+      // sms
+      permissionsResults['sms'] = 'mozMobileMessage' in navigator;
+
+      // speaker-control
+      permissionsResults['speaker-control'] = true;
+      try {
+        var sm = new MozSpeakerManager();
+      } catch (err) {
+        permissionsResults['speaker-control'] = false;
+      }
+
+      // storage
+      // TODO: This permission removes limitations on how much device storage
+      //       can be used by the application cache and indexeddb. It is
+      //       difficult to test in a way that does not OOM my device.
+     
+      // systemXHR
       var req = new XMLHttpRequest({'mozSystem': true});
-      req.open('GET', 'http://192.168.1.100', false);
-      var system_xhr = true; 
+      req.open('GET', 'http://www.mozilla.org', false);
+      var system_xhr = true;
       try {
           req.send();
       } catch (err) {
-          system_xhr = false; 
+          system_xhr = false;
       }
       permissionsResults['systemXHR'] = system_xhr;
 
-      // tcp-socket 
+      // time
+      permissionsResults['time'] = 'mozTime' in navigator;
+
+      // tcp-socket
       permissionsResults['tcp-socket'] = navigator.mozTCPSocket !== null;
+
+      // telephony
+      permissionsResults['telephony'] = 'mozTelephony' in navigator;
+
+      // voicemail
+      permissionsResults['voicemail'] = 'mozVoicemail' in navigator;
+
+      // wappush
+      // Not testable here - these are received by using
+      // mozSetMessageHandler to subscribe to 'wappush-received' messages.
+      // Any app can subscribe but the messages are only delivered if
+      // the corresponding permission is set. Without a way of injecting
+      // 'wappush-received' messages we can't test this here.
+
+      // webapps-manage
+      permissionsResults['webapps-manage'] = navigator.mozApps.mgmt !== null;
+
+      // wifi-manage
+      permissionsResults['wifi-manager'] = navigator.mozWifiManager !== null;
 
       resolve(permissionsResults);
   });
