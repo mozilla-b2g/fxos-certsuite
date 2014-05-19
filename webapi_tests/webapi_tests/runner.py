@@ -16,7 +16,8 @@ import semiauto
 
 
 def iter_tests(start_dir, pattern="test_*.py"):
-    """List available Web API tests and yield a tuple of (group, tests), where tests is a list of test names."""
+    """List available Web API tests and yield a tuple of (group, tests),
+    where tests is a list of test names."""
 
     start_dir = os.path.abspath(start_dir)
     visited = set()
@@ -47,17 +48,17 @@ def iter_tests(start_dir, pattern="test_*.py"):
                 continue
 
             members = inspect.getmembers(module)
-            ks = [t for t in zip(*members)[1] if isinstance(t, type)]
+            bases = [t for t in zip(*members)[1] if isinstance(t, type)]
 
             # Include only semiauto tests
-            if semiauto.testcase.TestCase not in ks:
+            if semiauto.testcase.TestCase not in bases:
                 continue
 
-            for k in ks:
-                if getattr(k, "__module__", None) != name:
+            for klass in bases:
+                if getattr(klass, "__module__", None) != name:
                     continue
                 tests.extend(
-                    [m[0] for m in inspect.getmembers(k) if m[0].startswith("test_")])
+                    [m[0] for m in inspect.getmembers(klass) if m[0].startswith("test_")])
 
         if len(tests) > 0:
             yield group, tests
