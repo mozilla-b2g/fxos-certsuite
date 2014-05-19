@@ -19,12 +19,12 @@ def iter_tests(start_dir, pattern="test_*.py"):
     """List available Web API tests and yield a tuple of (group, tests), where tests is a list of test names."""
 
     start_dir = os.path.abspath(start_dir)
-    visited = []
+    visited = set()
 
     for root, dirs, files in os.walk(start_dir, followlinks=True):
         if root in visited:
             raise ImportError("Recursive symlink: %r" % root)
-        visited.append(root)
+        visited.add(root)
 
         group = os.path.relpath(root, start_dir)
 
