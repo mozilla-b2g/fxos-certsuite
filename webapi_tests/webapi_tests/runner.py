@@ -54,11 +54,11 @@ def iter_tests(start_dir, pattern="test_*.py"):
             if semiauto.testcase.TestCase not in bases:
                 continue
 
-            for klass in bases:
-                if getattr(klass, "__module__", None) != name:
+            for cls in bases:
+                if getattr(cls, "__module__", None) != name:
                     continue
                 tests.extend(
-                    [member[0] for member in inspect.getmembers(klass) if member[0].startswith("test_")])
+                    [member[0] for member in inspect.getmembers(cls) if member[0].startswith("test_")])
 
         if len(tests) > 0:
             yield group, tests
