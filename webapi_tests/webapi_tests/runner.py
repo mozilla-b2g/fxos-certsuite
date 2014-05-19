@@ -48,13 +48,14 @@ def iter_tests(start_dir, pattern="test_*.py"):
                 continue
 
             members = inspect.getmembers(module)
-            bases = [t for t in zip(*members)[1] if isinstance(t, type)]
+            ts = [t for t in zip(*members)[1] if isinstance(t, type)]
 
-            # Include only semiauto tests
-            if semiauto.testcase.TestCase not in bases:
-                continue
+            for cls in ts:
+                # Include only semiauto tests
+                bases = inspect.getmro(cls)
+                if semiauto.testcase.TestCase not in bases:
+                    continue
 
-            for cls in bases:
                 if getattr(cls, "__module__", None) != name:
                     continue
                 tests.extend(
