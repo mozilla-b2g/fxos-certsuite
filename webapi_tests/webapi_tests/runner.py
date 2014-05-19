@@ -73,8 +73,8 @@ def main():
                         help="Only include specified group(s) in run. Include several groups by repeating flag.")
     args = parser.parse_args(sys.argv[1:])
     if args.list_test_groups and len(args.include) > 0:
-        print >> sys.stderr("%s: error: cannot list and include test "
-                            "groups at the same time" % sys.argv[0])
+        print >> sys.stderr, "%s: error: cannot list and include test " \
+                            "groups at the same time" % sys.argv[0]
         parser.print_usage()
         sys.exit(1)
 
