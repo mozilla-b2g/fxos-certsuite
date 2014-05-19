@@ -58,7 +58,7 @@ def iter_tests(start_dir, pattern="test_*.py"):
                 if getattr(klass, "__module__", None) != name:
                     continue
                 tests.extend(
-                    [m[0] for m in inspect.getmembers(klass) if m[0].startswith("test_")])
+                    [member[0] for member in inspect.getmembers(klass) if member[0].startswith("test_")])
 
         if len(tests) > 0:
             yield group, tests
