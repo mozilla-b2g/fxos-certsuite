@@ -16,7 +16,7 @@ class BluetoothTestCommon(object):
         window.wrappedJSObject.rcvd_disabled_event = false;       
         window.wrappedJSObject.rcvd_error = false;
         var mozBT = window.navigator.mozBluetooth;
-        
+
         mozBT.onenabled = function() {
            console.log("Recieved mozBluetooth.onenabled event");
            window.wrappedJSObject.rcvd_enabled_vent = true;
@@ -100,39 +100,89 @@ class BluetoothTestCommon(object):
         self.assertNotEqual(adapter, None, "mozBluetooth.getDefaultAdapter returned none")
         return adapter
 
+    def get_bt_discoverable_timeout(self):
+        return self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.discoverableTimeout")
+
     def set_bt_discoverable_timeout(self, timeout):
-        self.marionette.execute_async_script("""
-        window.wrappedJSObject.rcvd_success = false;
-        window.wrappedJSObject.rcvd_error = false;
-        window.wrappedJSObject.discoverable_timeout = null;
-        var mozBt = window.navigator.mozBluetooth;
-        var mozBtAdapter = window.wrappedJSObject.bluetooth_adapter;
+        # no point in setting if it is already set to the requested value
+        if (self.get_bt_discoverable_timeout() != timeout):
+            self.marionette.execute_async_script("""
+            window.wrappedJSObject.rcvd_success = false;
+            window.wrappedJSObject.rcvd_error = false;
+            window.wrappedJSObject.discoverable_timeout = null;
+            var mozBt = window.navigator.mozBluetooth;
+            var mozBtAdapter = window.wrappedJSObject.bluetooth_adapter;
+            var new_timeout = arguments[0];
 
-        console.log("Setting bluetooth discoverable timeout");
-        var request = mozBtAdapter.setDiscoverableTimeout(10);
+            console.log("Setting bluetooth discoverable timeout");
+            var request = mozBtAdapter.setDiscoverableTimeout(new_timeout);
 
-        request.onsuccess = function() {
-            console.log("BluetoothAdapter.setDiscoverableTimeout request success");
-            window.wrappedJSObject.rcvd_success = true;
-            window.wrappedJSObject.discoverable_timeout = mozBtAdapter.discoverableTimeout;
-        }
+            request.onsuccess = function() {
+                console.log("BluetoothAdapter.setDiscoverableTimeout request success");
+                window.wrappedJSObject.rcvd_success = true;
+                window.wrappedJSObject.discoverable_timeout = mozBtAdapter.discoverableTimeout;
+            }
 
-        request.onerror = function() {
-            console.log("BluetoothAdapter.setDiscoverableTimeout returned error");
-            window.wrappedJSObject.rcvd_error = true;
-        }
-        marionetteScriptFinished(1);
-        """, script_args=[timeout])
+            request.onerror = function() {
+                console.log("BluetoothAdapter.setDiscoverableTimeout returned error");
+                window.wrappedJSObject.rcvd_error = true;
+            }
+            marionetteScriptFinished(1);
+            """, script_args=[timeout])
+            # wait for timeout to be set
+            wait = Wait(self.marionette, timeout=30, interval=0.5)
+            try:
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.rcvd_success"))
+            except:
+                if self.marionette.execute_script("return window.wrappedJSObject.rcvd_error"):
+                    self.fail("BluetoothAdapter.setDiscoverableTimeout returned error")
+                else:
+                    self.fail("BluetoothAdapter.setDiscoverableTimeout failed")
 
-        # wait for adapter to be found
-        wait = Wait(self.marionette, timeout=30, interval=0.5)
-        try:
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.rcvd_success"))
-        except:
-            if self.marionette.execute_script("return window.wrappedJSObject.rcvd_error"):
-                self.fail("BluetoothAdapter.setDiscoverableTimeout returned error")
+            set_timeout = self.get_bt_discoverable_timeout()
+            self.assertEqual(set_timeout, timeout, "BluetoothAdapter.discoverableTimeout value was not set correctly")
+
+    def get_bt_discoverable_mode(self):
+        return self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.discoverableTimeout")
+
+    def set_bt_discoverable_mode(self, set_discoverable):
+            self.marionette.execute_async_script("""
+            window.wrappedJSObject.rcvd_success = false;
+            window.wrappedJSObject.rcvd_error = false;
+            var mozBtAdapter = window.wrappedJSObject.bluetooth_adapter;
+            var set_discoverable = arguments[0];
+
+            if (set_discoverable == true){
+                console.log("Turning on bluetooth discoverable mode");
+            } else {
+                console.log("Turning off bluetooth discoverable mode");
+            }
+
+            var request = mozBtAdapter.setDiscoverable(set_discoverable);
+
+            request.onsuccess = function() {
+                console.log("BluetoothAdapter.setDiscoverable request success");
+                window.wrappedJSObject.rcvd_success = true;
+            }
+
+            request.onerror = function() {
+                console.log("BluetoothAdapter.setDiscoverable returned error");
+                window.wrappedJSObject.rcvd_error = true;
+            }
+            marionetteScriptFinished(1);
+            """, script_args=[set_discoverable])
+            # wait for request success
+            wait = Wait(self.marionette, timeout=30, interval=0.5)
+            try:
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.rcvd_success"))
+            except:
+                if self.marionette.execute_script("return window.wrappedJSObject.rcvd_error"):
+                    self.fail("BluetoothAdapter.setDiscoverable returned error")
+                else:
+                    self.fail("BluetoothAdapter.setDiscoverable failed")
+
+            discoverable_setting = self.marionette.execute_script("return window.wrappedJSObject.bluetooth_adapter.discoverable")
+            if set_discoverable:
+                self.assertTrue(discoverable_setting, "Firefox OS BluetoothAdapter.discoverable should be TRUE")
             else:
-                self.fail("BluetoothAdapter.setDiscoverableTimeout failed")
-
-        set_timeout = self.marionette.execute_script("return window.wrappedJSObject.discoverable_timeout")
-        self.assertEqual(set_timeout, timeout, "BluetoothAdapter.discoverableTimeout value was not set correctly")
+                self.assertFalse(discoverable_setting, "Firefox OS BluetoothAdapter.discoverable should be FALSE")

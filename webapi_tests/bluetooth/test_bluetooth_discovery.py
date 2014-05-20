@@ -16,7 +16,7 @@ class TestBluetoothDiscovery(TestCase, BluetoothTestCommon):
 
     def test_enabled(self):
         # start with bt disabled
-        
+
         # seems to be a bug with the enabled property; first time always returns false
         # so get it once at the start; file a bug for this/look into further
         print self.is_bt_enabled()
@@ -49,30 +49,42 @@ class TestBluetoothDiscovery(TestCase, BluetoothTestCommon):
     def test_discoverable(self):
         # ensure enabled
         if not self.is_bt_enabled():
-            self.set_bt_enabled(True)        
+            self.set_bt_enabled(True)
+            time.sleep(5)
         # get default adapter
         adapter = self.get_default_bt_adapter()
+        # ensure discoverable mode is off to start
+        if(self.get_bt_discoverable_mode):
+            self.set_bt_discoverable_mode(False)
+            time.sleep(5)
         # get default bluetooth adapter name
         name = adapter["name"]
         self.assertTrue(len(name) > 0, "BluetoothAdapter.name must not be empty")
         # set discoverable timeout
-        self.set_bt_discoverable_timeout(120)
+        self.set_bt_discoverable_timeout(180)
         # become discoverable
-
+        self.set_bt_discoverable_mode(True)
+        time.sleep(5)
         # have user verify device by the same name is found on other phone
         self.confirm('The Firefox OS device is now in Bluetooth discoverable mode. From a different phone, please \
-                      discover Bluetooth devices. Do you see the Firefox OS phone listed (with the name "%s")?' %name)
+                     discover Bluetooth devices. Do you see the Firefox OS device ("%s") listed?' %name)
+        # now turn off discoverable mode
+        self.set_bt_discoverable_mode(False)
+        time.sleep(5)
+        # have user verify by checking a different device
+        self.confirm('The Firefox OS device is NOT in Bluetooth discoverable mode. From a different phone, please \
+                     discover Bluetooth devices. IS IT TRUE that the Firefox OS device ("%s") DOES NOT appear anymore?' %name)
 
     def test_discovering(self):
         # ensure enabled
         if not self.is_bt_enabled():
             self.set_bt_enabled(True)
         # get default adapter
-        adapter = self.get_default_bt_adapter()        
+        adapter = self.get_default_bt_adapter()
         # have user ensure other phone bt is on and in discoverable mode
         # start discovery
         # stop discovery
-        # show user list of found devices, verify theirs is there 
+        # show user list of found devices, verify theirs is there
         self.assertTrue(True)
 
     def test_name(self):
