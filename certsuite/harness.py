@@ -19,6 +19,7 @@ import traceback
 import zipfile
 
 from collections import OrderedDict
+from datetime import datetime
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters
 
@@ -238,7 +239,7 @@ runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
     return 0
 
 def run_tests(args, config):
-    output_zipfile = 'firefox-os-certification.zip'
+    output_zipfile = 'firefox-os-certification_%s.zip' % (datetime.now().strftime("%Y%m%d%H%M%S"),)
     output_logfile = "run.log"
     error = False
 
