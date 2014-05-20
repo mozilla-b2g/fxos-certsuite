@@ -25,4 +25,4 @@ setup(name='webapi_tests',
       include_package_data=True,
       zip_safe=False,
       install_requires=deps,
-      entry_points='')
+      entry_points={"console_scripts": ["webapitests = webapi_tests.runner:main"]})

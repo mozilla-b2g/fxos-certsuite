@@ -3,3 +3,5 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from telephony_test import TelephonyTestCommon
+from test_telephony_incoming import TestTelephonyIncoming
+from test_telephony_outgoing import TestTelephonyOutgoing
