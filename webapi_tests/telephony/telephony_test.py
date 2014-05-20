@@ -239,7 +239,8 @@ class TelephonyTestCommon(object):
         except:
             self.marionette.switch_to_frame(self.app["frame"])
             self.fail("failed to disable dialer agent")
-        self.marionette.switch_to_frame(self.app["frame"])
+        finally:
+            self.marionette.switch_to_frame(self.app["frame"])
 
     def enable_dialer(self):
         # enable system dialer agent to handle calls
@@ -253,4 +254,5 @@ class TelephonyTestCommon(object):
         except:
             self.marionette.switch_to_frame(self.app["frame"])
             self.fail("failed to disable dialer agent")
-        self.marionette.switch_to_frame(self.app["frame"])
+        finally:
+            self.marionette.switch_to_frame(self.app["frame"])
