@@ -101,7 +101,8 @@ class TelephonyTestCommon(object):
     def user_guided_incoming_call(self):
         # ask user to call the device; answer and verify via webapi
         self.setup_incoming_call()
-        self.instruct("From a different phone, call the Firefox OS device and let it ring. When it is ringing click 'OK'")
+        self.instruct("From a different phone, call the Firefox OS device, and when you \
+                      hear the ringing signal click 'OK'")
         self.verify_incoming_call()
         self.answer_call()
 
@@ -196,8 +197,7 @@ class TelephonyTestCommon(object):
             # failed to initiate call; check if the destination phone's line was busy
             busy = self.marionette.execute_script("return window.wrappedJSObject.received_busy")
             self.assertFalse(busy, "Received busy signal; ensure target phone is available and try again")
-            self.fail("Failed to initiate call; mozTelephony.dial is broken -or- \
-                        perhaps there is no mobile network signal. Please try again")
+            self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
         # verify one outgoing call
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
@@ -225,3 +225,34 @@ class TelephonyTestCommon(object):
 
         # have user answer the call on target, verify
         self.answer_call(incoming=False)
+
+    def disable_dialer(self):
+        # disable system dialer agent so it doesn't steal the
+        # incoming/outgoing calls away from the certest app
+        self.marionette.switch_to_frame() # system app
+        try:
+            self.marionette.execute_async_script("""
+            log("disabling system dialer agent");
+            window.wrappedJSObject.dialerAgent.stop();
+            marionetteScriptFinished(1);
+            """, special_powers=True)
+        except:
+            self.marionette.switch_to_frame(self.app["frame"])
+            self.fail("failed to disable dialer agent")
+        finally:
+            self.marionette.switch_to_frame(self.app["frame"])
+
+    def enable_dialer(self):
+        # enable system dialer agent to handle calls
+        self.marionette.switch_to_frame() # system app
+        try:
+            self.marionette.execute_async_script("""
+            log("enabling system dialer agent");
+            window.wrappedJSObject.dialerAgent.start();
+            marionetteScriptFinished(1);
+            """, special_powers=True)
+        except:
+            self.marionette.switch_to_frame(self.app["frame"])
+            self.fail("failed to disable dialer agent")
+        finally:
+            self.marionette.switch_to_frame(self.app["frame"])
