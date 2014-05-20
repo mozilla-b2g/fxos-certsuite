@@ -10,16 +10,17 @@ import marionette_extension
 import mozdevice
 import mozprocess
 import os
+import pkg_resources
+import shutil
 import subprocess
 import sys
 import tempfile
 import traceback
 import zipfile
-import shutil
 
 from collections import OrderedDict
 from mozfile import TemporaryDirectory
-from mozlog.structured import structuredlog, reader, handlers, formatters
+from mozlog.structured import structuredlog, handlers, formatters
 
 logger = None
 
@@ -39,6 +40,7 @@ def load_config(path):
     config["suites"] = OrderedDict(config["suites"])
     return config
 
+
 def iter_test_lists(suites_config):
     '''
     Query each subharness for the list of test groups it can run and
@@ -52,6 +54,31 @@ def iter_test_lists(suites_config):
         except subprocess.CalledProcessError:
             print >> sys.stderr("Failed to run command %s" % " ".join(cmd))
             sys.exit(1)
+
+
+def get_metadata():
+    dist = pkg_resources.get_distribution("fxos-certsuite")
+    return {"version": dist.version}
+
+def log_metadata():
+    metadata = get_metadata()
+    for key in sorted(metadata.keys()):
+        logger.info("fxos-certsuite %s: %s" % (key, metadata[key]))
+
+class LogManager(object):
+    def __init__(self, path, zip_file):
+        self.path = path
+        self.zip_file = zip_file
+        self.file = None
+
+    def __enter__(self):
+        self.file = open(self.path, "w")
+        return self.file
+
+    def __exit__(self, *args, **kwargs):
+        self.file.__exit__(*args, **kwargs)
+        self.zip_file.write(self.path)
+        os.unlink(self.path)
 
 class DeviceBackup(object):
     def __init__(self):
@@ -127,8 +154,6 @@ class TestRunner(object):
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
 
-        files = []
-
         try:
             cmd, output_files = self.build_command(suite, groups, temp_dir)
 
@@ -144,7 +169,7 @@ class TestRunner(object):
             proc.wait()
             logger.debug("Process finished")
 
-        except Exception as e:
+        except Exception:
             logger.critical("Error running suite %s:\n%s" %(suite, traceback.format_exc()))
             raise
         finally:
@@ -189,7 +214,7 @@ def log_result(results, result):
 def check_adb():
     try:
         logger.info("Testing ADB connection")
-        dm = mozdevice.DeviceManagerADB()
+        mozdevice.DeviceManagerADB()
     except mozdevice.DMError, e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
@@ -219,9 +244,10 @@ def run_tests(args, config):
 
     try:
         with zipfile.ZipFile(output_zipfile, 'w', zipfile.ZIP_DEFLATED) as zip_f:
-            with open(output_logfile, "w") as log_f:
+            with LogManager(output_logfile, zip_f) as log_f:
                 setup_logging(log_f)
 
+                log_metadata()
                 check_adb()
                 install_marionette()
 
@@ -240,7 +266,6 @@ def run_tests(args, config):
                 if error:
                     logger.critical("Encountered errors during run")
 
-            zip_f.write(output_logfile)
     except (SystemExit, KeyboardInterrupt):
         raise
     except:
