@@ -143,7 +143,7 @@ class BluetoothTestCommon(object):
             self.assertEqual(set_timeout, timeout, "BluetoothAdapter.discoverableTimeout value was not set correctly")
 
     def get_bt_discoverable_mode(self):
-        return self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.discoverableTimeout")
+        return self.marionette.execute_script("return window.wrappedJSObject.bluetooth_adapter.discoverable")
 
     def set_bt_discoverable_mode(self, set_discoverable):
             self.marionette.execute_async_script("""
