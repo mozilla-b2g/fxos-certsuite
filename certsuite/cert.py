@@ -9,12 +9,13 @@ import StringIO
 import argparse
 import json
 import logging
-from marionette import Marionette
+import marionette
 import mozdevice
 import moznetwork
 import os
 import pkg_resources
 import sys
+import time
 import wptserve
 from zipfile import ZipFile
 import fxos_appgen
@@ -51,19 +52,10 @@ supported_versions = ["1.4", "1.3"]
 def connect_handler(request, response):
     response.headers.set("Content-Type", "text/html")
     response.content = "<head><meta charset=utf-8 name=\"viewport\" content=\"width=device-width\"></head>" \
-                       "<p><a href='/headers'><h1>Click me</h1></a></p>"
+                       "<p><a href='/install.html'><h1>Click me</h1></a></p>"
 
     global connected
     connected = True
-
-@wptserve.handlers.handler
-def headers_handler(request, response):
-    response.headers.set("Content-Type", "text/html")
-    response.content = "<head><meta charset=utf-8 name=\"viewport\" content=\"width=device-width\"></head>" \
-                       "<p><a href='/install.html'><h1>Click me to go to the app install page<h1></a></p>"
-
-    global headers
-    headers = request.headers
 
 @wptserve.handlers.handler
 def installed_handler(request, response):
@@ -72,6 +64,9 @@ def installed_handler(request, response):
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
+    global headers
+    headers = request.headers
+
     global webapi_results
     webapi_results = json.loads(request.POST["results"])
 
@@ -89,7 +84,6 @@ static_path = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "static"))
 
 routes = [("GET", "/", connect_handler),
-          ("GET", "/headers", headers_handler),
           ("GET", "/installed", installed_handler),
           ("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_results_priv", webapi_results_priv_handler),
@@ -123,7 +117,7 @@ def diff_results(a, b):
     for key in same_keys:
         if type(a[key]) is dict:
             if type(b[key]) is not dict:
-                result.extend(key)
+                result.append(key)
             else:
                 result.extend([key + '.' + item for item in diff_results(a[key], b[key])])
         elif a[key] != b[key]:
@@ -300,8 +294,7 @@ def cli():
         if not args.generate_reference:
             os.remove(omni_results_path)
 
-    # Step 2: Navigate to local hosted web server to install app for
-    # WebIDL iteration and fetching HTTP headers
+    # run webapi, webidl and permissions tests
     if 'webapi' in test_groups:
         logger.test_start('webapi')
 
@@ -310,25 +303,35 @@ def cli():
             host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
         httpd.start()
 
-        print "\n#1: Ensure that the device is connected to the same Wi-Fi " \
-            "network as this machine.  Then, on the device, please launch the " \
-            "browser app and navigate to http://%s:%d/" % (httpd.host, httpd.port)
-        Wait(timeout=600).until(lambda: connected is True)
+        print "Installing the hosted app. This will take a minute... "
 
+        appname = 'WebAPI Verifier'
+        details = fxos_appgen.create_details(args.version, all_perms=True)
+        manifest = json.dumps(fxos_appgen.create_manifest(appname, details, 'web', args.version))
 
-        print "\n#2: On the web page that's loaded, please click the 'Click me' link"
-        Wait().until(lambda: headers is not None)
-        report["headers"] = headers
+        apppath = os.path.join(static_path, 'webapi-test-app')
+        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
+                              'manifest.webapp': manifest})
 
-        print "\n#3: Next, click the link which reads 'Click me to go to the app " \
-            "install page', then click the button which appears to install the test app"
-        Wait().until(lambda: installed is True)
+        # if we have recently rebooted, we might get here before marionette
+        # is running.
+        retries = 0
+        while retries < 3: 
+            try:
+                fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+                break
+            except marionette.errors.InvalidResponseException:
+                time.sleep(5)
+                retries += 1
+                continue
 
-        print "\n#4: Please follow the instructions to install the app, then launch " \
-            "WebAPI Verifier from the homescreen. This will start the WebAPI tests " \
-            "and may take a couple minutes to complete."
+        fxos_appgen.launch_app(appname)
+
+        print "Done. Running the app..."
+
         Wait(timeout=600).until(lambda: webapi_results is not None)
-        fxos_appgen.uninstall_app('WebAPI Verification App')
+        report["headers"] = headers
+        fxos_appgen.uninstall_app(appname)
 
         if args.generate_reference:
             with open('webapi_results.json', 'w') as f:
@@ -341,7 +344,7 @@ def cli():
         webapi_passed = parse_results(file_path, webapi_results, 'unpriv-', logger, report)
 
         # Run privileged app
-        print "\n#5: Installing the privileged app. This will take a minute... "
+        print "Installing the privileged app. This will take a minute... "
 
         appname = 'Privileged WebAPI Verifier'
         details = fxos_appgen.create_details(args.version, all_perms=True)
@@ -351,8 +354,9 @@ def cli():
         package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_priv";' % addr,
                               'manifest.webapp': manifest})
         fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+        fxos_appgen.launch_app(appname)
 
-        print "Done. Please run the Privileged WebAPI Verifier from the home screen."
+        print "Done. Running the app..."
 
         Wait(timeout=600).until(lambda: webapi_results_priv is not None)
         fxos_appgen.uninstall_app(appname)
@@ -367,7 +371,7 @@ def cli():
         webapi_passed = parse_results(file_path, webapi_results_priv, 'priv-', logger, report) and webapi_passed
 
         # Run certified app
-        print "\n#6: Installing the certified app. This will take a minute... "
+        print "Installing the certified app. This will take a minute... "
 
         appname = 'Certified WebAPI Verifier'
         details = fxos_appgen.create_details(args.version, all_perms=True)
@@ -376,8 +380,9 @@ def cli():
         package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_cert";' % addr,
                               'manifest.webapp': manifest})
         fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+        fxos_appgen.launch_app(appname)
         os.remove('app.zip')
-        print "Done. Please run the Certified WebAPI Verifier from the home screen."
+        print "Done. Running the app..."
 
         Wait(timeout=600).until(lambda: webapi_results_cert is not None)
         fxos_appgen.uninstall_app(appname)
