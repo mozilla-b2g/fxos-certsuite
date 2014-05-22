@@ -85,8 +85,8 @@ class DeviceBackup(object):
     def __init__(self):
         self.device = mozdevice.DeviceManagerADB()
         self.backup_dirs = ["/data/local",
-                            "/data/b2g/mozilla",
-                            "/system/etc"]
+                            "/data/b2g/mozilla"]
+        self.backup_files = ["/system/etc/hosts"]
 
     def local_dir(self, remote):
         return os.path.join(self.backup_path, remote.lstrip("/"))
@@ -99,6 +99,11 @@ class DeviceBackup(object):
             local = self.local_dir(remote)
             self.device.getDirectory(remote, local)
 
+        for remote_path in self.backup_files:
+            remote_dir, filename = remote_path.rsplit("/", 1)
+            local_path = os.path.join(self.local_dir(remote_dir), filename)
+            self.device.getFile(remote_path, local_path)
+
         return self
 
     def __exit__(self, *args, **kwargs):
@@ -106,10 +111,18 @@ class DeviceBackup(object):
 
     def restore(self):
         logger.info("Restoring device state")
+        self.device.remount()
         for remote in self.backup_dirs:
             local = self.local_dir(remote)
             self.device.removeDir(remote)
             self.device.pushDir(local, remote)
+
+        for remote_path in self.backup_files:
+            remote_dir, filename = remote_path.rsplit("/", 1)
+            local_path = os.path.join(self.local_dir(remote_dir), filename)
+            self.device.removeFile(remote_path)
+            self.device.pushFile(local_path, remote_path)
+
         self.device.reboot(wait=True)
 
 
