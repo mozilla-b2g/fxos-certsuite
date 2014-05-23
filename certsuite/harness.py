@@ -85,8 +85,8 @@ class DeviceBackup(object):
     def __init__(self):
         self.device = mozdevice.DeviceManagerADB()
         self.backup_dirs = ["/data/local",
-                            "/data/b2g/mozilla",
-                            "/system/etc"]
+                            "/data/b2g/mozilla"]
+        self.backup_files = ["/system/etc/hosts"]
 
     def local_dir(self, remote):
         return os.path.join(self.backup_path, remote.lstrip("/"))
@@ -95,9 +95,19 @@ class DeviceBackup(object):
         logger.info("Saving device state")
         self.backup_path = tempfile.mkdtemp()
 
-        for remote in self.backup_dirs:
-            local = self.local_dir(remote)
-            self.device.getDirectory(remote, local)
+        for remote_path in self.backup_dirs:
+            local_path = self.local_dir(remote_path)
+            if not os.path.exists(local_path):
+                os.makedirs(local_path)
+            self.device.getDirectory(remote_path, local_path)
+
+        for remote_path in self.backup_files:
+            remote_dir, filename = remote_path.rsplit("/", 1)
+            local_dir = self.local_dir(remote_dir)
+            local_path = os.path.join(local_dir, filename)
+            if not os.path.exists(local_dir):
+                os.makedirs(local_dir)
+            self.device.getFile(remote_path, local_path)
 
         return self
 
@@ -106,10 +116,19 @@ class DeviceBackup(object):
 
     def restore(self):
         logger.info("Restoring device state")
-        for remote in self.backup_dirs:
-            local = self.local_dir(remote)
-            self.device.removeDir(remote)
-            self.device.pushDir(local, remote)
+        self.device.remount()
+
+        for remote_path in self.backup_files:
+            remote_dir, filename = remote_path.rsplit("/", 1)
+            local_path = os.path.join(self.local_dir(remote_dir), filename)
+            self.device.removeFile(remote_path)
+            self.device.pushFile(local_path, remote_path)
+
+        for remote_path in self.backup_dirs:
+            local_path = self.local_dir(remote_path)
+            self.device.removeDir(remote_path)
+            self.device.pushDir(local_path, remote_path)
+
         self.device.reboot(wait=True)
 
 
