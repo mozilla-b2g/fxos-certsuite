@@ -4,7 +4,7 @@
 
 from setuptools import setup
 
-PACKAGE_VERSION = '0.1'
+PACKAGE_VERSION = '1.3.0.7'
 deps = ['fxos-appgen>=0.2.9',
         'marionette_client>=0.7.1.1',
         'marionette_extension >= 0.1',
