@@ -77,7 +77,7 @@ functional testing of Web API's.
 
 This semi-automatic harness is in development (and is thus not
 runnable using the process above), but you can run a prototype of
-these tests now. To do so:
+these tests now. To do so::
 
     cd webapi_tests
     ./setup_and_run.sh
