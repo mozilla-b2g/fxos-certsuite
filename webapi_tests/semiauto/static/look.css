@@ -80,13 +80,14 @@ td {
   min-width: 70%;
 }
 
-td code { margin-top: .5em; display: block; }
+td code { margin-top: .5em; display: block; font-size: 90%; }
 
 td.result {
   text-transform: uppercase;
   width: 25%;
   letter-spacing: 1px;
   font-size: 95%;
+  word-break: normal;
 }
 
 tr.running { background: -moz-linear-gradient(left, transparent 0, rgba(250,250,250,.5) 100%); }

@@ -10,16 +10,36 @@ import unittest
 import environment
 import runner
 
+from mozlog.structured import formatters, handlers, structuredlog
+from moztest.adapters.unit import StructuredTestRunner
+
+from semiauto import server
+
 
 test_loader = None
 
 
-def _install_test_event_hooks(test_runner, handler):
-    state_updater = runner.TestStateUpdater(handler)
-    test_runner.resultclass.add_callback(state_updater)
+def _wait_for_client():
+    """Wait for client to connect the host browser and return.
+
+    Gets a reference to the WebSocket handler associated with that client that
+    we can use to communicate with the browser.  This blocks until a client
+    connects.
+
+    """
+
+    # A timeout is needed because of http://bugs.python.org/issue1360
+    return server.clients.get(block=True, timeout=sys.maxint)
 
 
-def run(suite, spawn_browser=True, verbosity=1, quiet=False,
+def _create_logger():
+    logger = structuredlog.StructuredLogger("unknown")
+    logger.add_handler(
+        handlers.StreamHandler(sys.stdout, formatters.JSONFormatter()))
+    return logger
+
+
+def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
         failfast=False, catch_break=False, buffer=True, **kwargs):
     """A simple test runner.
 
@@ -44,64 +64,46 @@ def run(suite, spawn_browser=True, verbosity=1, quiet=False,
         import unittest.signals
         unittest.signals.installHandler()
 
-    test_runner = runner.PreInstantiatedTestRunner(verbosity=verbosity,
-                                                   failfast=failfast,
-                                                   buffer=buffer,
-                                                   **kwargs)
+    if not logger:
+        logger = _create_logger()
 
-    delegator = runner.TestEventDelegator(
-        test_runner.stream, test_runner.descriptions, test_runner.verbosity)
-    test_runner.resultclass = delegator
-
-    # Start new test environment, because first environment.get does
-    # that for us the first time.
-    #
-    # This is a hack and shouldn't be here.  The reason it is is
-    # because unittest doesn't allow us to modify the runner in a
-    # TestCase's setUp.
-    #
-    # Generally a lot of this code should live in TestCase.setUp.
     env = environment.get(environment.InProcessTestEnvironment,
                           verbose=(verbosity > 1))
 
-    # TODO(ato): Only spawn a browser when asked to.
     if spawn_browser:
         import webbrowser
         webbrowser.open("http://localhost:6666/")
     else:
-        print("Please connect your browser to http://%s:%d/" %
-              (env.server.addr[0], env.server.addr[1]))
+        print >> sys.stderr, "Please connect your browser to http://%s:%d/" % \
+            (env.server.addr[0], env.server.addr[1])
 
-    # Get a reference to the WebSocket handler that we can use to
-    # communicate with the client browser.  This blocks until a client
-    # connects.
-    from semiauto import server
-    # A timeout is needed because of http://bugs.python.org/issue1360
-    handler = server.clients.get(block=True, timeout=sys.maxint)
+    handler = _wait_for_client()
 
-    # Send list of tests to client.
+    test_runner = StructuredTestRunner(logger=logger)
     test_list = runner.serialize_suite(suite)
     handler.emit("testList", test_list)
 
+    # This is a hack to make the test suite metadata and the handler
+    # available to the tests.
     handler.suite = suite
     environment.env.handler = handler
 
-    # Due to extent of how much unittest sucks, this is unfortunately
-    # necessary:
-    _install_test_event_hooks(test_runner, handler)
+    logger.add_handler(
+        handlers.StreamHandler(sys.stdout, runner.TestStateUpdater(handler)))
 
+    handler.emit("testRunStart")
     try:
         results = test_runner.run(suite)
     except (SystemExit, KeyboardInterrupt) as e:
         sys.exit(1)
+    handler.emit("testRunStop")
 
     return results
 
 
 def main(argv):
-    config = {}
     from semiauto.loader import TestLoader
-    test_loader = TestLoader(config=config)
+    test_loader = TestLoader()
     prog = "python -m semiauto"
     indent = " " * len(prog)
     usage = """\

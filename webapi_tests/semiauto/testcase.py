@@ -24,9 +24,6 @@ class TestCase(CertAppMixin, unittest.TestCase):
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):
-        self.config = kwargs.pop("config")
-        #self.handler = kwargs.pop('handler')
-
         super(TestCase, self).__init__(*args, **kwargs)
         self.stored.handler = None
         self.stored.marionette = None
@@ -163,11 +160,11 @@ def turn_screen_on(marionette):
     marionette.execute_script("""
         var screenManager = window.wrappedJSObject.ScreenManager;
         screenManager.turnScreenOn();
-	""")
+    """)
 
 
 def unlock_screen(marionette):
     marionette.execute_script("""
         var lockScreen = window.wrappedJSObject.LockScreen;
         lockScreen.unlock();
-	""")
+    """)

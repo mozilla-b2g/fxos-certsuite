@@ -106,65 +106,71 @@ var Keys = (function() {
 })();
 
 // Represents tests in a table in the document.
+//
+// Argument `el' is the table element that this view will be attached
+// to.  `tests' should be an array of strings with the unique test
+// names.
 function TestListView(el, tests) {
   this.el = el;
   this.tests = tests;
 }
 
+// Exception that is thrown if server sends an unknown command.
+function UnknownCommand(msg) {
+  self.message = msg;
+}
+
 TestListView.prototype = {
   // have a reusable function if we want a 'Re-run tests' option
   resetTable: function() {
-    for (var index in this.tests) {
-      var test = this.tests[index];
+    for (var id in this.tests) {
+      var test = this.tests[id];
       var rowNode = this.el.insertRow(-1);
-      rowNode.id = "test" + test.id;
+      rowNode.id = "test" + id;
       var descriptionNode = rowNode.insertCell(0);
       var resultNode = rowNode.insertCell(1);
-      descriptionNode.innerHTML = test.description;
+      descriptionNode.innerHTML = test;
       resultNode.addClass("result");
       resultNode.innerHTML = "";
     }
   },
 
-  setTestState: function(testId, outcome, message) {
-    var el = $("#test" + testId);
+  updateTest: function(data) {
+    var el = $("#test" + this.tests.indexOf(data.test));
     var outcomeEl = el.getElementsByClassName("result")[0];
 
-    el.className = outcome;
-    if (outcome !== "running")
-      outcomeEl.innerHTML = outcome.replace("_", " ").titleize();
+    switch (data.action) {
+    case "test_start":
+      el.className = "running";
+      break;
 
-    if (message) {
-      var messageEl = document.createElement("code");
-      messageEl.innerHTML = "<pre>" + message + "</pre>";
-      el.getElementsByTagName("td")[0].appendChild(messageEl);
-    }
-  },
+    case "test_end":
+      var status = data.status;
 
-  updateTest: function(data) {
-    var testData = data.testData;
-    switch (testData.event) {
-      case "testStart":
-        this.setTestState(testData.id, "running");
-        break;
-      case "success":
-        this.setTestState(testData.id, "pass");
-        break;
-      case "expectedFailure":
-        this.setTestState(testData.id, "expected_failure");
-        break;
-      case "skip":
-        this.setTestState(testData.id, "skip", testData.reason);
-        break;
-      case "error":
-        this.setTestState(testData.id, "error", testData.error);
-        break;
-      case "failure":
-        this.setTestState(testData.id, "fail", testData.error);
-        break;
-      case "unexpectedSuccess":
-        this.setTestState(testData.id, "unexpected_success");
-        break;
+      // A failure with the same (i.e. missing) expected outcome
+      // is in other words an expected failure.  Conversely a pass
+      // with an expected fail is an unexpected success.
+      if (data.status == "FAIL" && !data.hasOwnProperty("expected")) {
+        status = "EXPECTED FAILURE";
+      } else if (data.status == "PASS" && data.expected == "FAIL") {
+        status = "UNEXPECTED SUCCESS";
+      }
+
+      el.className = status.toLowerCase().replace(" ", "_");
+      outcomeEl.innerHTML = status.toLowerCase().titleize();
+
+      if (data.message &&
+        !(status == "EXPECTED FAILURE" || status == "UNEXPECTED SUCCESS")) {
+        var messageEl = document.createElement("code");
+        messageEl.innerHTML = "<pre>" + data.message + "</pre>";
+        el.getElementsByTagName("td")[0].appendChild(messageEl);
+      }
+
+      break;
+
+    default:
+      throw new UnknownCommand(
+        "Received unknown command from server: " + data.action);
     }
   }
 };
@@ -309,45 +315,51 @@ Client.prototype = {
       var command = Object.keys(data)[0];
       console.log("recv", data);
 
-      switch (command) {
-      case "testList":
-        // set up the test_list table
-        this.testList = new TestListView($("#test_list"), data.testList);
-        this.testList.resetTable();
-        break;
-
-      case "testRunStart":
-        this.notificationEl.innerHTML = "Running tests…";
-        break;
-
-      case "testRunStop":
-        this.notificationEl.innerHTML = "Done!";
-        break;
-
-      case "prompt":
-        this.promptUser(data.prompt);
-        break;
-
-      case "instructPrompt":
-        this.instructUser(data.instructPrompt);
-        break;
-
-      case "confirmPrompt":
-        this.confirmPrompt(data.confirmPrompt);
-        break;
-
-      case "updateTest":
-        // TODO: this assumes any other request will be to update the table
-        this.testList.updateTest(data.updateTest);
-        break;
-
-      default:
+      try {
+        this.parseMessage(command, data);
+      } catch (e) {
         console.log("unkwn", data);
         this.ws.close();
-        this.notificationEl.innerHTML = "Received unknown command from server )-:";
-        break;
+        this.notificationEl.innerHTML = e.message;
       }
     }.bind(this);
+  },
+
+  parseMessage: function(command, data) {
+    switch (command) {
+    case "testList":
+      this.testList = new TestListView($("#test_list"), data.testList);
+      this.testList.resetTable();
+      break;
+
+    case "testRunStart":
+      this.notificationEl.innerHTML = "Running tests…";
+      break;
+
+    case "testRunStop":
+      this.notificationEl.innerHTML = "Done!";
+      break;
+
+    case "prompt":
+      this.promptUser(data.prompt);
+      break;
+
+    case "instructPrompt":
+      this.instructUser(data.instructPrompt);
+      break;
+
+    case "confirmPrompt":
+      this.confirmPrompt(data.confirmPrompt);
+      break;
+
+    case "updateTest":
+      this.testList.updateTest(data.updateTest);
+      break;
+
+    default:
+      throw new UnknownCommand(
+        "Received unknown command from server: " + command);
+    }
   },
 
   emit: function(event, data) {
