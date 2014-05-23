@@ -1,1 +1,2 @@
 include certapp/app_management.js
+graft semiauto/static

@@ -14,11 +14,12 @@ installed.
 If you need to install adb, see
 https://developer.mozilla.org/en-US/Firefox_OS/Debugging/Installing_ADB.
 
-Once installed, add adb to your PATH in your ~/.bashrc
-or equivalent file, by adding the following line to the file
-(replacing $SDK_HOME with the location of the android sdk)::
+Once installed, adb must be on your PATH.  If you use the bash shell
+emulator you can modify your *~/.bashrc* or equivalent file, by
+adding the following line to the file (replacing $SDK_HOME with the
+location of the Android SDK::
 
-    PATH=$SDK_HOME:$PATH
+    export PATH=$SDK_HOME:$PATH
 
 The device and the host machine running the tests must also be on the
 same Wi-Fi network.
