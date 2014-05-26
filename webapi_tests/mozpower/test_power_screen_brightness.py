@@ -5,23 +5,24 @@
 from semiauto import TestCase
 
 
-class PowerManagement(TestCase):
+class TestPowerManagement(TestCase):
 
     def test_brightness_decrease(self):
-        self.instruct("Testing decrease in brightness")
-        decrease_brightness = """
-            //initialize the brightness
-            window.navigator.mozPower.screenBrightness = 1.0;
-            //decresing the brightnesss
-            window.navigator.mozPower.screenBrightness = 0.1;
-        """
-        self.marionette.execute_script(decrease_brightness)
-        self.confirm("Did you notice decrease in brightness ?")
+        #initialize the screen brightness
+        self.marionette.execute_script("""
+            window.navigator.mozPower.screenBrightness = 1.0;""")
+        self.instruct("About to decrease the screen "\
+                      "brightness; please watch the screen and click OK")
+        self.marionette.execute_script("""
+            window.navigator.mozPower.screenBrightness = 0.1""")
+        self.confirm("Did you notice decrease in brightness?")
 
     def test_brightness_increase(self):
-        self.confirm("Testing increase in brightness")
-        increase_brightness = """
-            window.navigator.mozPower.screenBrightness = 1.0;
-        """
-        self.marionette.execute_script(increase_brightness)
-        self.confirm("Did you notice increase in brightness ?")
+        #initialize the screen brightness
+        self.marionette.execute_script("""
+            window.navigator.mozPower.screenBrightness = 0.1;""")
+        self.instruct("About to increase the screen "\
+                      "brightness; please watch the screen and click OK")
+        self.marionette.execute_script("""
+            window.navigator.mozPower.screenBrightness = 1.0;""")
+        self.confirm("Did you notice increase in brightness?")
