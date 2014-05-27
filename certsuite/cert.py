@@ -215,8 +215,6 @@ def cli():
     parser.add_argument("--generate-reference",
                         help="Generate expected result files",
                         action="store_true")
-    parser.add_argument("--port", default=8080, type=int,
-                        help="Port for webserver to listen on (default=8080)")
     commandline.add_logging_group(parser)
 
     args = parser.parse_args()
@@ -300,10 +298,10 @@ def cli():
     if 'webapi' in test_groups:
         logger.test_start('webapi')
 
-        addr = (moznetwork.get_ip(), args.port)
         httpd = wptserve.server.WebTestHttpd(
-            host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
+            host=moznetwork.get_ip(), port=0, routes=routes, doc_root=static_path)
         httpd.start()
+        addr = (httpd.host, httpd.port)
 
         print "Installing the hosted app. This will take a minute... "
 
