@@ -216,7 +216,7 @@ def cli():
                         help="Generate expected result files",
                         action="store_true")
     parser.add_argument("--port", default=8080, type=int,
-                        help="Port for webserver to listen on")
+                        help="Port for webserver to listen on (default=8080)")
     commandline.add_logging_group(parser)
 
     args = parser.parse_args()
