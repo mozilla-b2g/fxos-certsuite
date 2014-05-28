@@ -123,11 +123,11 @@ def test_user_agent(user_agent, logger):
     elif m.groups()[2] != None:
         # Specified a device string, strip leading ';' and any leading/trailing whitespace
         device = m.groups()[2][1:].strip()
-        # Do not use slash ("/"), semicolon (";"), round brackets or any whitespace. 
+        # Do not use slash ("/"), semicolon (";"), round brackets or any whitespace.
         device_rexp = re.compile('[/;\(\)\s]')
         m = device_rexp.search(device)
         if m:
-            valid = False 
+            valid = False
             message = 'Device identifier: "%s" contains forbidden characters' % device
 
     if valid:
@@ -347,7 +347,7 @@ def cli():
         # if we have recently rebooted, we might get here before marionette
         # is running.
         retries = 0
-        while retries < 3: 
+        while retries < 3:
             try:
                 fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
                 break
