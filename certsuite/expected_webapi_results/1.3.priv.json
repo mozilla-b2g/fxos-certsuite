@@ -1,6 +1,7 @@
 {
   "permissionsResults": {
     "alarms": true, 
+    "attention": false, 
     "audio-capture": false, 
     "audio-channel-alarm": "alarm", 
     "audio-channel-content": "content", 
@@ -9,7 +10,10 @@
     "audio-channel-publicnotification": "normal", 
     "audio-channel-ringer": "normal", 
     "audio-channel-telephony": "normal", 
+    "bluetooth": false, 
     "browser": true, 
+    "camera": false, 
+    "cellbroadcast": false, 
     "contacts": true, 
     "desktop-notification": true, 
     "device-storage:apps": false, 
@@ -18,14 +22,33 @@
     "device-storage:pictures": true, 
     "device-storage:sdcard": true, 
     "device-storage:videos": true, 
+    "embed-apps": false, 
+    "feature-detection": false, 
     "fmradio": true, 
     "geolocation": true, 
+    "idle": false, 
+    "input": true, 
+    "input-manage": true, 
     "keyboard": false, 
+    "mobileconnection": true, 
     "mobilenetwork": true, 
+    "nfc": false, 
+    "open-remote-window": false, 
+    "permissions": true, 
+    "phonenumberservice": false, 
+    "power": false, 
     "push": true, 
-    "systemXHR": false, 
+    "settings": false, 
+    "sms": false, 
+    "speaker-control": true, 
+    "systemXHR": true, 
     "tcp-socket": true, 
-    "video-capture": false
+    "telephony": false, 
+    "time": false, 
+    "video-capture": false, 
+    "voicemail": false, 
+    "webapps-manage": false, 
+    "wifi-manager": false
   }, 
   "webIDLResults": [
     {
@@ -6389,7 +6412,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://privileged-webapi-verifier/testharness.js:651\nmake_message@app://privileged-webapi-verifier/testharness.js:2073\nassert@app://privileged-webapi-verifier/testharness.js:2060\nassert_equals@app://privileged-webapi-verifier/testharness.js:700\nIdlInterface.prototype.test_self/<@app://privileged-webapi-verifier/idlharness.js:1259\nTest.prototype.step@app://privileged-webapi-verifier/testharness.js:1159\ntest@app://privileged-webapi-verifier/testharness.js:442\nIdlInterface.prototype.test_self@app://privileged-webapi-verifier/idlharness.js:1281\nIdlExceptionOrInterface.prototype.test@app://privileged-webapi-verifier/idlharness.js:706\nIdlArray.prototype.test@app://privileged-webapi-verifier/idlharness.js:435\nrunTest@app://privileged-webapi-verifier/main.js:224\n)", 
+      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://privileged-webapi-verifier/testharness.js:651\nmake_message@app://privileged-webapi-verifier/testharness.js:2073\nassert@app://privileged-webapi-verifier/testharness.js:2060\nassert_equals@app://privileged-webapi-verifier/testharness.js:700\nIdlInterface.prototype.test_self/<@app://privileged-webapi-verifier/idlharness.js:1259\nTest.prototype.step@app://privileged-webapi-verifier/testharness.js:1159\ntest@app://privileged-webapi-verifier/testharness.js:442\nIdlInterface.prototype.test_self@app://privileged-webapi-verifier/idlharness.js:1281\nIdlExceptionOrInterface.prototype.test@app://privileged-webapi-verifier/idlharness.js:706\nIdlArray.prototype.test@app://privileged-webapi-verifier/idlharness.js:435\nrunTest@app://privileged-webapi-verifier/main.js:364\n)", 
       "name": "DOMSettableTokenList interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
