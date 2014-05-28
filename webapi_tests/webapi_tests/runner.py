@@ -18,7 +18,7 @@ import semiauto
 
 def iter_tests(start_dir, pattern="test_*.py"):
     """List available Web API tests and yield a tuple of (group, tests),
-where tests is a list of test names."""
+    where tests is a list of test names."""
 
     start_dir = os.path.abspath(start_dir)
     visited = set()
