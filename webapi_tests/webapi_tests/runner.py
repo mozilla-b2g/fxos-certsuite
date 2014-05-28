@@ -17,15 +17,16 @@ import semiauto
 
 
 def iter_tests(start_dir, pattern="test_*.py"):
-    """List available Web API tests and yield a tuple of (group, tests), where tests is a list of test names."""
+    """List available Web API tests and yield a tuple of (group, tests),
+where tests is a list of test names."""
 
     start_dir = os.path.abspath(start_dir)
-    visited = []
+    visited = set()
 
     for root, dirs, files in os.walk(start_dir, followlinks=True):
         if root in visited:
             raise ImportError("Recursive symlink: %r" % root)
-        visited.append(root)
+        visited.add(root)
 
         group = os.path.relpath(root, start_dir)
 
@@ -48,17 +49,18 @@ def iter_tests(start_dir, pattern="test_*.py"):
                 continue
 
             members = inspect.getmembers(module)
-            ks = [t for t in zip(*members)[1] if isinstance(t, type)]
+            ts = [t for t in zip(*members)[1] if isinstance(t, type)]
 
-            # Include only semiauto tests
-            if semiauto.testcase.TestCase not in ks:
-                continue
+            for cls in ts:
+                # Include only semiauto tests
+                bases = inspect.getmro(cls)
+                if semiauto.testcase.TestCase not in bases:
+                    continue
 
-            for k in ks:
-                if getattr(k, "__module__", None) != name:
+                if getattr(cls, "__module__", None) != name:
                     continue
                 tests.extend(
-                    [m[0] for m in inspect.getmembers(k) if m[0].startswith("test_")])
+                    [member[0] for member in inspect.getmembers(cls) if member[0].startswith("test_")])
 
         if len(tests) > 0:
             yield group, tests
