@@ -22,6 +22,10 @@ class TestCert(unittest.TestCase):
         self.assertTrue(test_user_agent("Mozilla/5.0 (Mobile; nnnn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "example device")
         self.assertFalse(test_user_agent("Mozilla/5.0 (Mobile; nn nn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "invalid device")
         self.assertFalse(test_user_agent("Mozilla/5.0 (Mobile; nn;nn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "invalid device")
+        self.assertFalse(test_user_agent("Mozilla/5.0 (Mobile; nn/nn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "invalid device")
+        self.assertFalse(test_user_agent("Mozilla/5.0 (Mobile; nn(nn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "invalid device")
+        self.assertFalse(test_user_agent("Mozilla/5.0 (Mobile; nn)nn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "invalid device")
+
         self.assertTrue(test_user_agent("Mozilla/5.0 (Mobile;   nnnn   ; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "extra whitespace in device")
         self.assertTrue(test_user_agent("Mozilla/5.0 (Mobile;nnnn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "no whitespace in device")
 
