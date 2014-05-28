@@ -172,20 +172,8 @@ function permissionsTests()
       permissionsResults['mobileconnection'] = navigator.mozMobileConnection !== null;
 
       // mobilenetwork
-      /* TODO: need sim card to get this working
-      if (navigator.mozMobileConnections !== null) {
-        permissionsResults['mobilenetwork'] = false;
-        for (var i = 0; i < navigator.mozMobileConnections.length; ++i) {
-          var conn = navigator.mozMobileConnections[i];
-          if ('voice' in conn || 'data' in conn) {
-            permissionsResults['mobilenetwork'] = true;
-          }
-        }
-      } else {
-        permissionsResults['mobilenetwork'] = 'no sim';
-      }
-      */
-     
+      permissionsResults['mobilenetwork'] = 'mozMobileConnections' in navigator;
+ 
       // network-events
       // TODO: Not testable here - we need a suitable source of network events
 
