@@ -14,6 +14,7 @@ import mozdevice
 import moznetwork
 import os
 import pkg_resources
+import re
 import sys
 import time
 import wptserve
@@ -105,6 +106,36 @@ def package_app(path, extrafiles):
                 zip_file.write(os.path.join(root, f), f)
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
+
+def test_user_agent(user_agent, logger):
+    # See https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference#Firefox_OS
+    # and https://wiki.mozilla.org/B2G/User_Agent/Device_Model_Inclusion_Requirements
+    ua_rexp = re.compile("Mozilla/(\d+\.\d+) \((Mobile|Tablet)(;.*)?; rv:(\d+\.\d+)\) Gecko/(\d+\.\d+) Firefox/(\d+\.\d+)")
+
+    m = ua_rexp.match(user_agent)
+
+    valid = True
+
+    if m is None or len(m.groups()) != 6:
+        # no match
+        valid = False
+        message = 'Did not match regular expression'
+    elif m.groups()[2] != None:
+        # Specified a device string, strip leading ';' and any leading/trailing whitespace
+        device = m.groups()[2][1:].strip()
+        # Do not use slash ("/"), semicolon (";"), round brackets or any whitespace.
+        device_rexp = re.compile('[/;\(\)\s]')
+        m = device_rexp.search(device)
+        if m:
+            valid = False
+            message = 'Device identifier: "%s" contains forbidden characters' % device
+
+    if valid:
+        logger.test_status('webapi', 'user-agent-string', 'PASS')
+    else:
+        logger.test_status('webapi', 'user-agent-string', 'FAIL', 'Invalid user-agent string: %s: %s' % (user_agent, message))
+
+    return valid
 
 def diff_results(a, b):
 
@@ -316,7 +347,7 @@ def cli():
         # if we have recently rebooted, we might get here before marionette
         # is running.
         retries = 0
-        while retries < 3: 
+        while retries < 3:
             try:
                 fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
                 break
@@ -332,6 +363,7 @@ def cli():
         Wait(timeout=600).until(lambda: webapi_results is not None)
         report["headers"] = headers
         fxos_appgen.uninstall_app(appname)
+        test_user_agent(headers['user-agent'], logger)
 
         if args.generate_reference:
             with open('webapi_results.json', 'w') as f:
