@@ -5,3 +5,4 @@ recursive-include certsuite/static *
 recursive-include certsuite/expected_webapi_results *
 recursive-include certsuite/expected_omni_results *
 recursive-include certsuite/expected_permissions_results *
+recursive-include certsuite/html_output *

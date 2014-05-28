@@ -5,6 +5,7 @@ mozdevice >= 0.33
 mozlog >= 1.8
 moznetwork >= 0.24
 mozprocess >= 0.18
+py
 wptserve >= 1.0.1
 wptrunner >= 0.3.11
 moztest == 0.5

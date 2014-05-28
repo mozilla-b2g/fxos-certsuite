@@ -22,7 +22,12 @@ import zipfile
 from collections import OrderedDict
 from datetime import datetime
 from mozfile import TemporaryDirectory
-from mozlog.structured import structuredlog, handlers, formatters
+from mozlog.structured import (
+    structuredlog,
+    handlers,
+    formatters,
+    reader,
+)
 
 
 logger = None
@@ -170,17 +175,19 @@ class TestRunner(object):
 
     def run_suite(self, suite, groups, output_zip):
         with TemporaryDirectory() as temp_dir:
-            result_files = self.run_test(suite, groups, temp_dir)
+            result_files, failures = self.run_test(suite, groups, temp_dir)
 
             for path in result_files:
                 file_name = os.path.split(path)[1]
                 output_zip.write(path, "%s/%s" % (suite, file_name))
+            return failures
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
 
+        failures = []
         try:
-            cmd, output_files = self.build_command(suite, groups, temp_dir)
+            cmd, output_files, structured_log = self.build_command(suite, groups, temp_dir)
 
             logger.debug(cmd)
             logger.debug(output_files)
@@ -193,6 +200,10 @@ class TestRunner(object):
             proc.run()
             proc.wait()
             logger.debug("Process finished")
+            failures = get_test_failures(structured_log)
+            html_log = structured_log.replace('.log', '.html')
+            output_files.append(html_log)
+            write_html_output(structured_log, html_log)
 
         except Exception:
             logger.critical("Error running suite %s:\n%s" %(suite, traceback.format_exc()))
@@ -203,7 +214,7 @@ class TestRunner(object):
             except:
                 pass
 
-        return output_files
+        return output_files, failures
 
     def build_command(self, suite, groups, temp_dir):
         suite_opts = self.config["suites"][suite]
@@ -227,7 +238,7 @@ class TestRunner(object):
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
 
-        return cmd, output_files
+        return cmd, output_files, log_name
 
 def log_result(results, result):
     results[result.test_name] = {
@@ -265,6 +276,33 @@ def list_tests(args, config):
 runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
     return 0
 
+def get_test_failures(raw_log):
+    '''
+    Return the list of test failures contained within a structured log file.
+    '''
+    failures = []
+    def test_status(data):
+        if data['status'] == 'FAIL':
+            failures.append(data)
+    with open(raw_log, 'r') as f:
+        reader.each_log(reader.read(f),
+                        {'test_status':test_status})
+    return failures
+
+def write_html_output(structured_log, html_log):
+    shutil.copy(structured_log, "/tmp")
+    handler = handlers.StreamHandler(open(html_log, 'wb'), formatters.HTMLFormatter())
+    reader.handle_log(reader.read(open(structured_log)), handler)
+
+def write_static_files(zip_f):
+    '''
+    Add static files to the results zip file.
+    '''
+    for file in ['results.html', 'results.js']:
+        path = pkg_resources.resource_filename(__name__,
+                                               os.path.join('html_output', file))
+        zip_f.write(path, file)
+
 def run_tests(args, config):
     output_zipfile = 'firefox-os-certification_%s.zip' % (datetime.now().strftime("%Y%m%d%H%M%S"),)
     output_logfile = "run.log"
@@ -272,19 +310,25 @@ def run_tests(args, config):
 
     try:
         with zipfile.ZipFile(output_zipfile, 'w', zipfile.ZIP_DEFLATED) as zip_f:
+            write_static_files(zip_f)
             with LogManager(output_logfile, zip_f) as log_f:
                 setup_logging(log_f)
 
                 log_metadata()
                 check_adb()
                 install_marionette(config['version'])
+                results = []
 
                 with DeviceBackup() as device:
                     runner = TestRunner(args, config)
 
                     for suite, groups in runner.iter_suites():
                         try:
-                            runner.run_suite(suite, groups, zip_f)
+                            failures = runner.run_suite(suite, groups, zip_f)
+                            results.append({'passed': len(failures) == 0,
+                                            'shortname': suite,
+                                            #TODO: put human-readable names in config.json
+                                            'name': suite})
                         except:
                             logger.critical("Encountered error:\n%s" % traceback.format_exc())
                             error = True
@@ -293,6 +337,7 @@ def run_tests(args, config):
 
                 if error:
                     logger.critical("Encountered errors during run")
+                zip_f.writestr('result_data.js', 'var results = %s;\n' % json.dumps(results))
 
     except (SystemExit, KeyboardInterrupt):
         raise

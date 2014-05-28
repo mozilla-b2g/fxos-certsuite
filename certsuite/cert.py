@@ -374,6 +374,7 @@ def cli():
     for section in config.sections():
         report['application_ini'][section] = dict(config.items(section))
 
+    logger.suite_start([])
     # run the omni.ja analyzer
     if 'omni-analyzer' in test_groups:
         omni_results_path = pkg_resources.resource_filename(
@@ -519,6 +520,8 @@ def cli():
 
         # clean up embed-apps test app
         fxos_appgen.uninstall_app(embed_appname)
+
+    logger.suite_end()
 
     result_file = open(result_file_path, "w")
     result_file.write(json.dumps(report, indent=2))
