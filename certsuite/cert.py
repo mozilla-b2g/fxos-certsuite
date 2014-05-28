@@ -298,10 +298,10 @@ def cli():
     if 'webapi' in test_groups:
         logger.test_start('webapi')
 
-        addr = (moznetwork.get_ip(), 8080)
         httpd = wptserve.server.WebTestHttpd(
-            host=addr[0], port=addr[1], routes=routes, doc_root=static_path)
+            host=moznetwork.get_ip(), port=0, routes=routes, doc_root=static_path)
         httpd.start()
+        addr = (httpd.host, httpd.port)
 
         print "Installing the hosted app. This will take a minute... "
 
