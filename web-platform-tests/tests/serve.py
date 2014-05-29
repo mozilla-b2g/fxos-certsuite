@@ -1,16 +1,17 @@
  # -*- coding: utf-8 -*-
-import sys
-import os
-import logging
+import argparse
 import json
-import socket
+import logging
+import os
 import signal
+import socket
+import sys
 import threading
-from multiprocessing import Process, Event
-from collections import defaultdict
+import time
 import urllib2
 import uuid
-import argparse
+from collections import defaultdict
+from multiprocessing import Process, Event
 
 repo_root = os.path.abspath(os.path.split(__file__)[0])
 
@@ -74,7 +75,7 @@ class ServerProc(object):
         try:
             self.daemon = init_func(config, paths, port, bind_hostname)
         except socket.error:
-            logger.error("Socket error on port %s" % port)
+            print >> sys.stderr, "Socket error on port %s" % port
             raise
 
         if self.daemon:
@@ -93,31 +94,36 @@ class ServerProc(object):
         self.proc.terminate()
         self.proc.join()
 
+    def is_alive(self):
+        return self.proc.is_alive()
+
 def check_subdomains(config, paths, subdomains, bind_hostname):
     port = get_port()
     wrapper = ServerProc()
     wrapper.start(start_http_server, config, paths, port, bind_hostname)
 
-    rv = {}
+    connected = False
+    for i in range(10):
+        try:
+            urllib2.urlopen("http://%s:%d/" % (config["host"], port))
+            connected = True
+            break
+        except urllib2.URLError:
+            time.sleep(1)
+
+    if not connected:
+        logger.critical("Failed to connect to test server on http://%s:%s You may need to edit /etc/hosts or similar" % (config["host"], port))
+        sys.exit(1)
 
     for subdomain, (punycode, host) in subdomains.iteritems():
         domain = "%s.%s" % (punycode, host)
         try:
             urllib2.urlopen("http://%s:%d/" % (domain, port))
         except Exception as e:
-            if config["external_domain"]:
-                external = "%s.%s" % (punycode, config["external_domain"])
-                logger.warning("Using external server %s for subdomain %s" % (external, subdomain))
-                rv[subdomain] = external
-            else:
-                logger.critical("Failed probing domain %s and no external fallback configured. You may need to edit /etc/hosts or similar." % domain)
-                sys.exit(1)
-        else:
-            rv[subdomain] = "%s.%s" % (punycode, host)
+            logger.critical("Failed probing domain %s. You may need to edit /etc/hosts or similar." % domain)
+            sys.exit(1)
 
     wrapper.wait()
-
-    return rv
 
 def get_subdomains(config):
     #This assumes that the tld is ascii-only or already in punycode
@@ -141,8 +147,6 @@ def start_servers(config, paths, ports, bind_hostname):
 
             server_proc = ServerProc()
             server_proc.start(init_func, config, paths, port, bind_hostname)
-
-            logger.info("Started server at %s://%s:%s" % (scheme, config["host"], port))
             servers[scheme].append((port, server_proc))
 
     return servers
@@ -181,7 +185,6 @@ class WebSocketDaemon(object):
         self.server_thread = None
 
     def start(self, block=False):
-        logger.info("Starting websockets server on %s:%s" % (self.host, self.port))
         self.started = True
         if block:
             self.server.serve_forever()
@@ -202,7 +205,6 @@ class WebSocketDaemon(object):
                 self.server.server_close()
                 self.server_thread.join()
                 self.server_thread = None
-                logger.info("Stopped websockets server on %s:%s" % (self.host, self.port))
             except AttributeError:
                 pass
             self.started = False
@@ -236,6 +238,10 @@ def normalise_config(config, domains, ports):
         ports_[scheme] = ports_used
 
     domains_ = domains.copy()
+
+    for key, value in domains_.iteritems():
+        domains_[key] = ".".join(value)
+
     domains_[""] = config["host"]
 
     return {"host":config["host"],
@@ -251,7 +257,7 @@ def start(config):
              "ws_doc_root": config["ws_doc_root"]}
 
     if config["check_subdomains"]:
-        domains = check_subdomains(config, paths, domains, bind_hostname)
+        check_subdomains(config, paths, domains, bind_hostname)
 
     config_ = normalise_config(config, domains, ports)
 

@@ -216,8 +216,20 @@ class WebTestRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     response.set_error(500, err)
             logger.info("%i %s %s (%s) %i" % (response.status[0], request.method,
                                          request.request_path, request.headers.get('Referer'), request.raw_input.length))
+
             if not response.writer.content_written:
                 response.write()
+
+            # If we want to remove this in the future, a solution is needed for
+            # scripts that produce a non-string iterable of content, since these
+            # can't set a Content-Length header. A notable example of this kind of
+            # problem is with the trickle pipe i.e. foo.js?pipe=trickle(d1)
+            if response.close_connection:
+                self.close_connection = True
+
+            if not self.close_connection:
+                # Ensure that the whole request has been read from the socket
+                request.raw_input.read()
 
         except socket.timeout, e:
             self.log_error("Request timed out: %r", e)

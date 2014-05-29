@@ -31,7 +31,9 @@ onload = function() {
           xhr.onload = test_obj.step_func(function(e) {
               if (xhr.response == "") {
                   if (new Date() - start > 10000) {
-                      assert_unreached("Reached poll timeout");
+                      // If we set the status to TIMEOUT here we avoid a race between the
+                      // page and the test timing out
+                      test_obj.force_timeout();
                   }
                   setTimeout(poll, 200);
               } else {
@@ -483,6 +485,15 @@ onload = function() {
       assert_equals(e.data, expected_current);
     });
   }, 'EventSource constructor',
+  {help:'http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#dom-eventsource'});
+
+  // EventSource#url
+  test(function() {
+    var source = new EventSource(input_url_eventstream);
+    source.close();
+    var got = source.url;
+    assert_true(source.url.indexOf(expected_current) > -1, msg(expected_current, got));
+  }, 'EventSource#url',
   {help:'http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#dom-eventsource'});
 
   // XMLDocument#load()
