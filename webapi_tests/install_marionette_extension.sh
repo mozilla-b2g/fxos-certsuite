@@ -5,5 +5,5 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 source setup_venv.sh
-install_marionette
+install_marionette $1
 deactivate
