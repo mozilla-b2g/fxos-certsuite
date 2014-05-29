@@ -7,10 +7,17 @@ import traceback
 import types
 import unittest
 
+from mozlog.structured import handlers
 
-def TestStateUpdater(handler):
-    """Sends tests results over WebSocket to the host browser."""
-    return lambda t: handler.emit("updateTest", t)
+
+class WSHandler(handlers.BaseHandler):
+    """Sends test results over WebSocket to the host browser."""
+
+    def __init__(self, transport):
+        self.transport = transport
+
+    def __call__(self, data):
+        self.transport.emit("updateTest", data)
 
 
 def serialize_suite(tests, ov=[]):

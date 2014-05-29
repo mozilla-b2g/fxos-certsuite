@@ -76,8 +76,7 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
     so.suite = suite
     environment.env.handler = so
 
-    logger.add_handler(
-        handlers.StreamHandler(sys.stdout, runner.TestStateUpdater(so)))
+    logger.add_handler(runner.WSHandler(so))
 
     so.emit("testRunStart")
     try:
