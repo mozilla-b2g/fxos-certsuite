@@ -101,7 +101,7 @@ def main():
                 print("%s.%s" % (group, test))
         return 0
 
-    test_loader = semiauto.TestLoader(config={})
+    test_loader = semiauto.TestLoader()
     tests = test_loader.loadTestsFromNames(
         args.include or [g for g, _ in testgen], None)
     results = semiauto.run(tests,
