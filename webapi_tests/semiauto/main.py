@@ -19,19 +19,6 @@ from semiauto import server
 test_loader = None
 
 
-def _wait_for_client():
-    """Wait for client to connect the host browser and return.
-
-    Gets a reference to the WebSocket handler associated with that client that
-    we can use to communicate with the browser.  This blocks until a client
-    connects.
-
-    """
-
-    # A timeout is needed because of http://bugs.python.org/issue1360
-    return server.clients.get(block=True, timeout=sys.maxint)
-
-
 def _create_logger():
     logger = structuredlog.StructuredLogger("unknown")
     logger.add_handler(
@@ -77,26 +64,27 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
         print >> sys.stderr, "Please connect your browser to http://%s:%d/" % \
             (env.server.addr[0], env.server.addr[1])
 
-    handler = _wait_for_client()
+    # Wait for browser to connect and get socket connection to client
+    so = server.wait_for_client()
 
     test_runner = StructuredTestRunner(logger=logger)
     test_list = runner.serialize_suite(suite)
-    handler.emit("testList", test_list)
+    so.emit("testList", test_list)
 
     # This is a hack to make the test suite metadata and the handler
     # available to the tests.
-    handler.suite = suite
-    environment.env.handler = handler
+    so.suite = suite
+    environment.env.handler = so
 
     logger.add_handler(
-        handlers.StreamHandler(sys.stdout, runner.TestStateUpdater(handler)))
+        handlers.StreamHandler(sys.stdout, runner.TestStateUpdater(so)))
 
-    handler.emit("testRunStart")
+    so.emit("testRunStart")
     try:
         results = test_runner.run(suite)
     except (SystemExit, KeyboardInterrupt) as e:
         sys.exit(1)
-    handler.emit("testRunStop")
+    so.emit("testRunStop")
 
     return results
 

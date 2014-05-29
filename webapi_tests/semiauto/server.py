@@ -144,3 +144,16 @@ class TestHandler(tornado.websocket.WebSocketHandler,
 
     def __str__(self):
         return str(self.id)
+
+
+def wait_for_client():
+    """Wait for client to connect the host browser and return.
+
+    Gets a reference to the WebSocket handler associated with that client that
+    we can use to communicate with the browser.  This blocks until a client
+    connects.
+
+    """
+
+    # A timeout is needed because of http://bugs.python.org/issue1360
+    return clients.get(block=True, timeout=sys.maxint)
