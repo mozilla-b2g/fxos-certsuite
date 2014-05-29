@@ -292,7 +292,7 @@ def run_tests(args, config):
         error = True
         print "Encountered error at top level:\n%s" % traceback.format_exc()
 
-    sys.stderr.write('Results saved in %s' % output_zipfile)
+    sys.stderr.write('Results saved in %s\n' % output_zipfile)
 
     return int(error)
 
