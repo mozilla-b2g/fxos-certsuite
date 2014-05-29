@@ -17,7 +17,7 @@ class WSHandler(handlers.BaseHandler):
         self.transport = transport
 
     def __call__(self, data):
-        self.transport.emit("updateTest", data)
+        self.transport.emit(data)
 
 
 def serialize_suite(tests, ov=[]):

@@ -67,9 +67,8 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
     # Wait for browser to connect and get socket connection to client
     so = server.wait_for_client()
 
-    test_runner = StructuredTestRunner(logger=logger)
-    test_list = runner.serialize_suite(suite)
-    so.emit("testList", test_list)
+    tests = runner.serialize_suite(suite)
+    test_runner = StructuredTestRunner(logger=logger, test_list=tests)
 
     # This is a hack to make the test suite metadata and the handler
     # available to the tests.
@@ -78,12 +77,10 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
 
     logger.add_handler(runner.WSHandler(so))
 
-    so.emit("testRunStart")
     try:
         results = test_runner.run(suite)
     except (SystemExit, KeyboardInterrupt) as e:
         sys.exit(1)
-    so.emit("testRunStop")
 
     return results
 

@@ -38,6 +38,17 @@ String.prototype.titleize = function() {
   return this.replace(/(?:^|\s)\S/g, function (c) { return c.toUpperCase(); });
 };
 
+// Exception that is thrown if server sends an unknown message.
+function UnknownMessage(msg) {
+  this.message = msg;
+}
+
+// Encapsulates JS exceptions to provide an explanation of `e`'s
+// original message.
+function InternalError(e) {
+  this.message = "Internal error: " + e;
+}
+
 var Keys = (function() {
   function Keys() {
     var arr = [];
@@ -115,11 +126,6 @@ function TestListView(el, tests) {
   this.tests = tests;
 }
 
-// Exception that is thrown if server sends an unknown command.
-function UnknownCommand(msg) {
-  self.message = msg;
-}
-
 TestListView.prototype = {
   // have a reusable function if we want a 'Re-run tests' option
   resetTable: function() {
@@ -136,7 +142,11 @@ TestListView.prototype = {
   },
 
   updateTest: function(data) {
-    var el = $("#test" + this.tests.indexOf(data.test));
+    var index = this.tests.indexOf(data.test);
+    if (index == -1)
+      throw new InternalError("Could not find test: " + data.test);
+
+    var el = $("#test" + index);
     var outcomeEl = el.getElementsByClassName("result")[0];
 
     switch (data.action) {
@@ -169,8 +179,8 @@ TestListView.prototype = {
       break;
 
     default:
-      throw new UnknownCommand(
-        "Received unknown command from server: " + data.action);
+      throw new UnknownMessage(
+        "Received unknown action from server: " + data.action);
     }
   }
 };
@@ -277,7 +287,7 @@ Client.prototype = {
   promptUser: function(text) {
     var dialog = new Dialog(text);
     dialog.onok = function() { this.emit("prompt", dialog.value()); }.bind(this);
-    dialog.oncancel = function() { this.emit("promptCancel"); }.bind(this);
+    dialog.oncancel = function() { this.emit("prompt_cancel"); }.bind(this);
     dialog.show();
   },
 
@@ -287,8 +297,8 @@ Client.prototype = {
   // whether she was successful in carrying out the instruction.
   instructUser: function(text) {
     var dialog = new Dialog(text, "instruct");
-    dialog.onok = function() { this.emit("instructPromptOk"); }.bind(this);
-    dialog.oncancel = function() { this.emit("instructPromptCancel"); }.bind(this);
+    dialog.onok = function() { this.emit("instruct_prompt_ok"); }.bind(this);
+    dialog.oncancel = function() { this.emit("instruct_prompt_cancel"); }.bind(this);
     dialog.show();
   },
 
@@ -299,8 +309,8 @@ Client.prototype = {
   // whether the question posed was true or false.
   confirmPrompt: function(question) {
     var dialog = new Dialog(question, "confirm");
-    dialog.onok = function() { this.emit("confirmPromptOk"); }.bind(this);
-    dialog.oncancel = function() { this.emit("confirmPromptCancel"); }.bind(this);
+    dialog.onok = function() { this.emit("confirm_prompt_ok"); }.bind(this);
+    dialog.oncancel = function() { this.emit("confirm_prompt_cancel"); }.bind(this);
     dialog.show();
   },
 
@@ -311,54 +321,53 @@ Client.prototype = {
     this.ws.onclose = function(e) { console.log("close", e); }.bind(this);
 
     this.ws.onmessage = function(e) {
-      var data = JSON.parse(e.data);
-      var command = Object.keys(data)[0];
-      console.log("recv", data);
+      var message = JSON.parse(e.data);
+      console.log("recv", message);
 
       try {
-        this.parseMessage(command, data);
+        this.parseMessage(message);
       } catch (e) {
-        console.log("unkwn", data);
+        console.log("unkwn", message);
         this.ws.close();
+        if (!(e instanceof UnknownMessage || e instanceof InternalError))
+          e = new InternalError(e);
         this.notificationEl.innerHTML = e.message;
       }
     }.bind(this);
   },
 
-  parseMessage: function(command, data) {
-    switch (command) {
-    case "testList":
-      this.testList = new TestListView($("#test_list"), data.testList);
+  parseMessage: function(data) {
+    switch (data.action) {
+    case "suite_start":
+      this.testList = new TestListView($("#test_list"), data.tests);
       this.testList.resetTable();
-      break;
-
-    case "testRunStart":
       this.notificationEl.innerHTML = "Running tests…";
       break;
 
-    case "testRunStop":
+    case "suite_end":
       this.notificationEl.innerHTML = "Done!";
       break;
 
     case "prompt":
-      this.promptUser(data.prompt);
+      this.promptUser(data.message);
       break;
 
-    case "instructPrompt":
-      this.instructUser(data.instructPrompt);
+    case "instruct_prompt":
+      this.instructUser(data.instruction);
       break;
 
-    case "confirmPrompt":
-      this.confirmPrompt(data.confirmPrompt);
+    case "confirm_prompt":
+      this.confirmPrompt(data.question);
       break;
 
-    case "updateTest":
-      this.testList.updateTest(data.updateTest);
+    case "test_start":
+    case "test_end":
+      this.testList.updateTest(data);
       break;
 
     default:
-      throw new UnknownCommand(
-        "Received unknown command from server: " + command);
+      throw new UnknownMessage(
+        "Received unknown message from server: " + data);
     }
   },
 

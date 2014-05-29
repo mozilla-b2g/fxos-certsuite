@@ -10,7 +10,7 @@ deps = ['marionette_client>=0.7.1.1',
         'marionette_extension >= 0.1',
         'mozlog>=1.7',
         'moznetwork>=0.24',
-        'moztest>=0.3',
+        'moztest>=0.5',
         'tornado>=3.2',
         'fxos-appgen>=0.2']
 
