@@ -74,7 +74,7 @@ class HandlerMixin(object):
         global clients
         clients.put(handler)
 
-    def emit(self, event, data):
+    def emit(self, data):
         for cb in self.handlers:
             cb(event, data)
 
@@ -88,19 +88,19 @@ class BlockingPromptMixin(object):
         return self.response.get(block=True, timeout=sys.maxint)
 
     def confirmation(self, question):
-        self.emit("confirmPrompt", question)
+        self.emit({"action": "confirm_prompt", "question": question})
         resp = self.get_response()
-        return True if "confirmPromptOk" in resp else False
+        return True if "confirm_prompt_ok" in resp else False
 
-    def prompt(self, question):
-        self.emit("prompt", question)
+    def prompt(self, message):
+        self.emit({"action": "prompt", "message": message})
         resp = self.get_response()
         return resp["prompt"] if "prompt" in resp else False
 
     def instruction(self, instruction):
-        self.emit("instructPrompt", instruction)
+        self.emit({"action": "instruct_prompt", "instruction": instruction})
         resp = self.get_response()
-        return True if "instructPromptOk" in resp else False
+        return True if "instruct_prompt_ok" in resp else False
 
 
 class TestHandler(tornado.websocket.WebSocketHandler,
@@ -126,9 +126,8 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         self.response.put({})
         logger.info("Client left: %s" % self)
 
-    def emit(self, event, data=None):
-        command = {event: data}
-        payload = json.dumps(command)
+    def emit(self, message):
+        payload = json.dumps(message)
         logger.info("Sending %s" % payload)
         self.write_message(payload)
 
@@ -144,3 +143,16 @@ class TestHandler(tornado.websocket.WebSocketHandler,
 
     def __str__(self):
         return str(self.id)
+
+
+def wait_for_client():
+    """Wait for client to connect the host browser and return.
+
+    Gets a reference to the WebSocket handler associated with that client that
+    we can use to communicate with the browser.  This blocks until a client
+    connects.
+
+    """
+
+    # A timeout is needed because of http://bugs.python.org/issue1360
+    return clients.get(block=True, timeout=sys.maxint)

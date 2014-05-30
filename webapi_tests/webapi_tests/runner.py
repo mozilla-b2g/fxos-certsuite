@@ -11,6 +11,7 @@ import os
 import sys
 
 from fnmatch import fnmatch
+from mozlog.structured import commandline
 
 import semiauto
 
@@ -66,17 +67,26 @@ def iter_tests(start_dir, pattern="test_*.py"):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Runner for Web API tests.")
+    parser = argparse.ArgumentParser(
+        description="Runner for guided Web API tests.")
     parser.add_argument("-l", "--list-test-groups", action="store_true",
-                        help="List all logical test groups.")
+                        help="List all logical test groups")
     parser.add_argument("-a", "--list-all-tests", action="store_true",
-                        help="List all tests.")
+                        help="List all tests")
     parser.add_argument("-i", "--include", metavar="GROUP", action="append", default=[],
-                        help="Only include specified group(s) in run. Include several groups by repeating flag.")
+                        help="Only include specified group(s) in run, include several "
+                        "groups by repeating flag")
+    parser.add_argument("-n", "--no-browser", action="store_true",
+                        help="Don't start a browser but wait for manual connection")
+    parser.add_argument(
+        "-v", dest="verbose", action="store_true", help="Verbose output")
+    commandline.add_logging_group(parser)
     args = parser.parse_args(sys.argv[1:])
+    logger = commandline.setup_logging(
+        "webapi", vars(args), {"raw": sys.stdout})
     if args.list_test_groups and len(args.include) > 0:
-        print >> sys.stderr, "%s: error: cannot list and include test " \
-                            "groups at the same time" % sys.argv[0]
+        print >> sys.stderr("%s: error: cannot list and include test "
+                            "groups at the same time" % sys.argv[0])
         parser.print_usage()
         sys.exit(1)
 
@@ -91,11 +101,15 @@ def main():
                 print("%s.%s" % (group, test))
         return 0
 
-    test_loader = semiauto.TestLoader(config={})
+    test_loader = semiauto.TestLoader()
     tests = test_loader.loadTestsFromNames(
         args.include or [g for g, _ in testgen], None)
-    results = semiauto.run(tests)
+    results = semiauto.run(tests,
+                           logger=logger,
+                           spawn_browser=not args.no_browser,
+                           verbosity=2 if args.verbose else 1)
     return 0 if results.wasSuccessful() else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
