@@ -108,8 +108,7 @@ tests in the current working directory (".").\
     parser.add_option("-n", "--no-browser", action="store_true",
                       dest="no_browser", default=False, help="Don't "
                       "start a browser but wait for manual connection")
-    parser.add_option("-v", "--verbose", action="store_true",
-                      dest="verbose", default=False,
+    parser.add_option("-v", action="store_true", dest="verbose", default=False,
                       help="Verbose output")
     parser.add_option("-q", "--quiet", action="store_true",
                       dest="quiet", help="Minimal output")
