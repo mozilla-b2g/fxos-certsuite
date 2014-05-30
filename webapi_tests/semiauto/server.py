@@ -118,11 +118,6 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         logger.info("Sending %s" % payload)
         self.write_message(payload)
 
-    # TODO(ato): What does this do?
-    def handle_event(self, event, data):
-        print("event: %r" % event)
-        print(" data: %s" % data)
-
     def on_message(self, payload):
         message = json.loads(payload)
         self.response.put(message)
