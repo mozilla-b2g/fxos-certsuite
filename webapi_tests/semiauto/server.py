@@ -62,23 +62,6 @@ class FrontendServer(object):
         return self.started
 
 
-# Not currently in use, but offers a more foolproof way of emitting
-# messages to connections:
-class HandlerMixin(object):
-    handlers = []
-
-    def add(self, handler, callback):
-        self.handlers.append(callback)
-
-        # Hack:
-        global clients
-        clients.put(handler)
-
-    def emit(self, data):
-        for cb in self.handlers:
-            cb(event, data)
-
-
 class BlockingPromptMixin(object):
     def __init__(self):
         self.response = Queue.Queue()
@@ -104,7 +87,7 @@ class BlockingPromptMixin(object):
 
 
 class TestHandler(tornado.websocket.WebSocketHandler,
-                  BlockingPromptMixin, HandlerMixin):
+                  BlockingPromptMixin):
     def __init__(self, *args, **kwargs):
         super(TestHandler, self).__init__(*args, **kwargs)
         self.id = None
@@ -114,8 +97,12 @@ class TestHandler(tornado.websocket.WebSocketHandler,
     def open(self, *args):
         self.id = uuid.uuid4()
         self.stream.set_nodelay(True)
-        self.add(self, self.async_callback(self.emit))
         self.connected = True
+
+        # Hack:
+        global clients
+        clients.put(self)
+
         logger.info("Accepted new client: %s" % self)
 
     def on_close(self):
