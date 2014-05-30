@@ -27,3 +27,11 @@ same Wi-Fi network.
 Furthermore, the device must have a SIM card with a functioning phone
 subscription to receive SMS messages for a subset of the tests to
 pass.
+
+Lastly, you must have Marionette installed on your phone. To install
+it, please run::
+
+    source install_marionette_extension.sh VERSION
+
+Where you must replace VERSION with the base FirefoxOS version number
+you are running against. We currently support 1.3 and 1.4
