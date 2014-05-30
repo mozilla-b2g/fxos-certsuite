@@ -7,13 +7,14 @@ from semiauto import TestCase
 
 class TestWifi(TestCase):
     def tearDown(self):
-        self.marionette.execute_script("window.navigator.mozWifiManager = null;")
-        TestCase.tearDown(self)
+        self.marionette.execute_script("""
+            window.navigator.mozWifiManager = null;""")
+        super(TestWifi, self).tearDown()
 
     def test_wifi_basic(self):
         self.instruct("This test requires a local WiFi network to be"
-                 " available and visible. Please ensure a local WiFi network"
-                 " is visible before continuing")
+                      " available and visible. Please ensure a local"
+                      " WiFi network is visible before continuing")
         foundnwks_status = None
         find_networks = """
             var wifi = navigator.mozWifiManager;
@@ -22,9 +23,11 @@ class TestWifi(TestCase):
                 var network = this.result[0];
                 var networkinfo;
                 if(network.security.length > 0) {
-                    networkinfo = "ssid: " + network.ssid + " security: " + network.security;
+                    networkinfo = "ssid: " + network.ssid +
+                                  ", security: " + network.security;
                 } else {
-                    networkinfo = "ssid: " + network.ssid + " security: None";
+                    networkinfo = "ssid: " + network.ssid +
+                                  ", security: None";
                 }
                 marionetteScriptFinished(networkinfo);
             };
@@ -35,5 +38,6 @@ class TestWifi(TestCase):
         foundnwks_status = self.marionette.execute_async_script(find_networks)
         if foundnwks_status is None:
             self.fail("No Wifi networks found")
-        self.confirm('Found a Wifi network with following info: "%s"' %foundnwks_status)
+        self.confirm("Please confirm if a Wifi network is found with"
+                     " following properties: \"%s\"?" % foundnwks_status)
 
