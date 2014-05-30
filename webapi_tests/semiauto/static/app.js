@@ -169,6 +169,8 @@ TestListView.prototype = {
   }
 };
 
+var currentDialog = null;
+
 // Represents a dialogue overlay.  Type can either be "prompt",
 // "instruct", "confirm".  Message is the question or confirmation to
 // pose to the user.
@@ -203,6 +205,8 @@ function Dialog(msg, type) {
     this.cancelEl.innerHTML = "No";
     break;
   }
+
+  currentDialog = this;
 }
 
 Dialog.prototype = {
@@ -238,6 +242,8 @@ Dialog.prototype = {
     Keys.unbind("n");
     this.el.addClass("hidden");
     this.reset();
+    if (currentDialog === this)
+      currentDialog = null;
   },
 
   value: function() {
@@ -302,7 +308,11 @@ Client.prototype = {
     this.ws = new WebSocket("ws://" + this.addr + "/tests");
 
     this.ws.onopen = function(e) { console.log("open", e); }.bind(this);
-    this.ws.onclose = function(e) { console.log("close", e); }.bind(this);
+    this.ws.onclose = function(e) {
+      console.log("close", e);
+      if (currentDialog !== null)
+        currentDialog.close();
+    }.bind(this);
 
     this.ws.onmessage = function(e) {
       var data = JSON.parse(e.data);
