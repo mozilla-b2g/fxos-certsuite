@@ -23,7 +23,11 @@ from datetime import datetime
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters
 
+
 logger = None
+config_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "config.json"))
+
 
 def setup_logging(log_f):
     global logger
@@ -312,7 +316,7 @@ def get_parser():
     #TODO make this more robust
     parser.add_argument('--config',
                         help='Path to config file', type=os.path.abspath,
-                        action='store', default='certsuite/config.json')
+                        action='store', default=config_path)
     parser.add_argument('--list-tests',
                         help='list all tests available to run',
                         action='store_true')
