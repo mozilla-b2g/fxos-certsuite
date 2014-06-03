@@ -44,24 +44,8 @@ headers = None
 installed = False
 
 webapi_results = None
-webapi_results_priv = None
-webapi_results_cert = None
 
 supported_versions = ["1.4", "1.3"]
-
-@wptserve.handlers.handler
-def connect_handler(request, response):
-    response.headers.set("Content-Type", "text/html")
-    response.content = "<head><meta charset=utf-8 name=\"viewport\" content=\"width=device-width\"></head>" \
-                       "<p><a href='/install.html'><h1>Click me</h1></a></p>"
-
-    global connected
-    connected = True
-
-@wptserve.handlers.handler
-def installed_handler(request, response):
-    global installed
-    installed = True
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
@@ -71,24 +55,10 @@ def webapi_results_handler(request, response):
     global webapi_results
     webapi_results = json.loads(request.POST["results"])
 
-@wptserve.handlers.handler
-def webapi_results_priv_handler(request, response):
-    global webapi_results_priv
-    webapi_results_priv = json.loads(request.POST["results"])
-
-@wptserve.handlers.handler
-def webapi_results_cert_handler(request, response):
-    global webapi_results_cert
-    webapi_results_cert = json.loads(request.POST["results"])
-
 static_path = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "static"))
 
-routes = [("GET", "/", connect_handler),
-          ("GET", "/installed", installed_handler),
-          ("POST", "/webapi_results", webapi_results_handler),
-          ("POST", "/webapi_results_priv", webapi_results_priv_handler),
-          ("POST", "/webapi_results_cert", webapi_results_cert_handler),
+routes = [("POST", "/webapi_results", webapi_results_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
 def read_manifest(app):
@@ -283,6 +253,24 @@ def cli():
         print "Rebooting device..."
         dm.reboot(wait=True)
 
+        # wait here to make sure marionette is running
+        if dm.forward("tcp:2828", "tcp:2828") != 0:
+            raise Exception("Can't use localhost:2828 for port forwarding." \
+                            "Is something else using port 2828?")
+        retries = 0
+        while retries < 5:
+            try:
+                m = marionette.Marionette()
+                m.start_session()
+                m.delete_session()
+                break
+            except (IOError, TypeError):
+                time.sleep(5)
+                retries += 1
+        else:
+            raise Exception("Couldn't connect to marionette after %d attempts. " \
+            "Is the marionette extension installed?" % retries)
+
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
               (args.version, supported_versions)
@@ -330,103 +318,46 @@ def cli():
         logger.test_start('webapi')
 
         httpd = wptserve.server.WebTestHttpd(
-            host=moznetwork.get_ip(), port=0, routes=routes, doc_root=static_path)
+            host=moznetwork.get_ip(), port=8000, routes=routes, doc_root=static_path)
         httpd.start()
         addr = (httpd.host, httpd.port)
 
-        print "Installing the hosted app. This will take a minute... "
+        webapi_passed = True
 
-        appname = 'WebAPI Verifier'
-        details = fxos_appgen.create_details(args.version, all_perms=True)
-        manifest = json.dumps(fxos_appgen.create_manifest(appname, details, 'web', args.version))
+        for apptype in ['web', 'privileged', 'certified']:
+            global webapi_results
 
-        apppath = os.path.join(static_path, 'webapi-test-app')
-        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
-                              'manifest.webapp': manifest})
+            webapi_results = None
+            print "Installing the %s app. This will take a minute... " % apptype
 
-        # if we have recently rebooted, we might get here before marionette
-        # is running.
-        retries = 0
-        while retries < 3:
-            try:
-                fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
-                break
-            except marionette.errors.InvalidResponseException:
-                time.sleep(5)
-                retries += 1
-                continue
+            appname = '%s WebAPI Verifier' % apptype.capitalize()
+            details = fxos_appgen.create_details(args.version, all_perms=True)
+            manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, args.version))
 
-        fxos_appgen.launch_app(appname)
+            apppath = os.path.join(static_path, 'webapi-test-app')
+            package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
+                                  'manifest.webapp': manifest})
 
-        print "Done. Running the app..."
+            fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+            fxos_appgen.launch_app(appname)
 
-        Wait(timeout=600).until(lambda: webapi_results is not None)
-        report["headers"] = headers
-        fxos_appgen.uninstall_app(appname)
-        test_user_agent(headers['user-agent'], logger)
+            print "Done. Running the app..."
 
-        if args.generate_reference:
-            with open('webapi_results.json', 'w') as f:
-                f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
+            Wait(timeout=600).until(lambda: webapi_results is not None)
+            fxos_appgen.uninstall_app(appname)
+            if "headers" not in report:
+                report["headers"] = headers
+                test_user_agent(headers['user-agent'], logger)
 
-        print "Processing results..."
-        file_path = pkg_resources.resource_filename(
-                            __name__, os.path.sep.join(['expected_webapi_results', '%s.json' % args.version]))
+            if args.generate_reference:
+                with open('webapi_results_%s.json' % apptype, 'w') as f:
+                    f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
 
-        webapi_passed = parse_results(file_path, webapi_results, 'unpriv-', logger, report)
+            print "Processing results..."
+            file_path = pkg_resources.resource_filename(
+                                __name__, os.path.sep.join(['expected_webapi_results', '%s.%s.json' % (args.version, apptype)]))
 
-        # Run privileged app
-        print "Installing the privileged app. This will take a minute... "
-
-        appname = 'Privileged WebAPI Verifier'
-        details = fxos_appgen.create_details(args.version, all_perms=True)
-        manifest = json.dumps(fxos_appgen.create_manifest(appname, details, 'privileged', args.version))
-
-        apppath = os.path.join(static_path, 'webapi-test-app')
-        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_priv";' % addr,
-                              'manifest.webapp': manifest})
-        fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
-        fxos_appgen.launch_app(appname)
-
-        print "Done. Running the app..."
-
-        Wait(timeout=600).until(lambda: webapi_results_priv is not None)
-        fxos_appgen.uninstall_app(appname)
-
-        if args.generate_reference:
-            with open('webapi_results_priv.json', 'w') as f:
-                f.write(json.dumps(webapi_results_priv, sort_keys=True, indent=2))
-
-        print "Processing results..."
-        file_path = pkg_resources.resource_filename(
-                            __name__, os.path.sep.join(['expected_webapi_results', '%s.priv.json' % args.version]))
-        webapi_passed = parse_results(file_path, webapi_results_priv, 'priv-', logger, report) and webapi_passed
-
-        # Run certified app
-        print "Installing the certified app. This will take a minute... "
-
-        appname = 'Certified WebAPI Verifier'
-        details = fxos_appgen.create_details(args.version, all_perms=True)
-        manifest = json.dumps(fxos_appgen.create_manifest(appname, details, 'certified', args.version))
-        apppath = os.path.join(static_path, 'webapi-test-app')
-        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_cert";' % addr,
-                              'manifest.webapp': manifest})
-        fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
-        fxos_appgen.launch_app(appname)
-        os.remove('app.zip')
-        print "Done. Running the app..."
-
-        Wait(timeout=600).until(lambda: webapi_results_cert is not None)
-        fxos_appgen.uninstall_app(appname)
-
-        if args.generate_reference:
-            with open('webapi_results_cert.json', 'w') as f:
-                f.write(json.dumps(webapi_results_cert, sort_keys=True, indent=2))
-
-        print "Processing results..."
-        file_path = pkg_resources.resource_filename(
-                            __name__, os.path.sep.join(['expected_webapi_results', '%s.cert.json' % args.version]))
-        webapi_passed = parse_results(file_path, webapi_results_cert, 'cert-', logger, report) and webapi_passed
+            webapi_passed = parse_results(file_path, webapi_results, '%s-' % apptype, logger, report) and webapi_passed
 
         logger.test_end('webapi', 'OK' if webapi_passed else 'ERROR')
 
