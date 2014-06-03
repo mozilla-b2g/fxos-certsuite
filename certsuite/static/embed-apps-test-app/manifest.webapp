@@ -1,0 +1,22 @@
+{
+  "name": "Embed Apps Test App",
+  "description": "Embedded Apps Test App",
+  "launch_path": "/embedded.html",
+  "developer": {
+    "name": "The Ateam",
+    "url": "https://wiki.mozilla.org/Auto-tools"
+  },
+  "permissions": {
+     "audio-channel-content": {}
+  },
+  "locales": {
+    "en-US": {
+      "name": "Embed Apps Test App",
+      "description": "Embed Apps Test App"
+    }
+  },
+  "default_locale": "en-US",
+  "messages": [
+     { "dummy-system-message": "/embedded.html" }
+  ]
+}

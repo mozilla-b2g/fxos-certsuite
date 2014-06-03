@@ -44,6 +44,7 @@ headers = None
 installed = False
 
 webapi_results = None
+webapi_results_embed_app = None
 
 supported_versions = ["1.4", "1.3"]
 
@@ -55,18 +56,24 @@ def webapi_results_handler(request, response):
     global webapi_results
     webapi_results = json.loads(request.POST["results"])
 
-static_path = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), "static"))
+@wptserve.handlers.handler
+def webapi_results_embed_apps_handler(request, response):
+    global webapi_results_embed_app
+    webapi_results_embed_app = json.loads(request.POST["results"])
 
 routes = [("POST", "/webapi_results", webapi_results_handler),
+          ("POST", "/webapi_results_embed_apps", webapi_results_embed_apps_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
+
+static_path = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), "static"))
 
 def read_manifest(app):
     with open(os.path.join(app, 'manifest.webapp')) as f:
         manifest = f.read()
     return manifest
 
-def package_app(path, extrafiles):
+def package_app(path, extrafiles={}):
     app_path = 'app.zip'
     with ZipFile(app_path, 'w') as zip_file:
         for root, dirs, files in os.walk(path):
@@ -107,6 +114,52 @@ def test_user_agent(user_agent, logger):
 
     return valid
 
+def test_open_remote_window(version, addr, apptype, all_perms):
+    print "Installing the open remote window test app. This will take a minute... "
+
+    result = False
+
+    appname = 'Open Remote Window Test App'
+    fxos_appgen.uninstall_app(appname)
+    details = fxos_appgen.create_details(version, all_perms=all_perms)
+    manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, version))
+
+    apppath = os.path.join(static_path, 'open-remote-window-test-app')
+    package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
+                          'manifest.webapp': manifest})
+    fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+    fxos_appgen.launch_app(appname)
+
+    print "Done. Running the app..."
+
+    global webapi_results
+    webapi_results = None
+    Wait(timeout=60).until(lambda: webapi_results is not None)
+    webapi_results = None
+
+    script = """
+        let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+        return manager.getRunningApps();
+    """
+
+    m = marionette.Marionette()
+    m.start_session()
+    running_apps = m.execute_script(script)
+    for app in running_apps:
+        if app.find('Remote Window') != -1:
+            result = True
+            # window.close() from the remote window doesn't seem to work
+            kill_script = """
+                let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+                manager.kill("%s")""" % app
+            m.execute_script(kill_script)
+
+    m.delete_session()
+
+    fxos_appgen.uninstall_app(appname)
+
+    return result
+
 def diff_results(a, b):
 
     a_set = set(a.keys())
@@ -126,18 +179,18 @@ def diff_results(a, b):
 
     return result
 
-def log_results(diff, logger, report, name):
+def log_results(diff, logger, report, test_group, name):
     if diff:
         report[name.replace('-', '_')] = diff
         for result in diff:
             try:
-                logger.test_status('webapi', name, 'FAIL', message='Unexpected result for: %s' % result['name'])
+                logger.test_status(test_group, name, 'FAIL', message='Unexpected result for: %s' % result['name'])
             except TypeError:
-                logger.test_status('webapi', name, 'FAIL', message='Unexpected result for: %s' % result)
+                logger.test_status(test_group, name, 'FAIL', message='Unexpected result for: %s' % result)
     else:
-        logger.test_status('webapi', name, 'PASS')
+        logger.test_status(test_group, name, 'PASS')
 
-def parse_results(expected_results_path, results, prefix, logger, report):
+def parse_webapi_results(expected_results_path, results, prefix, logger, report):
     with open(expected_results_path) as f:
         expected_results = json.load(f)
 
@@ -148,10 +201,10 @@ def parse_results(expected_results_path, results, prefix, logger, report):
     window = results["windowList"]
 
     missing_window = diff_results(expected_window, window)
-    log_results(missing_window, logger, report, prefix + 'missing-window-functions')
+    log_results(missing_window, logger, report, 'webapi', prefix + 'missing-window-functions')
 
     added_window = diff_results(window, expected_window)
-    log_results(added_window, logger, report, prefix + 'added-window-functions')
+    log_results(added_window, logger, report, 'webapi', prefix + 'added-window-functions')
     if missing_window or added_window:
         webapi_passed = False
 
@@ -173,24 +226,27 @@ def parse_results(expected_results_path, results, prefix, logger, report):
     # since we delete found results above, anything here is missing
     missing_webidl_results = list(expected_webidl.values())
 
-    log_results(unexpected_webidl_results, logger, report, prefix + 'unexpected-webidl-results')
-    log_results(added_webidl_results, logger, report, prefix + 'added-webidl-results')
-    log_results(missing_webidl_results, logger, report, prefix + 'missing-webidl-results')
+    log_results(unexpected_webidl_results, logger, report, 'webapi', prefix + 'unexpected-webidl-results')
+    log_results(added_webidl_results, logger, report, 'webapi', prefix + 'added-webidl-results')
+    log_results(missing_webidl_results, logger, report, 'webapi', prefix + 'missing-webidl-results')
     if added_webidl_results or unexpected_webidl_results or missing_webidl_results:
-        webapi_passed = False
-
-    # compute differences in permissions results
-    expected_permissions = expected_results["permissionsResults"]
-    permissions = results["permissionsResults"]
-    unexpected_permissions_results = diff_results(expected_permissions, permissions)
-    log_results(unexpected_permissions_results, logger, report, prefix + 'unexpected-permissions-results')
-    if unexpected_permissions_results:
         webapi_passed = False
 
     return webapi_passed
 
+def parse_permissions_results(expected_results_path, results, prefix, logger, report):
+    with open(expected_results_path) as f:
+        expected_results = json.load(f)
+
+    # compute differences in permissions results
+    unexpected_results = diff_results(expected_results, results)
+    log_results(unexpected_results, logger, report, 'permissions', prefix + 'unexpected-permissions-results')
+    return not unexpected_results
 
 def cli():
+    global webapi_results
+    global webapi_results_embed_app
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-reboot",
                         help="don't reboot device before running test",
@@ -222,6 +278,7 @@ def cli():
 
     test_groups = [
         'omni-analyzer',
+        'permissions',
         'webapi',
         ]
     if args.list_test_groups:
@@ -313,14 +370,16 @@ def cli():
         if not args.generate_reference:
             os.remove(omni_results_path)
 
-    # run webapi, webidl and permissions tests
-    if 'webapi' in test_groups:
-        logger.test_start('webapi')
-
+    # start webserver
+    if 'webapi' in test_groups or 'permissions' in test_groups:
         httpd = wptserve.server.WebTestHttpd(
             host=moznetwork.get_ip(), port=8000, routes=routes, doc_root=static_path)
         httpd.start()
         addr = (httpd.host, httpd.port)
+
+    # run webapi and webidl tests
+    if 'webapi' in test_groups:
+        logger.test_start('webapi')
 
         webapi_passed = True
 
@@ -349,17 +408,85 @@ def cli():
                 report["headers"] = headers
                 test_user_agent(headers['user-agent'], logger)
 
+            results_filename = '%s.%s.json' % (args.version, apptype)
             if args.generate_reference:
-                with open('webapi_results_%s.json' % apptype, 'w') as f:
+                with open(results_filename, 'w') as f:
                     f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
 
             print "Processing results..."
             file_path = pkg_resources.resource_filename(
-                                __name__, os.path.sep.join(['expected_webapi_results', '%s.%s.json' % (args.version, apptype)]))
+                                __name__, os.path.sep.join(['expected_webapi_results', results_filename]))
 
-            webapi_passed = parse_results(file_path, webapi_results, '%s-' % apptype, logger, report) and webapi_passed
+            webapi_passed = parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report) and webapi_passed
 
         logger.test_end('webapi', 'OK' if webapi_passed else 'ERROR')
+
+    if 'permissions' in test_groups:
+        permissions_passed = True
+
+        logger.test_start('permissions')
+
+        # install test app for embed-apps permission test
+        embed_appname = 'Embed Apps Test App'
+        fxos_appgen.uninstall_app(embed_appname)
+        apppath = os.path.join(static_path, 'embed-apps-test-app')
+        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr})
+        fxos_appgen.install_app(embed_appname, 'app.zip', script_timeout=30000)
+
+        # run tests
+        for apptype in ['web', 'privileged', 'certified']:
+            for all_perms in [True, False]:
+
+                webapi_results = None
+                webapi_results_embed_app = None
+
+                print "Installing the %s app. This will take a minute... " % apptype
+
+                appname = '%s WebAPI Verifier' % apptype.capitalize()
+                details = fxos_appgen.create_details(args.version, all_perms=all_perms)
+                manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, args.version))
+
+                apppath = os.path.join(static_path, 'permissions-test-app')
+                package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
+                                      'manifest.webapp': manifest})
+
+                fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+                fxos_appgen.launch_app(appname)
+
+                print "Done. Running the app..."
+
+                Wait(timeout=600).until(lambda: webapi_results is not None)
+                fxos_appgen.uninstall_app(appname)
+
+                # gather results
+                results = webapi_results
+
+                # embed-apps results are posted to a separate URL
+                if webapi_results_embed_app:
+                    results['embed-apps'] = webapi_results_embed_app['embed-apps']
+                else:
+                    results['embed-apps'] = False
+
+                # we test open-remote-window separately as opening a remote
+                # window might stop the test app
+                results['open-remote-window'] = test_open_remote_window(args.version,
+                                                    addr, apptype, all_perms)
+
+                results_filename = '%s.%s.%s.json' % (args.version, apptype, ('all_perms' if all_perms else 'no_perms'))
+                if args.generate_reference:
+                    with open(results_filename, 'w') as f:
+                        f.write(json.dumps(results, sort_keys=True, indent=2))
+
+                print "Processing results..."
+                file_path = pkg_resources.resource_filename( __name__,
+                                os.path.sep.join(['expected_permissions_results', results_filename]))
+
+                permissions_passed = parse_permissions_results(file_path, results, '%s-%s-' % (apptype, ('all_perms' if all_perms else 'no_perms')), logger, report) and permissions_passed
+
+        logger.test_end('permissions', 'OK' if permissions_passed else 'ERROR')
+
+        # clean up embed-apps test app
+        fxos_appgen.uninstall_app(embed_appname)
 
     result_file_path = args.result_file
     if not result_file_path:
