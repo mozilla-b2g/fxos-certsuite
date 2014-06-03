@@ -257,16 +257,19 @@ def cli():
         if dm.forward("tcp:2828", "tcp:2828") != 0:
             raise Exception("Can't use localhost:2828 for port forwarding." \
                             "Is something else using port 2828?")
-        m = marionette.Marionette()
         retries = 0
-        while retries < 3:
+        while retries < 5:
             try:
+                m = marionette.Marionette()
                 m.start_session()
                 m.delete_session()
                 break
-            except (IOError, TypeError, marionette.errors.InvalidResponseException):
+            except (IOError, TypeError):
                 time.sleep(5)
                 retries += 1
+        else:
+            raise Exception("Couldn't connect to marionette after %d attempts. " \
+            "Is the marionette extension installed?" % retries)
 
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
@@ -315,7 +318,7 @@ def cli():
         logger.test_start('webapi')
 
         httpd = wptserve.server.WebTestHttpd(
-            host=moznetwork.get_ip(), port=0, routes=routes, doc_root=static_path)
+            host=moznetwork.get_ip(), port=8000, routes=routes, doc_root=static_path)
         httpd.start()
         addr = (httpd.host, httpd.port)
 
