@@ -21,17 +21,24 @@ location of the Android SDK::
 
     export PATH=$SDK_HOME:$PATH
 
-The device and the host machine running the tests must also be on the
-same Wi-Fi network.
-
-Furthermore, the device must have a SIM card with a functioning phone
+The device must have a SIM card with a functioning phone
 subscription to receive SMS messages for a subset of the tests to
 pass.
 
-Lastly, you must have Marionette installed on your phone. To install
-it, please run::
+Network
+-------
+The device must be connected to WiFi and must have network access to
+the host machine.
 
-    source install_marionette_extension.sh VERSION
+On the host machine, the following ports are required, and must not
+have any existing servers running on them:
 
-Where you must replace VERSION with the base FirefoxOS version number
-you are running against. We currently support 1.3 and 1.4
+    2828
+    6666
+    8000
+    8001
+    8888
+
+
+Any network firewall must be configured to allow the device to access
+the host computer on the above ports.
