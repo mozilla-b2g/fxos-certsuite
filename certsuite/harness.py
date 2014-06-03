@@ -6,7 +6,8 @@
 
 import argparse
 import json
-import marionette_extension
+from marionette_extension import install as marionette_install
+from marionette_extension import AlreadyInstalledException
 import mozdevice
 import mozprocess
 import os
@@ -245,10 +246,13 @@ def check_adb():
                         e.msg)
         sys.exit(1)
 
-def install_marionette():
+def install_marionette(version):
     try:
         logger.info("Installing marionette extension")
-        marionette_extension.install()
+        try:
+            marionette_install(version)
+        except AlreadyInstalledException:
+            print "Marionette is already installed"
     except subprocess.CalledProcessError, e:
         logger.critical('Error installing marionette extension: %s' % e)
         sys.exit(1)
@@ -273,7 +277,7 @@ def run_tests(args, config):
 
                 log_metadata()
                 check_adb()
-                install_marionette()
+                install_marionette(config['version'])
 
                 with DeviceBackup() as device:
                     runner = TestRunner(args, config)
