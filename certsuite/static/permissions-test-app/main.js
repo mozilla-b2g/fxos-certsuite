@@ -102,14 +102,9 @@ function permissionsTests()
       //       when installing we get PermissionsInstaller.jsm: 'downloads'
       //       is not a valid Webapps permission name.
 
-      //embed apps
-/*
-      var xmlHttp = null;
-      xmlHttp = new XMLHttpRequest();
-      xmlHttp.open( "POST", RESULTS_URI + "_embed_apps", true );
-      xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-      xmlHttp.send("results=" + JSON.stringify('hello, world!'));
-*/
+      // embed apps
+      // This is tested by running a separate app in an iframe which posts
+      // its own results.
 
       // feature-detection
       // See: https://wiki.mozilla.org/WebAPI/Navigator.hasFeature
@@ -143,7 +138,7 @@ function permissionsTests()
 
       // mobilenetwork
       permissionsResults['mobilenetwork'] = 'mozMobileConnections' in navigator;
- 
+
       // network-events
       // TODO: Not testable here - we need a suitable source of network events
 
@@ -164,7 +159,7 @@ function permissionsTests()
       // open-remote-window
       // This needs to be tested in a separate app. Opening the remote
       // window could cause this app to stop which means the tests never
-      // complete. 
+      // complete.
 
       // permissions
       permissionsResults['permissions'] = navigator.mozPermissions !== null;
@@ -172,7 +167,7 @@ function permissionsTests()
       // phone number service
       // normalize and fuzzyMatch only exposed if permissions exist
       permissionsResults['phonenumberservice'] = 'normalize' in navigator.mozPhoneNumberService;
-     
+
       // power
       permissionsResults['power'] = 'mozPower' in navigator;
 
@@ -197,7 +192,7 @@ function permissionsTests()
       // TODO: This permission removes limitations on how much device storage
       //       can be used by the application cache and indexeddb. It is
       //       difficult to test in a way that does not OOM my device.
-     
+
       // systemXHR
       var req = new XMLHttpRequest({'mozSystem': true});
       req.open('GET', 'http://www.mozilla.org', false);
