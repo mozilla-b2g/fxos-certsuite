@@ -6,8 +6,6 @@
 
             ["web-platform-tests", {"cmd": "wptrunner",
                                     "args": ["--product=b2g", "--test-type=testharness", "--include-manifest=web-platform-tests/include.ini", "--b2g-no-backup"],
-                                    "pos_args": ["web-platform-tests/metadata", "web-platform-tests/tests"]}],
-
-            ["webapi", {"cmd": "webapitests"}]
+                                    "pos_args": ["web-platform-tests/metadata", "web-platform-tests/tests"]}]
            ]
 }
