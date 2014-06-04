@@ -54,7 +54,7 @@ def iter_test_lists(suites_config):
     '''
     for name, opts in suites_config.iteritems():
         try:
-            cmd = [opts["cmd"], '--list-test-groups'] + opts.get("pos_args", [])
+            cmd = [opts["cmd"], '--list-test-groups'] + opts.get("common_args", [])
             for group in subprocess.check_output(cmd).splitlines():
                 yield name, group
         except subprocess.CalledProcessError:
@@ -213,7 +213,6 @@ class TestRunner(object):
         subn.update({"temp_dir": temp_dir})
 
         cmd = [suite_opts['cmd']]
-        cmd.extend(item % subn for item in suite_opts.get("args", []))
 
         log_name = "%s/%s_structured%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
         cmd.extend(["--log-raw=%s" % log_name,
@@ -222,7 +221,8 @@ class TestRunner(object):
         if groups:
             cmd.extend('--include=%s' % g for g in groups)
 
-        cmd.extend(item % subn for item in suite_opts.get("pos_args", []))
+        cmd.extend(item % subn for item in suite_opts.get("run_args", []))
+        cmd.extend(item % subn for item in suite_opts.get("common_args", []))
 
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
