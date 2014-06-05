@@ -139,9 +139,6 @@ function permissionsTests()
       // mobilenetwork
       permissionsResults['mobilenetwork'] = 'mozMobileConnections' in navigator;
 
-      // network-events
-      // TODO: Not testable here - we need a suitable source of network events
-
       // nfc
       permissionsResults['nfc'] = 'mozNfc' in navigator;
 
@@ -245,6 +242,28 @@ function permissionsTests()
       resolve({'audio-capture': false});
   });
 
+  // network-events
+  // TODO: The network events are associated with using the data network
+  //       but the test framework assumes the use of wifi, so this test
+  //       will always return false for now.
+  var networkEventsPromise = new Promise(
+    function(resolve, reject) {
+
+      addEventListener('moznetworkdownload', function (evt) {
+        resolve({'network-events': true});
+      });
+
+      var iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframe.src = 'http://example.org';
+      iframe.onload = function () {
+        // Allow some time for the moznetworkdownload to fire
+        setTimeout(function () {
+          resolve({'network-events': false});
+        }, 100);
+      };
+  });
+
   // video-capture
   var videoCapturePromise = new Promise(
     function(resolve, reject) {
@@ -258,7 +277,7 @@ function permissionsTests()
       resolve({'video-capture': false});
   });
 
-  return Promise.all([syncAPIPromise, audioCapturePromise, videoCapturePromise]);
+  return Promise.all([syncAPIPromise, audioCapturePromise, networkEventsPromise, videoCapturePromise]);
 }
 
 function runTest()

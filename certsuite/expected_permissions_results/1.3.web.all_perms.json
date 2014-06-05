@@ -31,6 +31,7 @@
   "keyboard": false, 
   "mobileconnection": true, 
   "mobilenetwork": false, 
+  "network-events": false, 
   "nfc": false, 
   "open-remote-window": false, 
   "permissions": true, 

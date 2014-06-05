@@ -390,6 +390,7 @@ def cli():
             print "Installing the %s app. This will take a minute... " % apptype
 
             appname = '%s WebAPI Verifier' % apptype.capitalize()
+            fxos_appgen.uninstall_app(appname)
             details = fxos_appgen.create_details(args.version, all_perms=True)
             manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, args.version))
 
@@ -443,6 +444,7 @@ def cli():
                 print "Installing the %s app. This will take a minute... " % apptype
 
                 appname = '%s WebAPI Verifier' % apptype.capitalize()
+                fxos_appgen.uninstall_app(appname)
                 details = fxos_appgen.create_details(args.version, all_perms=all_perms)
                 manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, args.version))
 
