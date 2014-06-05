@@ -213,13 +213,6 @@ function permissionsTests()
       // voicemail
       permissionsResults['voicemail'] = 'mozVoicemail' in navigator;
 
-      // wappush
-      // Not testable here - these are received by using
-      // mozSetMessageHandler to subscribe to 'wappush-received' messages.
-      // Any app can subscribe but the messages are only delivered if
-      // the corresponding permission is set. Without a way of injecting
-      // 'wappush-received' messages we can't test this here.
-
       // webapps-manage
       permissionsResults['webapps-manage'] = navigator.mozApps.mgmt !== null;
 
@@ -277,7 +270,23 @@ function permissionsTests()
       resolve({'video-capture': false});
   });
 
-  return Promise.all([syncAPIPromise, audioCapturePromise, networkEventsPromise, videoCapturePromise]);
+  // wappush
+  // TODO: This test is expected to fail as we are not currently injecting
+  //       any wappush events into the system for this to receive.
+  var wappushPromise = new Promise(
+    function(resolve, reject) {
+
+      navigator.mozSetMessageHandler('wappush-received', function (msg) {
+        resolve({'wappush': true});
+      });
+
+      // Eventually timeout if we never receive an wappush
+      setTimeout(function () {
+        resolve({'wappush': false});
+      }, 1000);
+  });
+
+  return Promise.all([syncAPIPromise, audioCapturePromise, networkEventsPromise, videoCapturePromise, wappushPromise]);
 }
 
 function runTest()

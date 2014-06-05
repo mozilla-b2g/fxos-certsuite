@@ -47,6 +47,7 @@
   "time": false, 
   "video-capture": false, 
   "voicemail": false, 
+  "wappush": false, 
   "webapps-manage": false, 
   "wifi-manager": false
 }

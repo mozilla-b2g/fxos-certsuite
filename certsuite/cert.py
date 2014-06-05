@@ -194,8 +194,6 @@ def parse_webapi_results(expected_results_path, results, prefix, logger, report)
     with open(expected_results_path) as f:
         expected_results = json.load(f)
 
-    webapi_passed = True
-
     #compute difference in window functions
     expected_window = expected_results["windowList"]
     window = results["windowList"]
@@ -205,8 +203,6 @@ def parse_webapi_results(expected_results_path, results, prefix, logger, report)
 
     added_window = diff_results(window, expected_window)
     log_results(added_window, logger, report, 'webapi', prefix + 'added-window-functions')
-    if missing_window or added_window:
-        webapi_passed = False
 
     # compute differences in WebIDL results
     expected_webidl = {}
@@ -229,10 +225,6 @@ def parse_webapi_results(expected_results_path, results, prefix, logger, report)
     log_results(unexpected_webidl_results, logger, report, 'webapi', prefix + 'unexpected-webidl-results')
     log_results(added_webidl_results, logger, report, 'webapi', prefix + 'added-webidl-results')
     log_results(missing_webidl_results, logger, report, 'webapi', prefix + 'missing-webidl-results')
-    if added_webidl_results or unexpected_webidl_results or missing_webidl_results:
-        webapi_passed = False
-
-    return webapi_passed
 
 def parse_permissions_results(expected_results_path, results, prefix, logger, report):
     with open(expected_results_path) as f:
@@ -381,8 +373,6 @@ def cli():
     if 'webapi' in test_groups:
         logger.test_start('webapi')
 
-        webapi_passed = True
-
         for apptype in ['web', 'privileged', 'certified']:
             global webapi_results
 
@@ -418,13 +408,11 @@ def cli():
             file_path = pkg_resources.resource_filename(
                                 __name__, os.path.sep.join(['expected_webapi_results', results_filename]))
 
-            webapi_passed = parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report) and webapi_passed
+            parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report)
 
-        logger.test_end('webapi', 'OK' if webapi_passed else 'ERROR')
+        logger.test_end('webapi', 'OK')
 
     if 'permissions' in test_groups:
-        permissions_passed = True
-
         logger.test_start('permissions')
 
         # install test app for embed-apps permission test
@@ -483,9 +471,9 @@ def cli():
                 file_path = pkg_resources.resource_filename( __name__,
                                 os.path.sep.join(['expected_permissions_results', results_filename]))
 
-                permissions_passed = parse_permissions_results(file_path, results, '%s-%s-' % (apptype, ('all_perms' if all_perms else 'no_perms')), logger, report) and permissions_passed
+                parse_permissions_results(file_path, results, '%s-%s-' % (apptype, ('all_perms' if all_perms else 'no_perms')), logger, report)
 
-        logger.test_end('permissions', 'OK' if permissions_passed else 'ERROR')
+        logger.test_end('permissions', 'OK')
 
         # clean up embed-apps test app
         fxos_appgen.uninstall_app(embed_appname)
