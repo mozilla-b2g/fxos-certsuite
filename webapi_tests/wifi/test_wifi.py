@@ -29,6 +29,8 @@ class TestWifi(TestCase):
                     networkinfo = "ssid: " + network.ssid +
                                   ", security: None";
                 }
+                console.log("Found a Wifi network with following properties: "
+                            + networkinfo);
                 marionetteScriptFinished(networkinfo);
             };
             request.onerror = function(event) {
@@ -38,6 +40,3 @@ class TestWifi(TestCase):
         foundnwks_status = self.marionette.execute_async_script(find_networks)
         if foundnwks_status is None:
             self.fail("No Wifi networks found")
-        self.confirm("Please confirm if a Wifi network is found with"
-                     " following properties: \"%s\"?" % foundnwks_status)
-
