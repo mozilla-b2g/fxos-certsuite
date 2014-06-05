@@ -6,10 +6,9 @@ from marionette.wait import Wait
 
 
 class GeolocationTestCommon(object):
-    permission = False;
+    permission = False
 
     def is_geolocation_enabled(self):
-        # see if geolocation is enabled in the device settings
         self.marionette.execute_async_script("""
         window.wrappedJSObject.geo_enabled = null;
         window.wrappedJSObject.get_success = false;
@@ -70,13 +69,7 @@ class GeolocationTestCommon(object):
                 self.fail("Failed to change the geolocation.enabled setting")
 
     def is_geolocation_available(self):
-        return self.marionette.execute_async_script("""
-        var available = false;
-        if ("geolocation" in navigator) {
-            available = true;
-        }
-        marionetteScriptFinished(available);
-        """)
+        return self.marionette.execute_script("return 'geolocation' in navigator")
 
     def get_current_position(self):
         self.marionette.execute_async_script("""
@@ -99,7 +92,7 @@ class GeolocationTestCommon(object):
         """)
 
         # ask user to accept and dismiss the default gaia app location share prompt
-        self.instruct("On the Firefox OS device, if a location request dialog is displayed, please " 
+        self.instruct("On the Firefox OS device, if a location request dialog is displayed, please "
                       "click the 'Share' button. If there is no dialog on the device, just continue.")
 
         # wait for the position request to finish

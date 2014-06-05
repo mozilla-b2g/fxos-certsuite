@@ -12,12 +12,10 @@ class TestGeolocationBasic(TestCase, GeolocationTestCommon):
 
     def setUp(self):
         super(TestGeolocationBasic, self).setUp()
-        # ensure geolocation is enabled in device settings
+        # ensure geolocation is available and enabled in settings
+        self.assertTrue(self.is_geolocation_available(), "Geolocation is not available on the device")
         if not self.is_geolocation_enabled():
             self.set_geolocation_enabled(True)
-
-    def test_is_geolocation_available(self):
-        self.assertTrue(self.is_geolocation_available())
 
     def test_enabled(self):
         # already enabled, so disable first
@@ -28,7 +26,6 @@ class TestGeolocationBasic(TestCase, GeolocationTestCommon):
         self.assertTrue(self.is_geolocation_enabled(), "Geolocation should be enabled")
 
     def test_get_current_position(self):
-        position = None
         position = self.get_current_position()
         # check position details exist
         self.assertIsNotNone(position['timestamp'], "position.timestamp must have a value")
@@ -44,4 +41,4 @@ class TestGeolocationBasic(TestCase, GeolocationTestCommon):
         long = position['coords']['longitude']
         self.confirm("Location found. <br /><br />Latitude: %s<br /> Longitude: %s<br /><br />"
                      " Please look up these coordinates on an internet mapping web site. Does"
-                     " this correctly identify your current approximate location?" %(lat, long))
+                     " this correctly identify your current approximate location?" % (lat, long))
