@@ -40,6 +40,10 @@ tests, and lastly deactivates the environment.
 You may call *run.sh* as many times as you like, and it will run
 the tests using its previously set up virtual environment.
 
+Some of the tests for Web APIs require manual user intervention.
+At this point a browser will open on your host computer.  Simply
+follow the instructions given on screen.
+
 Setup and Usage With virtualenv
 -------------------------------
 
@@ -67,24 +71,6 @@ For example it is possible to list logical test groups and to run
 filtered test runs of only a subset of the tests::
 
     runcertsuite --list-test-groups
-
-WIP: Running Guided Web API Tests
----------------------------------
-
-This test tool will eventually contain a full suite of guided Web
-API tests that allow a tester to interact with the phone to perform
-functional testing of Web API's.
-
-This semi-automatic harness is in development (and is thus not
-runnable using the process above), but you can run a prototype of
-these tests now. To do so::
-
-    cd webapi_tests
-    ./setup_and_run.sh
-
-This will install a test app on your device, and then open a web
-page on your host browser (*not* on the device), which will lead
-you through the tests.
 
 Submitting Results
 ------------------
