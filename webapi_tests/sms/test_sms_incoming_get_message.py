@@ -2,8 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from semiauto import TestCase
-from sms import SmsTestCommon
+from webapi_tests.semiauto import TestCase
+from webapi_tests.sms import SmsTestCommon
 
 
 class TestSmsIncomingGetMessage(TestCase, SmsTestCommon):
@@ -12,7 +12,7 @@ class TestSmsIncomingGetMessage(TestCase, SmsTestCommon):
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
-        TestCase.tearDown(self)
+        super(TestSmsIncomingGetMessage, self).tearDown()
 
     def test_sms_incoming_get_message(self):
         # have user send sms to the Firefox OS device, verify body

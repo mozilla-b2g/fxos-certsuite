@@ -3,9 +3,9 @@
                       "run_args": ["--version=%(version)s",
                                    "--result-file=%(temp_dir)s/results.json"],
                       "extra_files": ["%(temp_dir)s/results.json"]}],
-
             ["web-platform-tests", {"cmd": "wptrunner",
                                     "common_args": ["--include-manifest=web-platform-tests/include.ini", "web-platform-tests/metadata", "web-platform-tests/tests"],
-                                    "run_args": ["--product=b2g", "--test-type=testharness"]}]
+                                    "run_args": ["--product=b2g", "--test-type=testharness"]}],
+            ["webapi", {"cmd": "webapirunner"}]
            ]
 }

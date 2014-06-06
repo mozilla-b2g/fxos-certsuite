@@ -13,7 +13,7 @@ import sys
 from fnmatch import fnmatch
 from mozlog.structured import commandline
 
-import semiauto
+from webapi_tests import semiauto
 
 
 def iter_tests(start_dir, pattern="test_*.py"):
@@ -39,7 +39,7 @@ def iter_tests(start_dir, pattern="test_*.py"):
             relpath = os.path.relpath(path, start_dir)
             if relpath.endswith(".py"):
                 relpath = relpath[:-3]
-            name = relpath.replace(os.path.sep, ".")
+            name = "webapi_tests.%s" % relpath.replace(os.path.sep, ".")
             module = None
             try:
                 module = importlib.import_module(name)
@@ -52,9 +52,7 @@ def iter_tests(start_dir, pattern="test_*.py"):
             ts = [t for t in zip(*members)[1] if isinstance(t, type)]
 
             for cls in ts:
-                # Include only semiauto tests
-                bases = inspect.getmro(cls)
-                if semiauto.testcase.TestCase not in bases:
+                if not issubclass(cls, semiauto.testcase.TestCase):
                     continue
 
                 if getattr(cls, "__module__", None) != name:
@@ -90,7 +88,7 @@ def main():
         parser.print_usage()
         sys.exit(1)
 
-    testgen = iter_tests(os.path.join(__file__, "../.."))
+    testgen = iter_tests(os.path.dirname(__file__))
     if args.list_test_groups:
         for group, _ in testgen:
             print(group)
@@ -103,7 +101,7 @@ def main():
 
     test_loader = semiauto.TestLoader()
     tests = test_loader.loadTestsFromNames(
-        args.include or [g for g, _ in testgen], None)
+        map(lambda t: "webapi_tests.%s" % t, args.include or [g for g, _ in testgen]), None)
     results = semiauto.run(tests,
                            logger=logger,
                            spawn_browser=not args.no_browser,
