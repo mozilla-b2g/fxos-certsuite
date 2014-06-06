@@ -13,7 +13,7 @@ import runner
 from mozlog.structured import formatters, handlers, structuredlog
 from moztest.adapters.unit import StructuredTestRunner
 
-from semiauto import server
+from webapi_tests.semiauto import server
 
 
 test_loader = None
@@ -57,15 +57,20 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
     env = environment.get(environment.InProcessTestEnvironment,
                           verbose=(verbosity > 1))
 
+    url = "http://%s:%d/" % (env.server.addr[0], env.server.addr[1])
     if spawn_browser:
         import webbrowser
-        webbrowser.open("http://localhost:6666/")
+        webbrowser.open(url)
     else:
-        print >> sys.stderr, "Please connect your browser to http://%s:%d/" % \
-            (env.server.addr[0], env.server.addr[1])
+        print >> sys.stderr, "Please connect your browser to %s" % url
 
     # Wait for browser to connect and get socket connection to client
-    so = server.wait_for_client()
+    try:
+        #so = server.wait_for_client()
+        so = server.clients.get(block=True, timeout=server.connect_timeout)
+    except server.ConnectError as e:
+        print >> sys.stderr, "%s: error: %s" % (sys.argv[0], e)
+        sys.exit(1)
 
     tests = runner.serialize_suite(suite)
     test_runner = StructuredTestRunner(logger=logger, test_list=tests)

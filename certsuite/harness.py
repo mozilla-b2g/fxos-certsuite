@@ -57,8 +57,8 @@ def iter_test_lists(suites_config):
             cmd = [opts["cmd"], '--list-test-groups'] + opts.get("common_args", [])
             for group in subprocess.check_output(cmd).splitlines():
                 yield name, group
-        except subprocess.CalledProcessError:
-            print >> sys.stderr("Failed to run command %s" % " ".join(cmd))
+        except (subprocess.CalledProcessError, OSError) as e:
+            print >> sys.stderr, "Failed to run command: %s: %s" % (" ".join(cmd), e)
             sys.exit(1)
 
 

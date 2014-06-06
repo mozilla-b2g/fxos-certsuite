@@ -1,0 +1,4 @@
+These testcases are not included in the meta harness and won't be
+triggered automatically.  They remain here as a reference until we
+have verified that they've been ported over to the semiauto harness.
+
