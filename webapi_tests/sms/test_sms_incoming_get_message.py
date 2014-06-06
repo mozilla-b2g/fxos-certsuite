@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webapi_tests.semiauto import TestCase
-from sms import SmsTestCommon
+from webapi_tests.sms import SmsTestCommon
 
 
 class TestSmsIncomingGetMessage(TestCase, SmsTestCommon):

@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webapi_tests.semiauto import TestCase
-from sms import SmsTestCommon
+from webapi_tests.sms import SmsTestCommon
 
 
 class TestSmsIncoming(TestCase, SmsTestCommon):
@@ -12,7 +12,7 @@ class TestSmsIncoming(TestCase, SmsTestCommon):
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
-        super(TestSmsIncoming, super).tearDown()
+        super(TestSmsIncoming, self).tearDown()
 
     def test_sms_incoming(self):
         # have user send sms to the Firefox OS device, verify body
