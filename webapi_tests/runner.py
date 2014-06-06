@@ -61,7 +61,7 @@ def iter_tests(start_dir, pattern="test_*.py"):
                     [member[0] for member in inspect.getmembers(cls) if member[0].startswith("test_")])
 
         if len(tests) > 0:
-            yield "webapi_tests.%s" % group, tests
+            yield group, tests
 
 
 def main():
@@ -101,7 +101,7 @@ def main():
 
     test_loader = semiauto.TestLoader()
     tests = test_loader.loadTestsFromNames(
-        args.include or [g for g, _ in testgen], None)
+        map(lambda t: "webapi_tests.%s" % t, args.include or [g for g, _ in testgen]), None)
     results = semiauto.run(tests,
                            logger=logger,
                            spawn_browser=not args.no_browser,
