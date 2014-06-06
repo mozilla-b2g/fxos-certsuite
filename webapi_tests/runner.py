@@ -39,7 +39,7 @@ def iter_tests(start_dir, pattern="test_*.py"):
             relpath = os.path.relpath(path, start_dir)
             if relpath.endswith(".py"):
                 relpath = relpath[:-3]
-            name = relpath.replace(os.path.sep, ".")
+            name = "webapi_tests.%s" % relpath.replace(os.path.sep, ".")
             module = None
             try:
                 module = importlib.import_module(name)
@@ -61,7 +61,7 @@ def iter_tests(start_dir, pattern="test_*.py"):
                     [member[0] for member in inspect.getmembers(cls) if member[0].startswith("test_")])
 
         if len(tests) > 0:
-            yield group, tests
+            yield "webapi_tests.%s" % group, tests
 
 
 def main():

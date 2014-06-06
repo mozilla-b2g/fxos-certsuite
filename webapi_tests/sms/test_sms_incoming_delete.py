@@ -5,7 +5,7 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from sms import SmsTestCommon
+from webapi_tests.sms import SmsTestCommon
 
 
 class TestSmsIncomingDelete(TestCase, SmsTestCommon):

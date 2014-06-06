@@ -5,7 +5,7 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from bluetooth import BluetoothTestCommon
+from webapi_tests.bluetooth import BluetoothTestCommon
 
 
 class TestBluetoothDiscovery(TestCase, BluetoothTestCommon):

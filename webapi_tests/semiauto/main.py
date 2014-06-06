@@ -7,13 +7,10 @@
 import sys
 import unittest
 
-import environment
-import runner
-
 from mozlog.structured import formatters, handlers, structuredlog
 from moztest.adapters.unit import StructuredTestRunner
 
-from webapi_tests.semiauto import server
+from webapi_tests.semiauto import environment, runner, server
 
 
 test_loader = None

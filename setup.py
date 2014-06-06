@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 PACKAGE_VERSION = '0.1'
 deps = ['fxos-appgen>=0.2.9',
@@ -26,7 +26,7 @@ setup(name='fxos-certsuite',
       author_email='tools@lists.mozilla.org',
       url='https://github.com/mozilla-b2g/fxos-certsuite',
       license='MPL',
-      packages=['certsuite', 'webapi_tests'],
+      packages=find_packages(),
       include_package_data=True,
       zip_safe=False,
       install_requires=deps,

@@ -1,9 +1,12 @@
 import os
 
+import fxos_appgen
+import mozdevice
+
 from marionette import MarionetteException
 
-
 class CertAppMixin(object):
+    app_name = "CertTest App"
     app_management = os.path.join(os.path.dirname(__file__), "app_management.js")
     timeout = 5000  # ms
 
@@ -21,7 +24,7 @@ class CertAppMixin(object):
 
     def use_cert_app(self):
         self._switch_to_app_management()
-        script = "GaiaApps.launchWithName('CertTest App');"
+        script = "GaiaApps.launchWithName('%s');" % CertAppMixin.app_name
 
         try:
             # NOTE: if the app is already launched, this doesn't
@@ -29,11 +32,11 @@ class CertAppMixin(object):
             # existing app
             self.app = self.marionette.execute_async_script(
                 script, script_timeout=CertAppMixin.timeout)
-            self.assertTrue(self.app, "Could not launch CertTest App")
+            self.assertTrue(self.app, "Could not launch %s" % CertAppMixin.app_name)
             self.marionette.switch_to_frame(self.app["frame"])
         except MarionetteException as e:
-            self.instruct("Could not launch CertTest app automatically. "
-                          "Please launch by hand.")
+            self.instruct("Could not launch %s automatically. "
+                          "Please launch by hand." % CertAppMixin.app_name)
             iframes = self.marionette.execute_script(
                 "return document.getElementsByTagName('iframe').length")
             for i in range(0, iframes):
@@ -41,7 +44,7 @@ class CertAppMixin(object):
                 if "certtest" in self.marionette.get_url():
                     return
                 self.marionette.switch_to_frame()
-            self.fail("Could not switch into CertTest App")
+            self.fail("Could not switch into %s" % CertAppMixin.app_name)
         except Exception as e:
             message = "Unexpected exception: %s" % e
             self.fail(message)
@@ -54,7 +57,7 @@ class CertAppMixin(object):
             time.sleep(1)
             tries -= 1
         if tries == 0:
-            self.fail("CertTest app did not load in time")
+            self.fail("%s did not load in time" % CertAppMixin.app_name)
 
         self.assertTrue("certtest" in self.marionette.get_url())
 
@@ -88,9 +91,10 @@ class CertAppMixin(object):
             self.manually_close_app()
 
     def manually_close_app(self):
-        instruction = "Could not close CertTest app automatically. " \
+        instruction = "Could not close %s automatically. " \
                       "Please close the app manually by holding down the Home button " \
-                      "and pressing the X above the CertTest app card."
+                      "and pressing the X above the %s card." % \
+                      (CertAppMixin.app_name, CertAppMixin.app_name)
         response = self.instruct(instruction)
         if response == 'n' or response == False:
             print "Must reboot"
@@ -101,3 +105,15 @@ class CertAppMixin(object):
             self.marionette = Marionette()
             self.marionette.start_session()
             self.fail("Failed attempts at closing app.")
+
+    def install_cert_app(self):
+        fxos_appgen.generate_app(CertAppMixin.app_name,
+                                 install=True, version="1.3",
+                                 all_perm=True,
+                                 marionette=getattr(self, "marionette", None))
+
+    # Issue filed: https://github.com/mozilla-b2g/fxos-appgen/issues/7
+    def is_app_installed(self):
+        installed_app_name = CertAppMixin.app_name.lower().replace(" ", "-")
+        dm = mozdevice.DeviceManagerADB()
+        return dm.dirExists("/data/local/webapps/%s" % installed_app_name)

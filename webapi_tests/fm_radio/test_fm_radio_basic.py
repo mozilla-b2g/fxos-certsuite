@@ -5,7 +5,7 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from fm_radio import FMRadioTestCommon
+from webapi_tests.fm_radio import FMRadioTestCommon
 
 
 class TestFMRadioBasic(TestCase, FMRadioTestCommon):

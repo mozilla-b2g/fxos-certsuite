@@ -5,7 +5,7 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from telephony import TelephonyTestCommon
+from webapi_tests.telephony import TelephonyTestCommon
 
 
 class TestTelephonyIncoming(TestCase, TelephonyTestCommon):

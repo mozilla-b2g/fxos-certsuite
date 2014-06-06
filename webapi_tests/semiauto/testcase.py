@@ -9,10 +9,9 @@ import unittest
 
 from marionette import Marionette, MarionetteException
 
-from semiauto import environment
-from semiauto.environment import InProcessTestEnvironment
-
-from certapp import CertAppMixin
+from webapi_tests.semiauto import environment
+from webapi_tests.semiauto.environment import InProcessTestEnvironment
+from webapi_tests.certapp import CertAppMixin
 
 
 """The default time to wait for a user to respond to a prompt or
@@ -47,6 +46,7 @@ class TestCase(CertAppMixin, unittest.TestCase):
         """
 
         super(TestCase, self).setUp()
+
         self.environment = environment.get(InProcessTestEnvironment)
         self.server = self.environment.server
         self.handler = self.environment.handler
@@ -56,6 +56,9 @@ class TestCase(CertAppMixin, unittest.TestCase):
         self.marionette = self.create_marionette()
         turn_screen_on(self.marionette)
         unlock_screen(self.marionette)
+
+        if not self.is_app_installed():
+            self.install_cert_app()
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
