@@ -66,8 +66,7 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
 
     # Wait for browser to connect and get socket connection to client
     try:
-        #so = server.wait_for_client()
-        so = server.clients.get(block=True, timeout=server.connect_timeout)
+        so = server.wait_for_client()
     except server.ConnectError as e:
         print >> sys.stderr, "%s: error: %s" % (sys.argv[0], e)
         sys.exit(1)
