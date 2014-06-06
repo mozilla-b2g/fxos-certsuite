@@ -17,9 +17,9 @@ import tornado.websocket
 
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
-timeout = 3
 logger = logging.getLogger(__name__)
 clients = Queue.Queue()
+connect_timeout = 30
 
 
 def static_path(path):
@@ -127,14 +127,21 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         return str(self.id)
 
 
+class ConnectError(RuntimeError):
+    pass
+
+
 def wait_for_client():
     """Wait for client to connect the host browser and return.
 
     Gets a reference to the WebSocket handler associated with that client that
     we can use to communicate with the browser.  This blocks until a client
-    connects.
+    connects, or ``server.connect_timeout`` is reached and a ``ConnectError``
+    is raised.
 
     """
 
-    # A timeout is needed because of http://bugs.python.org/issue1360
-    return clients.get(block=True, timeout=sys.maxint)
+    try:
+        return clients.get(block=True, timeout=connect_timeout)
+    except Queue.Empty:
+        raise ConnectError("Browser connection not made in time")

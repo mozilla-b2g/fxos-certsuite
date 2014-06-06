@@ -4,7 +4,7 @@
 
 import time
 
-from semiauto import TestCase
+from webapi_tests.semiauto import TestCase
 from telephony import TelephonyTestCommon
 
 

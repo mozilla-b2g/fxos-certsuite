@@ -1,10 +1,10 @@
-from semiauto import TestCase
 from datetime import datetime
 import time
 
+from webapi_tests.semiauto import TestCase
+
 
 class TestTime(TestCase):
-
     def test_time_set(self):
         get_current_time = """
             var curDate  = new Date();
