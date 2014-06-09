@@ -459,8 +459,11 @@ def cli():
 
                 # we test open-remote-window separately as opening a remote
                 # window might stop the test app
-                results['open-remote-window'] = test_open_remote_window(args.version,
-                                                    addr, apptype, all_perms)
+                # TODO: this test causes hangs on some phones, disabling
+                #       for now.
+                #results['open-remote-window'] = test_open_remote_window(args.version,
+                #                                    addr, apptype, all_perms)
+                results['open-remote-window'] = False
 
                 results_filename = '%s.%s.%s.json' % (args.version, apptype, ('all_perms' if all_perms else 'no_perms'))
                 if args.generate_reference:
