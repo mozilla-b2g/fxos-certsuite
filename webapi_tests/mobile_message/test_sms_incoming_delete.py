@@ -5,10 +5,10 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from webapi_tests.sms import SmsTestCommon
+from webapi_tests.mobile_message import MobileMessageTestCommon
 
 
-class TestSmsIncomingDelete(TestCase, SmsTestCommon):
+class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
     def tearDown(self):
         self.marionette.execute_script("""
             SpecialPowers.removePermission("sms", document);
@@ -24,7 +24,7 @@ class TestSmsIncomingDelete(TestCase, SmsTestCommon):
         time.sleep(5)
 
         # delete the SMS using the webapi
-        sms_to_delete = self.in_sms['id']
+        sms_to_delete = self.in_msg['id']
         self.delete_message(sms_to_delete)
 
         # now verify the message has been deleted by trying to get it, should fail

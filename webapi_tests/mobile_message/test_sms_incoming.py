@@ -3,10 +3,10 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webapi_tests.semiauto import TestCase
-from webapi_tests.sms import SmsTestCommon
+from webapi_tests.mobile_message import MobileMessageTestCommon
 
 
-class TestSmsIncoming(TestCase, SmsTestCommon):
+class TestSmsIncoming(TestCase, MobileMessageTestCommon):
     def tearDown(self):
         self.marionette.execute_script("""
             SpecialPowers.removePermission("sms", document);
@@ -19,20 +19,20 @@ class TestSmsIncoming(TestCase, SmsTestCommon):
         self.user_guided_incoming_sms()
 
         # body already verified; verify the other message fields
-        self.assertEqual(self.in_sms['type'], 'sms', "Received SMS MozSmsMessage.type should be 'sms'")
-        self.assertTrue(self.in_sms['id'] > 0, "Received SMS MozSmsMessage.id should be > 0")
-        self.assertTrue(self.in_sms['threadId'] > 0, "Received SMS MozSmsMessage.threadId should be > 0")
-        self.assertEqual(self.in_sms['delivery'], 'received', "Received SMS MozSmsMessage.delivery should be 'received'")
-        self.assertTrue((self.in_sms['deliveryStatus'] == 'success') | (self.in_sms['deliveryStatus'] == 'not-applicable'),
+        self.assertEqual(self.in_msg['type'], 'sms', "Received SMS MozSmsMessage.type should be 'sms'")
+        self.assertTrue(self.in_msg['id'] > 0, "Received SMS MozSmsMessage.id should be > 0")
+        self.assertTrue(self.in_msg['threadId'] > 0, "Received SMS MozSmsMessage.threadId should be > 0")
+        self.assertEqual(self.in_msg['delivery'], 'received', "Received SMS MozSmsMessage.delivery should be 'received'")
+        self.assertTrue((self.in_msg['deliveryStatus'] == 'success') | (self.in_msg['deliveryStatus'] == 'not-applicable'),
                         "Sent SMS MozSmsMessage.deliveryStatus should be 'success' or 'not-applicable'")
         # cannot guarantee end-user didn't read message; test that specifically in a different test
-        self.assertTrue(((self.in_sms['read'] == False) or (self.in_sms['read'] == True)),
+        self.assertTrue(((self.in_msg['read'] == False) or (self.in_msg['read'] == True)),
                         "Received SMS MozSmsMessage.read field should be False or True")
         # for privacy, don't print/check actual receiver (Firefox OS) phone number; just ensure not empty
-        self.assertTrue(len(self.in_sms['receiver']) > 0, "Received SMS MozSmsMessage.receiver field should not be empty")
+        self.assertTrue(len(self.in_msg['receiver']) > 0, "Received SMS MozSmsMessage.receiver field should not be empty")
         # for privacy, don't print/check the actual sender's number; just ensure it is not empty
-        self.assertTrue(len(self.in_sms['sender']) > 0, "Received SMS MozSmsMessage.sender field should not be empty")
+        self.assertTrue(len(self.in_msg['sender']) > 0, "Received SMS MozSmsMessage.sender field should not be empty")
         # timezones and different SMSC's, don't check timestamp value; just ensure non-zero
-        self.assertTrue(self.in_sms['timestamp'] > 0, "Received SMS MozSmsMessage.timestamp should not be 0")
-        self.assertTrue(self.in_sms['messageClass'] in ["class-0", "class-1", "class-2", "class-3", "normal"],
+        self.assertTrue(self.in_msg['timestamp'] > 0, "Received SMS MozSmsMessage.timestamp should not be 0")
+        self.assertTrue(self.in_msg['messageClass'] in ["class-0", "class-1", "class-2", "class-3", "normal"],
                         "Received SMS MozSmsMessage.messageClass must be a valid class")
