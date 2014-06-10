@@ -84,6 +84,26 @@ def package_app(path, extrafiles={}):
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
 
+def install_app(logger, appname, version, apptype, apppath, all_perms,
+                extrafiles, launch=False):
+
+    logger.debug('uninstalling: %s' % appname)
+    fxos_appgen.uninstall_app(appname)
+
+    logger.debug('packaging: %s version: %s apptype: %s all_perms: %s' %
+        (appname, version, apptype, all_perms))
+    details = fxos_appgen.create_details(version, all_perms=all_perms)
+    manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, version))
+    files = extrafiles.copy()
+    files['manifest.webapp'] = manifest
+    package_app(apppath, files)
+
+    logger.debug('installing: %s' % appname)
+    fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+    if launch:
+        logger.debug('launching: %s' % appname)
+        fxos_appgen.launch_app(appname)
+
 def test_user_agent(user_agent, logger):
     # See https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference#Firefox_OS
     # and https://wiki.mozilla.org/B2G/User_Agent/Device_Model_Inclusion_Requirements
@@ -114,27 +134,27 @@ def test_user_agent(user_agent, logger):
 
     return valid
 
-def test_open_remote_window(version, addr, apptype, all_perms):
+def test_open_remote_window(logger, version, addr, apptype, all_perms):
     print "Installing the open remote window test app. This will take a minute... "
 
     result = False
 
     appname = 'Open Remote Window Test App'
-    fxos_appgen.uninstall_app(appname)
-    details = fxos_appgen.create_details(version, all_perms=all_perms)
-    manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, version))
-
     apppath = os.path.join(static_path, 'open-remote-window-test-app')
-    package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
-                          'manifest.webapp': manifest})
-    fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
-    fxos_appgen.launch_app(appname)
-
-    print "Done. Running the app..."
+    install_app(logger, appname, version, apptype, apppath, all_perms,
+        {'results_uri.js':
+            'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
+            True)
 
     global webapi_results
     webapi_results = None
-    Wait(timeout=60).until(lambda: webapi_results is not None)
+    try:
+        Wait(timeout=60).until(lambda: webapi_results is not None)
+    except wait.TimeoutException:
+        logger.error('Timed out waiting for results')
+        logger.test_end('permissions', 'ERROR')
+        sys.exit(1)
+
     webapi_results = None
 
     script = """
@@ -240,9 +260,6 @@ def cli():
     global webapi_results_embed_app
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--no-reboot",
-                        help="don't reboot device before running test",
-                        action="store_true")
     parser.add_argument("--version",
                         help="version of FxOS under test",
                         default="1.3",
@@ -297,32 +314,41 @@ def cli():
         logger.error("Error connecting to device: %s" % e.msg)
         sys.exit(1)
 
-    # Reboot phone so it is in a fresh state
-    if not args.no_reboot:
-        print "Rebooting device..."
-        dm.reboot(wait=True)
-
-        # wait here to make sure marionette is running
-        if dm.forward("tcp:2828", "tcp:2828") != 0:
-            raise Exception("Can't use localhost:2828 for port forwarding." \
-                            "Is something else using port 2828?")
-        retries = 0
-        while retries < 5:
-            try:
-                m = marionette.Marionette()
-                m.start_session()
-                m.delete_session()
-                break
-            except (IOError, TypeError):
-                time.sleep(5)
-                retries += 1
-        else:
-            raise Exception("Couldn't connect to marionette after %d attempts. " \
-            "Is the marionette extension installed?" % retries)
+    # wait here to make sure marionette is running
+    logger.debug('Attempting to set up port forwarding for marionette')
+    if dm.forward("tcp:2828", "tcp:2828") != 0:
+        raise Exception("Can't use localhost:2828 for port forwarding." \
+                        "Is something else using port 2828?")
+    retries = 0
+    while retries < 5:
+        try:
+            m = marionette.Marionette()
+            m.start_session()
+            m.delete_session()
+            break
+        except (IOError, TypeError):
+            time.sleep(5)
+            retries += 1
+    else:
+        raise Exception("Couldn't connect to marionette after %d attempts. " \
+        "Is the marionette extension installed?" % retries)
 
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
               (args.version, supported_versions)
+        sys.exit(1)
+
+    result_file_path = args.result_file
+    if not result_file_path:
+        result_file_path = "results.json"
+
+    # Make sure we can write to the results file before running tests.
+    # This will also ensure this file exists in case we error out later on.
+    try:
+        result_file = open(result_file_path, "w")
+        result_file.close()
+    except:
+        print 'Could not open result file for writing: %s' % result_file_path
         sys.exit(1)
 
     # get build properties
@@ -372,28 +398,27 @@ def cli():
     # run webapi and webidl tests
     if 'webapi' in test_groups:
         logger.test_start('webapi')
+        logger.debug('Running webapi tests')
 
         for apptype in ['web', 'privileged', 'certified']:
             global webapi_results
 
             webapi_results = None
-            print "Installing the %s app. This will take a minute... " % apptype
 
             appname = '%s WebAPI Verifier' % apptype.capitalize()
-            fxos_appgen.uninstall_app(appname)
-            details = fxos_appgen.create_details(args.version, all_perms=True)
-            manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, args.version))
-
             apppath = os.path.join(static_path, 'webapi-test-app')
-            package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
-                                  'manifest.webapp': manifest})
+            install_app(logger, appname, args.version, apptype, apppath, True,
+                        {'results_uri.js':
+                            'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
+                        True)
 
-            fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
-            fxos_appgen.launch_app(appname)
+            try:
+                Wait(timeout=600).until(lambda: webapi_results is not None)
+            except wait.TimeoutException:
+                logger.error('Timed out waiting for results')
+                logger.test_end('webapi', 'ERROR')
+                sys.exit(1)
 
-            print "Done. Running the app..."
-
-            Wait(timeout=600).until(lambda: webapi_results is not None)
             fxos_appgen.uninstall_app(appname)
             if "headers" not in report:
                 report["headers"] = headers
@@ -404,23 +429,24 @@ def cli():
                 with open(results_filename, 'w') as f:
                     f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
 
-            print "Processing results..."
             file_path = pkg_resources.resource_filename(
                                 __name__, os.path.sep.join(['expected_webapi_results', results_filename]))
 
             parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report)
 
+        logger.debug('Done.')
         logger.test_end('webapi', 'OK')
 
     if 'permissions' in test_groups:
         logger.test_start('permissions')
+        logger.debug('Running permissions tests')
 
         # install test app for embed-apps permission test
         embed_appname = 'Embed Apps Test App'
-        fxos_appgen.uninstall_app(embed_appname)
         apppath = os.path.join(static_path, 'embed-apps-test-app')
-        package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr})
-        fxos_appgen.install_app(embed_appname, 'app.zip', script_timeout=30000)
+        install_app(logger, appname, args.version, apptype, apppath, True,
+                    {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr},
+                     False)
 
         # run tests
         for apptype in ['web', 'privileged', 'certified']:
@@ -429,23 +455,21 @@ def cli():
                 webapi_results = None
                 webapi_results_embed_app = None
 
-                print "Installing the %s app. This will take a minute... " % apptype
-
                 appname = '%s WebAPI Verifier' % apptype.capitalize()
-                fxos_appgen.uninstall_app(appname)
-                details = fxos_appgen.create_details(args.version, all_perms=all_perms)
-                manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, args.version))
-
                 apppath = os.path.join(static_path, 'permissions-test-app')
-                package_app(apppath, {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results";' % addr,
-                                      'manifest.webapp': manifest})
 
-                fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
-                fxos_appgen.launch_app(appname)
+                install_app(logger, appname, args.version, apptype,
+                    apppath, all_perms,
+                    {'results_uri.js':
+                        'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
+                     True)
+                try:
+                    Wait(timeout=600).until(lambda: webapi_results is not None)
+                except wait.TimeoutException:
+                    logger.error('Timed out waiting for results')
+                    logger.test_end('permissions', 'ERROR')
+                    sys.exit(1)
 
-                print "Done. Running the app..."
-
-                Wait(timeout=600).until(lambda: webapi_results is not None)
                 fxos_appgen.uninstall_app(appname)
 
                 # gather results
@@ -470,25 +494,22 @@ def cli():
                     with open(results_filename, 'w') as f:
                         f.write(json.dumps(results, sort_keys=True, indent=2))
 
-                print "Processing results..."
                 file_path = pkg_resources.resource_filename( __name__,
                                 os.path.sep.join(['expected_permissions_results', results_filename]))
 
                 parse_permissions_results(file_path, results, '%s-%s-' % (apptype, ('all_perms' if all_perms else 'no_perms')), logger, report)
 
+        logger.debug('Done.')
         logger.test_end('permissions', 'OK')
 
         # clean up embed-apps test app
         fxos_appgen.uninstall_app(embed_appname)
 
-    result_file_path = args.result_file
-    if not result_file_path:
-        result_file_path = "results.json"
     result_file = open(result_file_path, "w")
     result_file.write(json.dumps(report, indent=2))
     result_file.close()
 
-    print "\nResults have been stored in: %s" % result_file_path
+    logger.debug('Results have been stored in: %s' % result_file_path)
 
 if __name__ == "__main__":
     cli()
