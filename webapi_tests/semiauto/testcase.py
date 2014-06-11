@@ -67,8 +67,6 @@ class TestCase(unittest.TestCase):
         turn_screen_on(self.marionette)
         unlock_screen(self.marionette)
 
-        print certapp
-        print dir(certapp)
         if not certapp.is_installed():
             certapp.install(self.marionette)
 
