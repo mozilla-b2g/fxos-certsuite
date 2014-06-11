@@ -7,11 +7,12 @@ import sys
 import threading
 import unittest
 
-from marionette import Marionette, MarionetteException
+import mozdevice
+from marionette import Marionette
 
+from webapi_tests import certapp
 from webapi_tests.semiauto import environment
 from webapi_tests.semiauto.environment import InProcessTestEnvironment
-from webapi_tests.certapp import CertAppMixin
 
 
 """The default time to wait for a user to respond to a prompt or
@@ -19,7 +20,7 @@ instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
 
-class TestCase(CertAppMixin, unittest.TestCase):
+class TestCase(unittest.TestCase):
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):
@@ -27,8 +28,17 @@ class TestCase(CertAppMixin, unittest.TestCase):
         self.stored.handler = None
         self.stored.marionette = None
 
+        self.marionette, self.server, self.handler, self.app = None, None, None, None
+
+        device = mozdevice.DeviceManagerADB()
+        device.forward("tcp:2828", "tcp:2828")
+
         # Cleanups are run irrespective of whether setUp fails
-        self.addCleanup(self.close_cert_app)
+        self.addCleanup(self.cleanup)
+
+    def cleanup(self):
+        if self.marionette is not None:
+            certapp.kill(self.marionette, app=self.app)
 
     def setUp(self):
         """Sets up the environment for a test case.
@@ -47,23 +57,32 @@ class TestCase(CertAppMixin, unittest.TestCase):
 
         super(TestCase, self).setUp()
 
-        self.environment = environment.get(InProcessTestEnvironment)
-        self.server = self.environment.server
-        self.handler = self.environment.handler
+        env = environment.get(InProcessTestEnvironment)
+        self.server = env.server
+        self.handler = env.handler
 
         self.assert_browser_connected()
+        self.marionette = TestCase.create_marionette()
 
-        self.marionette = self.create_marionette()
         turn_screen_on(self.marionette)
         unlock_screen(self.marionette)
 
-        if not self.is_app_installed():
-            self.install_cert_app()
+        print certapp
+        print dir(certapp)
+        if not certapp.is_installed():
+            certapp.install(self.marionette)
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
-        self.close_cert_app()
-        self.use_cert_app()
+        try:
+            certapp.kill(self.marionette)
+        except certapp.CloseError:
+            self.close_app_manually()
+
+        try:
+            self.app = certapp.launch(self.marionette)
+        except certapp.LaunchError:
+            self.launch_app_manually()
 
     def assert_browser_connected(self):
         """Asserts (and consequently fails the test if not true) that the
@@ -75,12 +94,15 @@ class TestCase(CertAppMixin, unittest.TestCase):
 
     @staticmethod
     def create_marionette():
-        """Creates a new Marionette session if one does not exist."""
+        """Returns current Marionette session, or creates one if
+        one does not exist.
+
+        """
 
         m = TestCase.stored.marionette
-
-        if not m:
+        if m is None:
             m = Marionette()
+            m.wait_for_port()
             m.start_session()
             TestCase.stored.marionette = m
 
@@ -158,6 +180,20 @@ class TestCase(CertAppMixin, unittest.TestCase):
         if not success:
             self.fail("Failed on instruction: %s" % message)
 
+    def close_app_manually(self):
+        success = self.instruct("Could not close %s automatically. "
+            "Please close the app manually by holding down the Home button "
+            "and pressing the X above the %s card." % (certapp.name, certapp.name))
+        if not success:
+            device = mozdevice.DeviceManagerADB()
+            device.reboot(wait=True)
+            self.instruct("Please unlock the lockscreen (if present) after device reboots")
+            self.fail("Failed attempts at closing certapp")
+
+    def launch_app_manually(self):
+        self.instruct("Could not launch %s automatically. Please launch by hand." % certapp.name)
+        certapp.activate(self.marionette)
+
 
 def turn_screen_on(marionette):
     marionette.execute_script("""
@@ -171,3 +207,28 @@ def unlock_screen(marionette):
         var lockScreen = window.wrappedJSObject.LockScreen;
         lockScreen.unlock();
     """)
+
+
+def wait_for_homescreen(marionette):
+    marionette.set_context(marionette.CONTEXT_CONTENT)
+    marionette.execute_async_script("""
+        let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+        log(manager);
+        let app = null;
+        if (manager) {
+            app = ('getActiveApp' in manager) ? manager.getActiveApp() : manager.getCurrentDisplayedApp();
+        }
+        log(app);
+        if (app) {
+            log('Already loaded home screen');
+            marionetteScriptFinished();
+        } else {
+            log('waiting for mozbrowserloadend');
+            window.addEventListener('mozbrowserloadend', function loaded(aEvent) {
+                log('received mozbrowserloadend for ' + aEvent.target.src);
+                if (aEvent.target.src.indexOf('ftu') != -1 || aEvent.target.src.indexOf('homescreen') != -1) {
+                    window.removeEventListener('mozbrowserloadend', loaded);
+                    marionetteScriptFinished();
+                }
+            });
+        }""", script_timeout=30000)

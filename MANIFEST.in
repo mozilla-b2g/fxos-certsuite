@@ -1,6 +1,6 @@
 graft webapi_tests/semiauto/static
 include certsuite/config.json
-include webapi_tests/certapp/app_management.js
+include webapi_tests/app_management.js
 recursive-include certsuite/static *
 recursive-include certsuite/expected_webapi_results *
 recursive-include certsuite/expected_omni_results *

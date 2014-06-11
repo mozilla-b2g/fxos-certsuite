@@ -18,9 +18,6 @@ from mozlog.structured import commandline
 from webapi_tests import semiauto
 
 
-adb = DeviceManagerADB()
-
-
 def iter_tests(start_dir, pattern="test_*.py"):
     """List available Web API tests and yield a tuple of (group, tests),
     where tests is a list of test names."""
@@ -103,8 +100,6 @@ def main():
             for test in tests:
                 print("%s.%s" % (group, test))
         return 0
-
-    adb.forward("tcp:2828", "tcp:2828")
 
     test_loader = semiauto.TestLoader()
     tests = test_loader.loadTestsFromNames(

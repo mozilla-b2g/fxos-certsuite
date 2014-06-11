@@ -1,1 +1,0 @@
-from certapp import CertAppMixin
