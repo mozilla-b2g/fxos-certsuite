@@ -4,4 +4,5 @@ Firefox OS Certification Testsuite
 Tests and tools to verify the functionality and characteristics of
 Firefox OS on real devices.
 
-For more information see: http://fxos-certsuite.readthedocs.org
+Before running the tests, make sure you read the full documentation
+at http://fxos-certsuite.readthedocs.org/ or in the *docs/* folder.
