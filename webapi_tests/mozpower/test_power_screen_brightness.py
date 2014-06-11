@@ -9,20 +9,16 @@ class TestPowerManagement(TestCase):
 
     def test_brightness_decrease(self):
         #initialize the screen brightness
-        self.marionette.execute_script("""
-            window.navigator.mozPower.screenBrightness = 1.0;""")
+        self.marionette.execute_script("window.navigator.mozPower.screenBrightness = 1.0;")
         self.instruct("About to decrease the screen "
                       "brightness; please watch the screen and click OK")
-        self.marionette.execute_script("""
-            window.navigator.mozPower.screenBrightness = 0.1""")
+        self.marionette.execute_script("window.navigator.mozPower.screenBrightness = 0.1")
         self.confirm("Did you notice decrease in brightness?")
 
     def test_brightness_increase(self):
         #initialize the screen brightness
-        self.marionette.execute_script("""
-            window.navigator.mozPower.screenBrightness = 0.1;""")
+        self.marionette.execute_script("window.navigator.mozPower.screenBrightness = 0.1;")
         self.instruct("About to increase the screen "
                       "brightness; please watch the screen and click OK")
-        self.marionette.execute_script("""
-            window.navigator.mozPower.screenBrightness = 1.0;""")
+        self.marionette.execute_script("window.navigator.mozPower.screenBrightness = 1.0;")
         self.confirm("Did you notice increase in brightness?")
