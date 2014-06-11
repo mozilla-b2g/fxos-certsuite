@@ -1,6 +1,5 @@
 function runTest()
 {
-  window.close();
   var win = window.open('remote-window.html', 'Remote Window', 'remote=true');
 }
 

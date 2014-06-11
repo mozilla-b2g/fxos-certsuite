@@ -158,8 +158,14 @@ def test_open_remote_window(logger, version, addr, apptype, all_perms):
     webapi_results = None
 
     script = """
-        let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
-        return manager.getRunningApps();
+      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+      let runningApps = manager.getRunningApps();
+
+      result = []
+      for (key in runningApps) {
+        result.push(key);
+      }
+      return result;
     """
 
     m = marionette.Marionette()
@@ -496,11 +502,8 @@ def cli():
 
                 # we test open-remote-window separately as opening a remote
                 # window might stop the test app
-                # TODO: this test causes hangs on some phones, disabling
-                #       for now.
-                #results['open-remote-window'] = test_open_remote_window(args.version,
-                #                                    addr, apptype, all_perms)
-                results['open-remote-window'] = False
+                results['open-remote-window'] = test_open_remote_window(args.version,
+                                                    addr, apptype, all_perms)
 
                 results_filename = '%s.%s.%s.json' % (args.version, apptype, ('all_perms' if all_perms else 'no_perms'))
                 if args.generate_reference:
