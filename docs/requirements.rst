@@ -27,18 +27,24 @@ pass.
 
 Network
 -------
+
 The device must be connected to WiFi and must have network access to
 the host machine.
 
 On the host machine, the following ports are required, and must not
 have any existing servers running on them:
 
-    2828
-    6666
-    8000
-    8001
-    8888
-
+- 2828
+- 6666
+- 8000
+- 8001
+- 8888
 
 Any network firewall must be configured to allow the device to access
 the host computer on the above ports.
+
+Additionally, if you run the test suite on Mac you need to disable
+the system firewall so that the servers used as part of the test
+suite can listen to the ports mentioned above.  To do this, head
+to the *Security & Privacy* pane in *System Preferences* and click
+the *Turn Off Firewall* button if present.
