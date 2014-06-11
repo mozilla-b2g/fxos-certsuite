@@ -30,9 +30,10 @@ class TestWifiBasic(TestCase, WifiTestCommon):
         self.set_wifi_enabled(True)
         time.sleep(10)
         # get wifi networks
-        wifinetworks = self.get_wifi_networks()
+        wifi_networks = self.get_wifi_networks()
+        self.assertTrue(len(wifi_networks) > 1, "Atleast one Wifi network should be available")
         # access first wifi network properties - ssid, bssid
-        wifinetwork = wifinetworks[0]
+        wifinetwork = wifi_networks[0]
         self.assertIsNotNone(wifinetwork["ssid"], "Wifi network must have a ssid value")
         self.assertEqual(len(wifinetwork["bssid"]), 17, "Wifi network bssid address should be 17 chars in length")
 

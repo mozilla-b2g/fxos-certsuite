@@ -70,8 +70,8 @@ class WifiTestCommon(object):
         self.marionette.execute_async_script("""
         window.wrappedJSObject.rcvd_success = false;
         window.wrappedJSObject.rcvd_error = false;
-        window.wrappedJSObject.wifi_netowrks = null;
-        window.wrappedJSObject.err_msg = null;
+        window.wrappedJSObject.wifi_networks = null;
+        window.wrappedJSObject.error_msg = null;
         var mozWifi = window.navigator.mozWifiManager;
 
         console.log("Getting wifi networks");
@@ -101,6 +101,6 @@ class WifiTestCommon(object):
             else:
                 self.fail("mozWifiManager.getNetworks failed")
 
-        wifinetworks = self.marionette.execute_script("return window.wrappedJSObject.wifi_networks")
-        self.assertIsNotNone(wifinetworks, "mozWifiManager.getNetowrk returned none")
-        return wifinetworks
+        wifi_networks = self.marionette.execute_script("return window.wrappedJSObject.wifi_networks")
+        self.assertIsNotNone(wifi_networks, "mozWifiManager.getNetowrk returned none")
+        return wifi_networks
