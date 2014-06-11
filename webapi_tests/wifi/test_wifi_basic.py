@@ -1,0 +1,43 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import time
+
+from semiauto import TestCase
+from wifi import WifiTestCommon
+
+
+class TestWifiBasic(TestCase, WifiTestCommon):
+    def setUp(self):
+        self.addCleanup(self.clean_up)
+        super(TestWifiBasic, self).setUp()
+        # start with wifi disabled
+        if self.is_wifi_enabled():
+            self.set_wifi_enabled(False)
+
+    def test_basic_wifi_enabled(self):
+        # enable wifi via settings
+        self.set_wifi_enabled(True)
+        self.assertTrue(self.is_wifi_enabled(), "Wifi should be enabled")
+        time.sleep(10)
+        # disable wifi via settings
+        self.set_wifi_enabled(False)
+        self.assertFalse(self.is_wifi_enabled(), "Wifi should NOT be enabled")
+
+    def test_get_wifi_networks(self):
+        # enable wifi via settings
+        self.set_wifi_enabled(True)
+        time.sleep(10)
+        # get wifi networks
+        wifi_networks = self.get_wifi_networks()
+        self.assertTrue(len(wifi_networks) > 1, "Atleast one Wifi network should be available")
+        # access first wifi network properties - ssid, bssid
+        wifinetwork = wifi_networks[0]
+        self.assertIsNotNone(wifinetwork["ssid"], "Wifi network must have a ssid value")
+        self.assertEqual(len(wifinetwork["bssid"]), 17, "Wifi network bssid address should be 17 chars in length")
+
+    def clean_up(self):
+        # disable wifi
+        if self.is_wifi_enabled():
+            self.set_wifi_enabled(False)
