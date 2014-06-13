@@ -13,10 +13,7 @@ class NotificationTestCommon(object):
         return self.marionette.execute_async_script("""
         console.log("Notification permission is: " + Notification.permission);
         console.log("Requesting user permission for notifications");
-        Notification.requestPermission(function (permission) {
-            console.log("User responded with: " + permission);
-        });
-        marionetteScriptFinished(Notification.permission);
+        Notification.requestPermission(function (perm) { marionetteScriptFinished(perm); })
     """)
 
     def create_notification(self, text):

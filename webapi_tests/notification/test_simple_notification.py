@@ -11,7 +11,7 @@ class TestSimpleNotification(TestCase, NotificationTestCommon):
         permission = self.get_permission_setting()
         if permission != "granted":
             result = self.request_permission()
-            self.assertEqual(result, "granted", "User must grant permission on device for notifications")
+        self.assertEqual(result, "granted", "User must grant permission on device for notifications")
 
     def test_simple_notification(self):
         text = "Hello from Firefox OS"
