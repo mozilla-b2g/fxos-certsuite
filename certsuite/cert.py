@@ -92,6 +92,7 @@ def install_app(logger, appname, version, apptype, apppath, all_perms,
 
     logger.debug('packaging: %s version: %s apptype: %s all_perms: %s' %
         (appname, version, apptype, all_perms))
+
     details = fxos_appgen.create_details(version, all_perms=all_perms)
     manifest = json.dumps(fxos_appgen.create_manifest(appname, details, apptype, version))
     files = extrafiles.copy()
@@ -134,57 +135,48 @@ def test_user_agent(user_agent, logger):
 
     return valid
 
-def test_open_remote_window(logger, version, addr, apptype, all_perms):
-    print "Installing the open remote window test app. This will take a minute... "
-
-    result = False
-
-    appname = 'Open Remote Window Test App'
-    apppath = os.path.join(static_path, 'open-remote-window-test-app')
-    install_app(logger, appname, version, apptype, apppath, all_perms,
-        {'results_uri.js':
-            'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
-            True)
-
+def test_open_remote_window(logger, version, addr):
     global webapi_results
-    webapi_results = None
-    try:
-        wait.Wait(timeout=60).until(lambda: webapi_results is not None)
-    except wait.TimeoutException:
-        logger.error('Timed out waiting for results')
-        logger.test_end('permissions', 'ERROR')
-        sys.exit(1)
 
-    webapi_results = None
+    results = {}
+    for value in ['deny', 'allow']:
+        result = False
+        webapi_results = None
 
-    script = """
-      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
-      let runningApps = manager.getRunningApps();
+        appname = 'Open Remote Window Test App'
+        installed_appname = appname.lower().replace(" ", "-")
+        apppath = os.path.join(static_path, 'open-remote-window-test-app')
+        install_app(logger, appname, version, 'web', apppath, False,
+            {'results_uri.js':
+                'RESULTS_URI="http://%s:%s/webapi_results";' % addr})
 
-      result = []
-      for (key in runningApps) {
-        result.push(key);
-      }
-      return result;
-    """
+        set_permission('open-remote-window', value, installed_appname)
+        fxos_appgen.launch_app(appname)
+        try:
+            wait.Wait(timeout=30).until(lambda: webapi_results is not None)
+        except wait.TimeoutException:
+            # This does not necessarily indicate a problem, if the other window
+            # launched remotely, our original test app may stop before it POSTs
+            pass
 
-    m = marionette.Marionette()
-    m.start_session()
-    running_apps = m.execute_script(script)
-    for app in running_apps:
-        if app.find('Remote Window') != -1:
-            result = True
-            # window.close() from the remote window doesn't seem to work
-            kill_script = """
-                let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
-                manager.kill("%s")""" % app
-            m.execute_script(kill_script)
+        if webapi_results is not None:
+            result = webapi_results['open-remote-window']
 
-    m.delete_session()
+        running_apps = get_runningapps()
+        for app in running_apps:
+            if app.find('Remote Window') != -1:
+                result = True
+                kill(app)
 
-    fxos_appgen.uninstall_app(appname)
+        # We uninstall rather than using kill() as kill seems unhappy when
+        # the popup is open.
+        fxos_appgen.uninstall_app(appname)
 
-    return result
+        results['open-remote-window-' + value] = result
+
+    logger.debug('uninstalling: %s' % appname)
+
+    return results
 
 def diff_results(a, b):
 
@@ -260,6 +252,102 @@ def parse_permissions_results(expected_results_path, results, prefix, logger, re
     unexpected_results = diff_results(expected_results, results)
     log_results(unexpected_results, logger, report, 'permissions', prefix + 'unexpected-permissions-results')
     return not unexpected_results
+
+def run_marionette_script(script, chrome=False, async=False):
+    """Create a Marionette instance and run the provided script"""
+    m = marionette.Marionette()
+    m.start_session()
+    if chrome:
+        m.set_context(marionette.Marionette.CONTEXT_CHROME)
+    if not async:
+        result = m.execute_script(script)
+    else:
+        result = m.execute_async_script(script)
+    m.delete_session()
+    return result
+
+def kill(name):
+    """Kill the specified app"""
+    script = """
+      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+      manager.kill('%s');
+    """
+    return run_marionette_script(script % name)
+
+def get_permission(permission, app):
+    # The object created to wrap PermissionSettingsModule is to work around
+    # an intermittent bug where it will sometimes be undefined.
+    script = """
+      const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
+      var a = {b: Cu.import("resource://gre/modules/PermissionSettings.jsm")};
+
+      return a.b.PermissionSettingsModule.getPermission('%s', '%s/manifest.webapp', '%s', '', false);
+    """
+    app_url = 'app://' + app
+    return run_marionette_script(script % (permission, app_url, app_url), True)
+
+def get_permissions():
+    """Return permissions in PermissionsTable.jsm"""
+    script = """
+      const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
+      Cu.import("resource://gre/modules/PermissionsTable.jsm");
+
+      result = []
+      for (permission in PermissionsTable) {
+        result.push(permission);
+      }
+
+      return result;
+    """
+    return run_marionette_script(script, True)
+
+def get_runningapps():
+    """Return names of running apps"""
+
+    script = """
+      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+      let runningApps = manager.getRunningApps();
+
+      result = []
+      for (key in runningApps) {
+        result.push(key);
+      }
+      return result;
+    """
+    return run_marionette_script(script)
+
+def set_permission(permission, value, app):
+    """Set a permission for the specified app
+       Value should be 'deny' or 'allow'
+    """
+    # The object created to wrap PermissionSettingsModule is to work around
+    # an intermittent bug where it will sometimes be undefined.
+    script = """
+      const {classes: Cc, interfaces: Ci, utils: Cu, results: Cr} = Components;
+      var a = {b: Cu.import("resource://gre/modules/PermissionSettings.jsm")};
+      return a.b.PermissionSettingsModule.addPermission({
+        type: '%s',
+        origin: '%s',
+        manifestURL: '%s/manifest.webapp',
+        value: '%s',
+        browserFlag: false
+      });
+    """
+    app_url = 'app://' + app
+    run_marionette_script(script % (permission, app_url, app_url, value), True)
+
+def set_preference(pref, value):
+    script = """
+      var lock = navigator.mozSettings.createLock();
+      var result = lock.set({'%s': %s});
+      result.onsuccess = function() {
+        marionetteScriptFinished(true);
+      };
+      result.onerror= function() {
+        marionetteScriptFinished(false);
+      };
+    """
+    return run_marionette_script(script % (pref, value), False, True)
 
 def cli():
     global webapi_results
@@ -357,6 +445,12 @@ def cli():
         print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
         sys.exit(1)
 
+    # We need to disable the lockscreen and screen timeout to get consistent
+    # results. The metaharness will reset these values for us.
+    if not (set_preference('screen.timeout', 0) or
+            set_preference('lockscreen.enabled', 'false')):
+        print 'Could not disable timeout and/or locksreen. Expect test timeouts'
+
     # get build properties
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
     for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
@@ -427,6 +521,7 @@ def cli():
                 logger.error('Timed out waiting for results')
                 errors = True
 
+            logger.debug('uninstalling: %s' % appname)
             fxos_appgen.uninstall_app(appname)
 
             if webapi_results is None:
@@ -440,11 +535,11 @@ def cli():
             if args.generate_reference:
                 with open(results_filename, 'w') as f:
                     f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
-
-            file_path = pkg_resources.resource_filename(
+            else:
+                file_path = pkg_resources.resource_filename(
                                 __name__, os.path.sep.join(['expected_webapi_results', results_filename]))
 
-            parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report)
+                parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report)
 
         logger.debug('Done.')
         if errors:
@@ -458,62 +553,109 @@ def cli():
         logger.test_start('permissions')
         logger.debug('Running permissions tests')
 
-        # install test app for embed-apps permission test
+        permissions = get_permissions()
+
+        # test default permissions
+        for apptype in ['web', 'privileged', 'certified']:
+            results = {}
+            expected_webapi_results = None
+
+
+            appname = 'Default Permissions Test App'
+            fxos_appgen.uninstall_app(appname)
+            installed_appname = appname.lower().replace(" ", "-")
+            fxos_appgen.generate_app(appname, install=True, app_type=apptype,
+                                     all_perm=True)
+
+            for permission in permissions:
+                result = get_permission(permission, installed_appname)
+                results[permission] = result
+
+            results_filename = '%s.%s.json' % (args.version, apptype)
+            if args.generate_reference:
+                with open(results_filename, 'w') as f:
+                    f.write(json.dumps(results, sort_keys=True, indent=2))
+            else:
+                file_path = pkg_resources.resource_filename(__name__,
+                            os.path.sep.join(['expected_permissions_results',
+                            results_filename]))
+                parse_permissions_results(file_path, results, '%s-' % apptype,
+                    logger, report)
+
+            fxos_appgen.uninstall_app(appname)
+
+        # test individual permissions
+        results = {}
+
+        # first install test app for embed-apps permission test
         embed_appname = 'Embed Apps Test App'
         apppath = os.path.join(static_path, 'embed-apps-test-app')
         install_app(logger, embed_appname, args.version, 'certified', apppath, True,
                     {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr},
                      False)
 
-        # run tests
-        for apptype in ['web', 'privileged', 'certified']:
-            for all_perms in [True, False]:
 
-                webapi_results = None
-                webapi_results_embed_app = None
 
-                appname = '%s WebAPI Verifier' % apptype.capitalize()
-                apppath = os.path.join(static_path, 'permissions-test-app')
+        appname = 'Permissions Test App'
+        installed_appname = appname.lower().replace(" ", "-")
+        apppath = os.path.join(static_path, 'permissions-test-app')
+        install_app(logger, appname, args.version, 'web', apppath, False,
+                {'results_uri.js':
+                    'RESULTS_URI="http://%s:%s/webapi_results";' % addr})
 
-                install_app(logger, appname, args.version, apptype,
-                    apppath, all_perms,
-                    {'results_uri.js':
-                        'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
-                     True)
-                try:
-                    wait.Wait(timeout=120).until(lambda: webapi_results is not None)
-                except wait.TimeoutException:
-                    logger.error('Timed out waiting for results')
-                    errors = True
+        for permission in [None] + permissions:
+            webapi_results = None
+            webapi_results_embed_app = None
 
-                fxos_appgen.uninstall_app(appname)
+            # if we try to launch after killing too quickly, the app seems
+            # to not fully launch
+            time.sleep(5)
 
-                if webapi_results is None:
-                    continue
+            if permission is not None:
+                logger.debug('testing permission: %s' % permission)
+                set_permission(permission, u'allow', installed_appname)
+            fxos_appgen.launch_app(appname)
 
-                # gather results
-                results = webapi_results
+            try:
+                wait.Wait(timeout=60).until(lambda: webapi_results is not None)
 
                 # embed-apps results are posted to a separate URL
                 if webapi_results_embed_app:
-                    results['embed-apps'] = webapi_results_embed_app['embed-apps']
+                    webapi_results['embed-apps'] = webapi_results_embed_app['embed-apps']
                 else:
-                    results['embed-apps'] = False
+                    webapi_results['embed-apps'] = False
 
-                # we test open-remote-window separately as opening a remote
-                # window might stop the test app
-                results['open-remote-window'] = test_open_remote_window(args.version,
-                                                    addr, apptype, all_perms)
+                if permission is None:
+                    expected_webapi_results = webapi_results
+                else:
+                    results[permission] = diff_results(expected_webapi_results, webapi_results)
+            except wait.TimeoutException:
+                logger.error('Timed out waiting for results')
+                results[permission] = 'timed out'
+                errors = True
 
-                results_filename = '%s.%s.%s.json' % (args.version, apptype, ('all_perms' if all_perms else 'no_perms'))
-                if args.generate_reference:
-                    with open(results_filename, 'w') as f:
-                        f.write(json.dumps(results, sort_keys=True, indent=2))
+            kill('app://' + installed_appname)
+            if permission is not None:
+                set_permission(permission, u'deny', installed_appname)
 
-                file_path = pkg_resources.resource_filename( __name__,
-                                os.path.sep.join(['expected_permissions_results', results_filename]))
+        logger.debug('uninstalling: %s' % appname)
+        fxos_appgen.uninstall_app(appname)
 
-                parse_permissions_results(file_path, results, '%s-%s-' % (apptype, ('all_perms' if all_perms else 'no_perms')), logger, report)
+        # we test open-remote-window separately as opening a remote
+        # window might stop the test app
+        results['open-remote-window'] = test_open_remote_window(logger,
+                                            args.version, addr)
+
+        results_filename = '%s.permissions.json' % args.version
+        if args.generate_reference:
+            with open(results_filename, 'w') as f:
+                f.write(json.dumps(results, sort_keys=True, indent=2))
+        else:
+            file_path = pkg_resources.resource_filename(__name__,
+                        os.path.sep.join(['expected_permissions_results',
+                        results_filename]))
+            parse_permissions_results(file_path, results, 'individual-',
+                logger, report)
 
         logger.debug('Done.')
         if errors:
@@ -522,6 +664,7 @@ def cli():
             logger.test_end('permissions', 'OK')
 
         # clean up embed-apps test app
+        logger.debug('uninstalling: %s' % embed_appname)
         fxos_appgen.uninstall_app(embed_appname)
 
     logger.suite_end()
