@@ -5,17 +5,10 @@
 from setuptools import setup, find_packages
 
 PACKAGE_VERSION = '0.1'
-deps = ['fxos-appgen>=0.2.10',
-        'marionette_client>=0.7.1.1',
-        'marionette_extension >= 0.4',
-        'mozdevice >= 0.33',
-        'mozlog >= 1.8',
-        'moznetwork >= 0.24',
-        'mozprocess >= 0.18',
-        'wptserve >= 1.0.1',
-        'wptrunner >= 0.3.11',
-        'moztest==0.5',
-        'tornado>=3.2']
+
+# dependencies
+with open('requirements.txt') as f:
+    deps = f.read().splitlines()
 
 setup(name='fxos-certsuite',
       version=PACKAGE_VERSION,
