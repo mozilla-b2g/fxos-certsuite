@@ -13,6 +13,8 @@ docs: documentation.pdf
 
 .PHONY = all clean docs
 
-documentation.pdf:
+DOCS_SRC = $(shell find ./docs -name '*.rst')
+
+documentation.pdf: $(DOCS_SRC)
 	$(MAKE) -C ./docs latexpdf
 	cp ./docs/_build/latex/*.pdf $@
