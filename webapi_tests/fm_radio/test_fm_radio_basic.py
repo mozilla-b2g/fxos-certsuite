@@ -9,6 +9,12 @@ from webapi_tests.fm_radio import FMRadioTestCommon
 
 
 class TestFMRadioBasic(TestCase, FMRadioTestCommon):
+    """
+    This tests basic functionality of the `WebFM API`_
+
+    .. _`WebFM API`: https://developer.mozilla.org/en-US/docs/WebAPI/WebFM_API
+    """
+
     def tearDown(self):
         # ensure fm radio is off and listeners removed
         if self.is_radio_enabled():

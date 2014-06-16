@@ -16,6 +16,7 @@ Contents:
 
    requirements
    setupusage
+   tests
    interpretingresults
 
 

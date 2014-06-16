@@ -8,4 +8,5 @@ mozprocess >= 0.18
 wptserve >= 1.0.1
 wptrunner >= 0.3.11
 moztest == 0.5
+sphinx
 tornado >= 3.2
