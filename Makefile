@@ -1,6 +1,9 @@
 all: docs
 	@true
 
+dist:
+	python setup.py sdist
+
 clean:
 	$(MAKE) -C ./docs clean
 	-rm -rf fxos_certsuite.egg-info
