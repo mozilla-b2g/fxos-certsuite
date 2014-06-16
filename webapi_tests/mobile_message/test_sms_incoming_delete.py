@@ -14,7 +14,7 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
-        TestCase.tearDown(self)
+        super(TestSmsIncomingDelete, self).tearDown()
 
     def test_sms_incoming_delete(self):
         # have user send sms to the Firefox OS device, verify body

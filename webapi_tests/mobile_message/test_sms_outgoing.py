@@ -20,20 +20,20 @@ class TestSmsOutgoing(TestCase, MobileMessageTestCommon):
 
         # verify other fields
         self.assertEqual(self.out_msg['type'], 'sms', "Sent SMS MozSmsMessage.type should be 'sms'")
-        self.assertTrue(self.out_msg['id'] > 0, "Sent SMS MozSmsMessage.id should be > 0")
-        self.assertTrue(self.out_msg['threadId'] > 0, "Sent SMS MozSmsMessage.threadId should be > 0")
+        self.assertGreater(self.out_msg['id'], 0, "Sent SMS MozSmsMessage.id should be > 0")
+        self.assertGreater(self.out_msg['threadId'], 0, "Sent SMS MozSmsMessage.threadId should be > 0")
         self.assertEqual(self.out_msg['delivery'], 'sent', "Sent SMS MozSmsMessage.delivery should be 'sent'")
         self.assertTrue((self.out_msg['deliveryStatus'] == 'success') | (self.out_msg['deliveryStatus'] == 'not-applicable'),
                         "Sent SMS MozSmsMessage.deliveryStatus should be 'success' or 'not-applicable'")
         # cannot guarantee end-user didn't read message; test that specifically in a different test
-        self.assertTrue(((self.out_msg['read'] == False) or (self.out_msg['read'] == True)),
+        self.assertTrue(self.out_msg['read'] is False or self.out_msg['read'] is True,
                         "Sent SMS MozSmsMessage.read field should be False or True")
         # can check receiver number as the user provided it above
         self.assertTrue(self.out_destination in self.out_msg['receiver'],
-                        "Sent SMS MozSmsMessage.receiver field should be %s" %self.out_destination)
+                        "Sent SMS MozSmsMessage.receiver field should be %s" % self.out_destination)
         # for privacy, don't print/check the actual sender's number; just ensure it is not empty
-        self.assertTrue(len(self.out_msg['sender']) > 0, "Sent SMS MozSmsMessage.sender field should not be empty")
+        self.assertGreater(len(self.out_msg['sender']), 0, "Sent SMS MozSmsMessage.sender field should not be empty")
         # timezones and different SMSC's, don't check timestamp value; just ensure non-zero
-        self.assertTrue(self.out_msg['timestamp'] > 0, "Sent SMS MozSmsMessage.timestamp should not be 0")
+        self.assertGreater(self.out_msg['timestamp'], 0, "Sent SMS MozSmsMessage.timestamp should not be 0")
         self.assertTrue(self.out_msg['messageClass'] in ["class-0", "class-1", "class-2", "class-3", "normal"],
                         "Sent SMS MozSmsMessage.messageClass must be a valid class")

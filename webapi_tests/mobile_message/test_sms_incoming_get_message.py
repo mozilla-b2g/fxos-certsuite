@@ -35,7 +35,7 @@ class TestSmsIncomingGetMessage(TestCase, MobileMessageTestCommon):
         self.assertEqual(event_sms['deliveryStatus'], self.in_msg['deliveryStatus'],
                           "Found SMS MozSmsMessage.deliveryStatus should match")
         # cant guarantee user didn't read message; just ensure is valid
-        self.assertTrue(((event_sms['read'] == False) or (event_sms['read'] == True)),
+        self.assertTrue(event_sms['read'] is False or event_sms['read'] is True,
                         "Found SMS MozSmsMessage.read field should be False or True")
         self.assertEqual(event_sms['receiver'], self.in_msg['receiver'], "Found SMS MozSmsMessage.receiver should match")
         self.assertEqual(event_sms['sender'], self.in_msg['sender'], "Found SMS MozSmsMessage.sender field should match")
