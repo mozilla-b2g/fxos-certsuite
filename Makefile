@@ -14,7 +14,7 @@ clean:
 docs: documentation.pdf
 	@true
 
-.PHONY = all clean docs
+.PHONY = all dist clean docs
 
 DOCS_SRC = $(shell find ./docs -name '*.rst')
 
