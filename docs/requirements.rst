@@ -35,7 +35,6 @@ On the host machine, the following ports are required, and must not
 have any existing servers running on them:
 
 - 2828
-- 6666
 - 8000
 - 8001
 - 8888

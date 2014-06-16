@@ -4,6 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import socket
 import sys
 import unittest
 
@@ -13,14 +14,42 @@ from moztest.adapters.unit import StructuredTestRunner
 from webapi_tests.semiauto import environment, runner, server
 
 
+__all__ = ["run", "main"]
+
+
 test_loader = None
 
 
-def _create_logger():
+def create_logger():
     logger = structuredlog.StructuredLogger("unknown")
     logger.add_handler(
         handlers.StreamHandler(sys.stdout, formatters.JSONFormatter()))
     return logger
+
+
+def get_free_port(start_port, exclude=None):
+    """Get the first port number after start_port (inclusive) that is
+    not currently bound.
+
+    :param start_port: Integer port number at which to start testing.
+    :param exclude: Set of port numbers to skip.
+    
+    """
+
+    port = start_port
+    while True:
+        if exclude and port in exclude:
+            port += 1
+            continue
+        s = socket.socket()
+        try:
+            s.bind(("127.0.0.1", port))
+        except socket.error:
+            port += 1
+        else:
+            return port
+        finally:
+            s.close()
 
 
 def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
@@ -49,9 +78,10 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
         unittest.signals.installHandler()
 
     if not logger:
-        logger = _create_logger()
+        logger = create_logger()
 
     env = environment.get(environment.InProcessTestEnvironment,
+                          addr=("localhost", get_free_port(6666)),
                           verbose=(verbosity > 1))
 
     url = "http://%s:%d/" % (env.server.addr[0], env.server.addr[1])
