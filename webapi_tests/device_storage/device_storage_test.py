@@ -13,8 +13,8 @@ class DeviceStorageTestCommon(object):
         request.onsuccess = function () {
             if (this.result == "available") {
                 flag = true;
-            } else if ((this.result == "unavailable") ||
-              (this.result == "shared")) {
+            } else if (this.result == "unavailable" ||
+              this.result == "shared") {
                 console.log("sdcard is either unavailable or " +
                             "usb storage is enabled")
                 flag = false;
@@ -22,9 +22,8 @@ class DeviceStorageTestCommon(object):
             marionetteScriptFinished(flag);
         };
         request.onerror = function () {
-            flag = this.error;
-            console.log("Unable to get the space used by the sdcard " +
-                         this.error)
+            flag = this.error.name;
+            console.log("Unable to get the space used by the sdcard " + flag)
             marionetteScriptFinished(flag);
         };
         """, script_timeout=10000)
@@ -36,7 +35,7 @@ class DeviceStorageTestCommon(object):
         var file_contents = arguments[1]
 
         //create a file with contents
-        var file   = new Blob([file_contents], {type: "text/plain"});
+        var file = new Blob([file_contents], {type: "text/plain"});
         var request = window.wrappedJSObject.sdcard.addNamed(file, file_name);
 
         request.onsuccess = function () {
@@ -44,8 +43,8 @@ class DeviceStorageTestCommon(object):
             marionetteScriptFinished(true);
         };
         request.onerror = function () {
-            console.log("Unable to write the file: " + this.error);
-            marionetteScriptFinished(this.error);
+            console.log("Unable to write the file: " + this.error.name);
+            marionetteScriptFinished(this.error.name);
         };
         """, script_args=[file_name, file_contents])
         return ret_namedfile_sdcard
@@ -71,11 +70,11 @@ class DeviceStorageTestCommon(object):
         var request = window.wrappedJSObject.sdcard.delete(delete_file);
 
         request.onsuccess = function () {
-        marionetteScriptFinished(true);
+            marionetteScriptFinished(true);
         }
         request.onerror = function (error) {
-        console.log('Unable to remove the file: ' + this.error);
-        marionetteScriptFinished(false);
+            console.log('Unable to remove the file: ' + this.error.name);
+            marionetteScriptFinished(false);
         }
         """, script_args=[file_name])
         return ret_file_delete_sdcard
@@ -95,8 +94,7 @@ class DeviceStorageTestCommon(object):
                 // success possibly with the next file as result.
                 this.continue();
             }
-            else
-            {
+            else {
                 marionetteScriptFinished(file_list);
             }
         };

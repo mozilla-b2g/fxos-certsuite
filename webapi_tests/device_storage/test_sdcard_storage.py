@@ -9,6 +9,7 @@ from device_storage import DeviceStorageTestCommon
 class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
 
     def setUp(self):
+        self.addCleanup(self.clean_up)
         super(TestSdcardStorage, self).setUp()
         self.marionette.execute_script("window.wrappedJSObject.sdcard = navigator.getDeviceStorage(\"sdcard\")")
         self.file_name = "test_sdcard_certsuite"
@@ -16,16 +17,17 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
 
     def test_sdcard_availability(self):
         ret_check_sdcard = self.is_sdcard_available()
-        self.assertTrue(ret_check_sdcard, "SDCard is unavailable. Please "
-                        "ensure there is an SD card in the device and usb "
-                        "storage sharing is not enabled")
+        self.assertEqual(True, ret_check_sdcard, "SDCard is unavailable. "
+                        "Please ensure there is an SD card in the device and "
+                        "usb storage sharing is not enabled")
 
     def test_add_namedfile_sdcard(self):
         if self.is_sdcard_available():
             #add the file to sdcard
             ret_add_namedfile_sdcard = self.add_namedfile_sdcard(self.file_name,
                                                             self.file_contents)
-            self.assertTrue(ret_add_namedfile_sdcard, "Unable to add the file")
+            self.assertEqual(True, ret_add_namedfile_sdcard, "Unable "
+                             "to add the file")
             #delete the file for cleanup
             if self.delete_file_sdcard(self.file_name) is False:
                 self.fail("Failed to delete the file")
@@ -52,7 +54,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
             if self.add_namedfile_sdcard(self.file_name, self.file_contents):
                 #delete the file
                 ret_file_delete_sdcard = self.delete_file_sdcard(self.file_name)
-                self.assertTrue(ret_file_delete_sdcard, "Unabled to "
+                self.assertEqual(True, ret_file_delete_sdcard, "Unabled to "
                                 "delete the file")
             else:
                 self.fail("Unable to add the file")
@@ -75,6 +77,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
         else:
             self.fail("Sdcard is unavailable")
 
-    def tearDown(self):
+    def clean_up(self):
         self.file_name = None
         self.file_contents = None
+        self.marionette.execute_script("window.wrappedJSObject.sdcard = null")
