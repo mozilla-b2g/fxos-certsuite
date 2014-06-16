@@ -13,7 +13,7 @@ deps = ['fxos-appgen>=0.2.10',
         'moznetwork >= 0.24',
         'mozprocess >= 0.18',
         'wptserve >= 1.0.1',
-        'wptrunner >= 0.3.8',
+        'wptrunner >= 0.3.10',
         'moztest==0.5',
         'tornado>=3.2']
 
