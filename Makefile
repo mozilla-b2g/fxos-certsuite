@@ -1,5 +1,9 @@
-all: docs
+all: test docs
 	@true
+
+test:
+	adb forward tcp:2828 tcp:2828
+	python -m semiauto webapi_tests.semiauto.smoketests | python -m mozlog.structured.scripts.format mach 2>/dev/null
 
 dist:
 	python setup.py sdist
@@ -14,7 +18,7 @@ clean:
 docs: documentation.pdf
 	@true
 
-.PHONY = all dist clean docs
+.PHONY = all test dist clean docs
 
 DOCS_SRC = $(shell find ./docs -name '*.rst')
 
