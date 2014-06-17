@@ -347,8 +347,8 @@ def cli():
     try:
         result_file = open(result_file_path, "w")
         result_file.close()
-    except:
-        print 'Could not open result file for writing: %s' % result_file_path
+    except IOError as e:
+        print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
         sys.exit(1)
 
     # get build properties
@@ -398,7 +398,7 @@ def cli():
     # run webapi and webidl tests
     if 'webapi' in test_groups:
         logger.test_start('webapi')
-        logger.debug('Running webapi tests')
+        logger.debug('Running webapi verifier tests')
 
         for apptype in ['web', 'privileged', 'certified']:
             global webapi_results
