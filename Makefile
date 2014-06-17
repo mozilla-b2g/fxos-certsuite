@@ -14,6 +14,7 @@ clean:
 	-rm -rf certsuite_venv
 	-rm -rf dist
 	-rm -rf build
+	-rm -rf firefox-os-certification_*.zip
 
 docs: documentation.pdf
 	@true
