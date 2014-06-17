@@ -15,35 +15,33 @@ class TestSmsIncomingGetMessage(TestCase, MobileMessageTestCommon):
         super(TestSmsIncomingGetMessage, self).tearDown()
 
     def test_sms_incoming_get_message(self):
-        # have user send sms to the Firefox OS device, verify body
+        # have user send an sms to the Firefox OS device
         self.user_guided_incoming_sms()
 
         # test mozMobileMessage.getMessage with valid id
-        sms_to_get = self.in_msg['id']
-        error_message = "mozMobileMessage.getMessage should have found the SMS message"
-        self.get_message(sms_to_get, True, error_message)
+        sms = self.get_message(self.in_msg['id'])
+        self.assertIsNotNone(sms, "The incoming SMS was not found but should have been")
 
-        # verify the other found message fields
-        event_sms = self.marionette.execute_script("return window.wrappedJSObject.event_sms")
-        self.assertEqual(event_sms['id'], sms_to_get, "MozMobileMessage.id of found SMS should match the received SMS")
-        self.assertEqual(event_sms['body'], self.in_msg['body'], "Message body of the found SMS should match the received SMS")
+        # verify the message fields
+        self.assertEqual(sms['id'], self.in_msg['id'], "MozMobileMessage.id of found SMS should match the received SMS")
+        self.assertEqual(sms['body'], self.in_msg['body'], "Message body of the found SMS should match the received SMS")
 
-        self.assertEqual(event_sms['type'], self.in_msg['type'], "Found SMS MozSmsMessage.type should match")
-        self.assertEqual(event_sms['id'], self.in_msg['id'], "Found SMS MozSmsMessage.id should match")
-        self.assertEqual(event_sms['threadId'], self.in_msg['threadId'], "Found SMS MozSmsMessage.threadId should match")
-        self.assertEqual(event_sms['delivery'], self.in_msg['delivery'], "Found SMS MozSmsMessage.delivery should match")
-        self.assertEqual(event_sms['deliveryStatus'], self.in_msg['deliveryStatus'],
+        self.assertEqual(sms['type'], self.in_msg['type'], "Found SMS MozSmsMessage.type should match")
+        self.assertEqual(sms['id'], self.in_msg['id'], "Found SMS MozSmsMessage.id should match")
+        self.assertEqual(sms['threadId'], self.in_msg['threadId'], "Found SMS MozSmsMessage.threadId should match")
+        self.assertEqual(sms['delivery'], self.in_msg['delivery'], "Found SMS MozSmsMessage.delivery should match")
+        self.assertEqual(sms['deliveryStatus'], self.in_msg['deliveryStatus'],
                           "Found SMS MozSmsMessage.deliveryStatus should match")
         # cant guarantee user didn't read message; just ensure is valid
-        self.assertTrue(event_sms['read'] is False or event_sms['read'] is True,
+        self.assertTrue(sms['read'] is False or event_sms['read'] is True,
                         "Found SMS MozSmsMessage.read field should be False or True")
-        self.assertEqual(event_sms['receiver'], self.in_msg['receiver'], "Found SMS MozSmsMessage.receiver should match")
-        self.assertEqual(event_sms['sender'], self.in_msg['sender'], "Found SMS MozSmsMessage.sender field should match")
-        self.assertEqual(event_sms['timestamp'], self.in_msg['timestamp'], "Found SMS MozSmsMessage.timestamp should match")
-        self.assertEqual(event_sms['messageClass'], self.in_msg['messageClass'],
+        self.assertEqual(sms['receiver'], self.in_msg['receiver'], "Found SMS MozSmsMessage.receiver should match")
+        self.assertEqual(sms['sender'], self.in_msg['sender'], "Found SMS MozSmsMessage.sender field should match")
+        self.assertEqual(sms['timestamp'], self.in_msg['timestamp'], "Found SMS MozSmsMessage.timestamp should match")
+        self.assertEqual(sms['messageClass'], self.in_msg['messageClass'],
                          "Found SMS MozSmsMessage.messageClass should match")
 
         # test mozMobileMessage.getMessage with invalid message object; should fail
-        sms_to_get = self.in_msg['id'] + 999 # no chance of receiving 999 more SMS between test cases
-        error_message = "mozMobileMessage.getMessage should NOT have found the SMS message"
-        self.get_message(sms_to_get, False, error_message)
+        invalid_sms = self.in_msg['id'] + 999  # no chance of receiving 999 more SMS between test cases
+        sms = self.get_message(invalid_sms)
+        self.assertIsNone(sms, "The SMS should not have been found because an invalid SMS id was used in getMessage")

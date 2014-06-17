@@ -25,7 +25,7 @@ class TestSmsIncoming(TestCase, MobileMessageTestCommon):
         self.assertGreater(self.in_msg['id'], 0, "Received SMS MozSmsMessage.id should be > 0")
         self.assertGreater(self.in_msg['threadId'], 0, "Received SMS MozSmsMessage.threadId should be > 0")
         self.assertEqual(self.in_msg['delivery'], 'received', "Received SMS MozSmsMessage.delivery should be 'received'")
-        self.assertTrue((self.in_msg['deliveryStatus'] == 'success') | (self.in_msg['deliveryStatus'] == 'not-applicable'),
+        self.assertTrue((self.in_msg['deliveryStatus'] in ['success', 'not-applicable']),
                         "Sent SMS MozSmsMessage.deliveryStatus should be 'success' or 'not-applicable'")
         # cannot guarantee end-user didn't read message; test that specifically in a different test
         self.assertTrue(self.in_msg['read'] is False or self.in_msg['read'] is True,

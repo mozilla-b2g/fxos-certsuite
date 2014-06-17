@@ -17,7 +17,7 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
         super(TestSmsIncomingDelete, self).tearDown()
 
     def test_sms_incoming_delete(self):
-        # have user send sms to the Firefox OS device, verify body
+        # have user send sms to the Firefox OS device
         self.user_guided_incoming_sms()
 
         # delete fails sometimes without a sleep (because of the msg notification?)
@@ -28,5 +28,5 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
         self.delete_message(sms_to_delete)
 
         # now verify the message has been deleted by trying to get it, should fail
-        error_message = "mozMobileMessage.getMessage found the deleted SMS but shouldn't have; delete failed"
-        self.get_message(sms_to_delete, False, error_message)
+        sms = self.get_message(sms_to_delete)
+        self.assertIsNone(sms, "The SMS should not have been found because it was deleted")
