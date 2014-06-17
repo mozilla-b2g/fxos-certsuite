@@ -4,7 +4,7 @@
 
 import unittest
 
-from semiauto import TestCase
+from webapi_tests.semiauto import TestCase
 
 
 class Smoketests(TestCase):
