@@ -5,28 +5,28 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from webapi_tests.sms import SmsTestCommon
+from webapi_tests.mobile_message import MobileMessageTestCommon
 
 
-class TestSmsIncomingDelete(TestCase, SmsTestCommon):
+class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
     def tearDown(self):
         self.marionette.execute_script("""
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
-        TestCase.tearDown(self)
+        super(TestSmsIncomingDelete, self).tearDown()
 
     def test_sms_incoming_delete(self):
-        # have user send sms to the Firefox OS device, verify body
+        # have user send sms to the Firefox OS device
         self.user_guided_incoming_sms()
 
         # delete fails sometimes without a sleep (because of the msg notification?)
         time.sleep(5)
 
         # delete the SMS using the webapi
-        sms_to_delete = self.in_sms['id']
+        sms_to_delete = self.in_msg['id']
         self.delete_message(sms_to_delete)
 
         # now verify the message has been deleted by trying to get it, should fail
-        error_message = "mozMobileMessage.getMessage found the deleted SMS but shouldn't have; delete failed"
-        self.get_message(sms_to_delete, False, error_message)
+        sms = self.get_message(sms_to_delete)
+        self.assertIsNone(sms, "The SMS should not have been found because it was deleted")
