@@ -5,6 +5,7 @@
 import time
 
 from marionette.wait import Wait
+from marionette import errors
 
 
 class MobileMessageTestCommon(object):
@@ -55,7 +56,7 @@ class MobileMessageTestCommon(object):
             self.remove_receiving_listener()
 
     def get_message(self, msg_id):
-        """ Get the sms for the given id. Return the sms, or null if it doesn't exist"""
+        """ Get the sms for the given id. Return the sms, or none if it doesn't exist"""
         self.marionette.execute_async_script("""
         var mm = window.navigator.mozMobileMessage;
         window.wrappedJSObject.event_sms = null;
@@ -82,10 +83,10 @@ class MobileMessageTestCommon(object):
         wait = Wait(self.marionette, timeout=30, interval=0.5)
         try:
             wait.until(lambda m: m.execute_script("return window.wrappedJSObject.rcvd_event"))
-        except:
+        except errors.TimeoutException:
             self.fail("mozMobileMessage.getMessage() failed")
 
-        # return the message if it was found, otherwise null
+        # return the message if it was found, otherwise none
         return self.marionette.execute_script("return window.wrappedJSObject.event_sms")
 
     def delete_message(self, msg_id):
@@ -115,7 +116,7 @@ class MobileMessageTestCommon(object):
         wait = Wait(self.marionette, timeout=30, interval=0.5)
         try:
             wait.until(lambda m: m.execute_script("return window.wrappedJSObject.msg_deleted"))
-        except:
+        except errors.TimeoutException:
             if self.marionette.execute_script("return window.wrappedJSObject.rcvd_error;"):
                 self.fail("Error received while deleting message")
             else:
@@ -195,7 +196,7 @@ class MobileMessageTestCommon(object):
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
             wait.until(lambda m: self.marionette.execute_script("return window.wrappedJSObject.rcvd_req_success"))
-        except:
+        except errors.TimeoutException:
             # msg wasn't sent; either the api is broken or mobile network signal is insufficient
             self.fail("Failed to send SMS or MMS; mozMobileMessage.send is broken -or- "
                       "perhaps there is no mobile network signal. Please try again")
