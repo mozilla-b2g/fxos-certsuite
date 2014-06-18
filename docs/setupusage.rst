@@ -83,7 +83,4 @@ working directory. Please e-mail this file to fxos-cert@mozilla.com.
 Known Issues
 ------------
 
-* Tests fail if re-run on a device they've already been run on
-  [https://bugzilla.mozilla.org/show_bug.cgi?id=995455].  Workaround:
-  re-install gaia or re-flash the device before re-running the
-  tests.
+* None
