@@ -202,7 +202,7 @@ def turn_screen_on(marionette):
 
 def unlock_screen(marionette):
     marionette.execute_script("""
-        var lockScreen = window.wrappedJSObject.LockScreen;
+        var lockScreen = window.wrappedJSObject.lockScreen || window.wrappedJSObject.LockScreen;
         lockScreen.unlock();
     """)
 
