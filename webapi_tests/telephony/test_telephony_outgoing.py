@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
+import unittest
 
 from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
@@ -15,6 +16,7 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
+    @unittest.skip("Currently disabled in 1.4")
     def test_telephony_outgoing(self):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
