@@ -28,7 +28,7 @@ from mozlog.structured import (
     structuredlog,
 )
 from omni_analyzer import OmniAnalyzer
-from wait import Wait
+import wait
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -149,7 +149,7 @@ def test_open_remote_window(logger, version, addr, apptype, all_perms):
     global webapi_results
     webapi_results = None
     try:
-        Wait(timeout=60).until(lambda: webapi_results is not None)
+        wait.Wait(timeout=60).until(lambda: webapi_results is not None)
     except wait.TimeoutException:
         logger.error('Timed out waiting for results')
         logger.test_end('permissions', 'ERROR')
@@ -413,7 +413,7 @@ def cli():
                         True)
 
             try:
-                Wait(timeout=600).until(lambda: webapi_results is not None)
+                wait.Wait(timeout=600).until(lambda: webapi_results is not None)
             except wait.TimeoutException:
                 logger.error('Timed out waiting for results')
                 logger.test_end('webapi', 'ERROR')
@@ -444,7 +444,7 @@ def cli():
         # install test app for embed-apps permission test
         embed_appname = 'Embed Apps Test App'
         apppath = os.path.join(static_path, 'embed-apps-test-app')
-        install_app(logger, appname, args.version, apptype, apppath, True,
+        install_app(logger, embed_appname, args.version, 'certified', apppath, True,
                     {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr},
                      False)
 
@@ -464,7 +464,7 @@ def cli():
                         'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
                      True)
                 try:
-                    Wait(timeout=600).until(lambda: webapi_results is not None)
+                    wait.Wait(timeout=600).until(lambda: webapi_results is not None)
                 except wait.TimeoutException:
                     logger.error('Timed out waiting for results')
                     logger.test_end('permissions', 'ERROR')
