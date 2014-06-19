@@ -117,7 +117,7 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
 
 
 def main(argv):
-    from semiauto.loader import TestLoader
+    from webapi_tests.semiauto.loader import TestLoader
     test_loader = TestLoader()
     prog = "python -m semiauto"
     indent = " " * len(prog)

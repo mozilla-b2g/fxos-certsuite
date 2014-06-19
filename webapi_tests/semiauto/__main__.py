@@ -6,7 +6,7 @@
 
 import sys
 
-from semiauto import main
+from webapi_tests.semiauto import main
 
 if __name__ == "__main__":
     main(sys.argv)
