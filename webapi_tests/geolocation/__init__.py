@@ -3,3 +3,4 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webapi_tests.geolocation.geolocation_test import GeolocationTestCommon
+from webapi_tests.geolocation.test_geolocation_basic import TestGeolocationBasic
