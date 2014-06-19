@@ -397,6 +397,8 @@ def cli():
 
     # run webapi and webidl tests
     if 'webapi' in test_groups:
+        errors = False
+
         logger.test_start('webapi')
         logger.debug('Running webapi verifier tests')
 
@@ -413,13 +415,16 @@ def cli():
                         True)
 
             try:
-                wait.Wait(timeout=600).until(lambda: webapi_results is not None)
+                wait.Wait(timeout=120).until(lambda: webapi_results is not None)
             except wait.TimeoutException:
                 logger.error('Timed out waiting for results')
-                logger.test_end('webapi', 'ERROR')
-                sys.exit(1)
+                errors = True
 
             fxos_appgen.uninstall_app(appname)
+
+            if webapi_results is None:
+                continue
+
             if "headers" not in report:
                 report["headers"] = headers
                 test_user_agent(headers['user-agent'], logger)
@@ -435,9 +440,14 @@ def cli():
             parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report)
 
         logger.debug('Done.')
-        logger.test_end('webapi', 'OK')
+        if errors:
+            logger.test_end('webapi', 'ERROR')
+        else:
+            logger.test_end('webapi', 'OK')
 
     if 'permissions' in test_groups:
+        errors = False
+
         logger.test_start('permissions')
         logger.debug('Running permissions tests')
 
@@ -464,13 +474,15 @@ def cli():
                         'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
                      True)
                 try:
-                    wait.Wait(timeout=600).until(lambda: webapi_results is not None)
+                    wait.Wait(timeout=120).until(lambda: webapi_results is not None)
                 except wait.TimeoutException:
                     logger.error('Timed out waiting for results')
-                    logger.test_end('permissions', 'ERROR')
-                    sys.exit(1)
+                    errors = True
 
                 fxos_appgen.uninstall_app(appname)
+
+                if webapi_results is None:
+                    continue
 
                 # gather results
                 results = webapi_results
@@ -500,7 +512,10 @@ def cli():
                 parse_permissions_results(file_path, results, '%s-%s-' % (apptype, ('all_perms' if all_perms else 'no_perms')), logger, report)
 
         logger.debug('Done.')
-        logger.test_end('permissions', 'OK')
+        if errors:
+            logger.test_end('permissions', 'ERROR')
+        else:
+            logger.test_end('permissions', 'OK')
 
         # clean up embed-apps test app
         fxos_appgen.uninstall_app(embed_appname)
