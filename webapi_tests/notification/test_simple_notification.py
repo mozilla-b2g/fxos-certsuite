@@ -8,9 +8,7 @@ from webapi_tests.notification import NotificationTestCommon
 class TestSimpleNotification(TestCase, NotificationTestCommon):
     def setUp(self):
         super(TestSimpleNotification, self).setUp()
-        permission = self.get_permission_setting()
-        if permission != "granted":
-            result = self.request_permission()
+        result = self.request_permission()
         self.assertEqual(result, "granted", "User must grant permission on device for notifications")
 
     def test_simple_notification(self):
