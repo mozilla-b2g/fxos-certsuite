@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webapi_tests.semiauto import TestCase
-from notification import NotificationTestCommon
+from webapi_tests.notification import NotificationTestCommon
 
 class TestSimpleNotification(TestCase, NotificationTestCommon):
     def setUp(self):

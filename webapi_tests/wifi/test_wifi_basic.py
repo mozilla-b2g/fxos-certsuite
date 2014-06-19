@@ -5,7 +5,7 @@
 import time
 
 from webapi_tests.semiauto import TestCase
-from wifi import WifiTestCommon
+from webapi_tests.wifi import WifiTestCommon
 
 
 class TestWifiBasic(TestCase, WifiTestCommon):
