@@ -39,18 +39,18 @@ the arguments for a method.)
 The W3C WebIDL test suite [1] is used to provide additional test coverage.
 This suite generates tests to verify WebAPI implementations based upon the
 WebIDL files used to define them. It goes further than the simple recursive
-enumeration of properties described above. For example, given an operation, it
-creates tests to verify the type of the operation is 'function', checks that
-the length of the operation matches the minimum number of arguments specified in
-the IDL file, and verifies that function will throw a TypeError if called with
-fewer arguments.
+enumeration of properties described above. For example, given a method on an
+interface, it creates tests to verify the type of the method is 'function',
+checks that the length of the operation matches the minimum number of arguments
+specified in the IDL file, and verifies that function will throw a TypeError if
+called with fewer arguments.
 
 The the WebIDL test suite is itself is still under development and so has bugs
-and does not provide complete coverage. It is designed to work on a desktop
-browser and will run of memory on some devices. To work around these problems,
-a preprocessing step is performed using the in-tree WebIDL.py parser, which also
-limits testing to a subset of the Interfaces defined in the full set of WebIDL
-files.
+and does not provide complete coverage. It was originally designed to work on a
+desktop browser and will run out of memory on some devices. To work around these
+problems, a preprocessing step is performed using the in-tree WebIDL.py parser,
+which also limits testing to a subset of the interfaces defined in the full set
+of WebIDL files.
 
 This avoids out-of-memory situations on the device as well as running tests
 which are guaranteed to fail. For example, the version of the test suite in use
