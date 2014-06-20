@@ -1,10 +1,10 @@
 Test Coverage
 =============
 
-web-platform-tests
-~~~~~~~~~~~~~~~~~~
+Web Platform Tests
+------------------
 
-Tests from the W3C's web-platform-tests testsuite covering
+Tests from the W3C's web-platform-tests_ testsuite covering
 standardised, web-exposed, platform features. These tests work by
 loading HTML documents in a simple test application and using
 javascript to determine the test result. Tests are divided
@@ -15,9 +15,14 @@ correctness for the purposes of the certsuite is determined by
 comparison to a reference run. At present the following tests groups
 are enabled:
 
- * dom - Tests for the dom core specification
+dom
+  Tests for the dom core specification
 
- * IndexedDB - Tests for the IndexedDB specification
+IndexedDB
+  Tests for the IndexedDB specification
 
- * touch_events - Simple tests for the automatically verifiable parts
-   of the touch events specification
+touch_events
+  Simple tests for the automatically verifiable parts of the touch
+  events specification
+  
+.. _web-platform-tests: https://github.com/w3c/web-platform-tests/
