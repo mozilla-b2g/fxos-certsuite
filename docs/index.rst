@@ -18,6 +18,7 @@ Contents:
    setupusage
    tests
    interpretingresults
+   coverage
 
 
 Indices and tables
