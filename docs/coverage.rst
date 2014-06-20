@@ -30,10 +30,9 @@ touch_events
 Guided WebAPI Tests
 -------------------
 
-WebAPIs makes it possible to interface between the web platform and
-device compatibility and access APIs.  To test these APIs we need
-to assert certain physical aspects about the phone during the
-testrun.
+WebAPIs make it possible to interface between the web platform and
+device compatibility APIs.  To test these APIs we need to assert
+certain physical aspects about the phone during the testrun.
 
 E.g. to verify that the device does indeed change its screen
 orientation when tilted 90º, we will first ask the user to turn the
@@ -41,7 +40,7 @@ device and then ask her for the perceived orientation, which is
 then compared with what the API reports.
 
 For this reason the guided Web API tests, backed by the test harness
-*semiauto*, requires a user to interact with various questions and
+*semiauto*, require a user to interact with various questions and
 prompts raised by the tests.  This works by showing a dialogue with
 a question, confirmation, or input request in a web browser on the
 user's host computer (the computer the device is connected to).
@@ -52,18 +51,17 @@ tests are running.  These involve the presence of a Wi-Fi network,
 a bluetooth enabled second device, a phone with SMS and MMS
 capabilities, &c.
 
-As with the web platform tests, the tests are organized into logical
-groups divided by directories or Python modules.  It is expected
-that the device under test passes all the following guided WebAPI
-test groups:
+As with the web platform tests, the tests are organized in logical
+groups divided by directories (listed below) that make up Python
+modules.  Some of the tests may not be applicable depending on the
+device under test's capabilities and hardware configuration.
 
 bluetooth
   Bluetooth API provides low-level access to the device's Bluetooth
   hardware.
 
 fm_radio
-  Provides support for a device's FM radio functionality, if
-  available.
+  Provides support for a device's FM radio functionality.
 
 geolocation
   Provides information about the device's physical location.
