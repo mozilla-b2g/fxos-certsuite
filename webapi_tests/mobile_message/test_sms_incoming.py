@@ -7,6 +7,16 @@ from webapi_tests.mobile_message import MobileMessageTestCommon
 
 
 class TestSmsIncoming(TestCase, MobileMessageTestCommon):
+    """
+    This is a test for the `WebSMS API`_ which will:
+
+    - Verify that an SMS can be received (sent by the test user)
+    - Confirm that the associated mozMobileMessage received event is triggered
+    - Verify the mozSmsMessage attributes
+
+    .. _`WebSMS API`: https://developer.mozilla.org/en-US/docs/Web/API/WebSMS_API
+    """
+
     def tearDown(self):
         self.marionette.execute_script("""
             SpecialPowers.removePermission("sms", document);

@@ -6,6 +6,16 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.notification import NotificationTestCommon
 
 class TestSimpleNotification(TestCase, NotificationTestCommon):
+    """
+    This is a test for the `Web Notifications API`_ which will:
+
+    - Check if the app has notification permission, if not ask the test user for permission
+    - Create a new device notification
+    - Ask the test user to verify that the notification appears correctly
+
+    .. _`Web Notifications API`: https://developer.mozilla.org/en-US/docs/Web/API/Notification/Using_Web_Notifications
+    """
+
     def setUp(self):
         super(TestSimpleNotification, self).setUp()
         result = self.request_permission()

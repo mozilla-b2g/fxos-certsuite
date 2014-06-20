@@ -6,6 +6,17 @@ from webapi_tests.semiauto import TestCase
 
 
 class TestScreenOrientation(TestCase):
+    """
+    This is a test for the `Screen Orientation API`_ which will:
+
+    - Ask the test user to move the device into various positions
+    - Verify that the corresponding mozOrientation values are correct
+    - Lock the screen orientation in portrait, ask the test user to verify
+    - Lock the screen orientation in landscape, ask the test user to verify 
+
+    .. _`Screen Orientation API`: https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model/Managing_screen_orientation
+    """
+
     def check_orientation(self, mode):
         orientation = self.marionette.execute_script("return window.wrappedJSObject.screen.mozOrientation;")
         self.assertTrue(mode in orientation, "the screen.mozOrientation value is incorrect/not what was expected")
