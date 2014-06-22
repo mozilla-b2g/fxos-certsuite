@@ -192,3 +192,24 @@ handling such as the mozbrowser permission. These will be tested using
 individual test cases as is currently done by using a separate app, and these
 tests will have to be maintained across different versions of B2G.
 
+Omni Analyzer
+-------------
+
+Many of Gecko's JavaScript sources are compressed into an omni.ja file which
+is part of all FirefoxOS distributions.  The omni-analyzer extracts these files
+and compares them to a relevant reference version.  Any differences are
+logged, and the diffs between test and reference files can be viewed using the
+omni_diff.py tool.
+
+The omni-analyzer does not produce pass/fail results; differences in
+JavaScript source files should be reviewed by an engineer to determine whether
+they're harmless in terms of FirefoxOS branding requirements.
+
+User-Agent Test
+---------------
+
+The user-agent test verifies that the user agent string reported by the device
+conforms to the `Gecko user agent specification`_ and the `device model inclusion requirements`_.
+
+.. _Gecko user agent specification: https://developer.mozilla.org/en-US/docs/Web/HTTP/Gecko_user_agent_string_reference#Firefox_OS
+.. _device model inclusion requirements: https://wiki.mozilla.org/B2G/User_Agent/Device_Model_Inclusion_Requirements
