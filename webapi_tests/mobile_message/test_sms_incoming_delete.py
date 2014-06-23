@@ -9,6 +9,16 @@ from webapi_tests.mobile_message import MobileMessageTestCommon
 
 
 class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
+    """
+    This is a test for the `WebSMS API`_ which will:
+
+    - Receive an incoming SMS (sent by the test user)
+    - Delete the SMS
+    - Verify that the SMS can no longer be retrieved
+
+    .. _`WebSMS API`: https://developer.mozilla.org/en-US/docs/Web/API/WebSMS_API
+    """
+
     def tearDown(self):
         self.marionette.execute_script("""
             SpecialPowers.removePermission("sms", document);

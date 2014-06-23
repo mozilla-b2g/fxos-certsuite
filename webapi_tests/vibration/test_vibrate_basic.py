@@ -8,6 +8,16 @@ from webapi_tests.semiauto import TestCase
 
 
 class TestVibrateBasic(TestCase):
+    """
+    This is a test for the `Vibration API`_ which will:
+
+    - Initiate a single 200ms vibration, and ask the test user to verify
+    - Initiate a second single 200ms vibration, and ask the test user to verify
+    - Initiate a vibration pattern and ask the test user to verify
+
+    .. _`Vibration API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Vibration
+    """
+
     def test_vibrate_basic(self):
         self.instruct("Ensure the phone is unlocked, then hold the phone.")
         self.marionette.execute_script("window.navigator.vibrate(200);")

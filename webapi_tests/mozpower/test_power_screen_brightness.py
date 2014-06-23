@@ -6,6 +6,14 @@ from webapi_tests.semiauto import TestCase
 
 
 class TestPowerManagement(TestCase):
+    """
+    This is a test for the `Power Management API`_ which will:
+
+    - Test increasing the device screen brightness (verified by the test user)
+    - Test decreasing the device screen brightness (verified by the test user)
+
+    .. _`Power Management API`: https://developer.mozilla.org/en-US/docs/Web/API/Power_Management_API
+    """
 
     def test_brightness_decrease(self):
         #initialize the screen brightness
