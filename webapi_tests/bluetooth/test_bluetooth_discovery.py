@@ -9,6 +9,18 @@ from webapi_tests.bluetooth import BluetoothTestCommon
 
 
 class TestBluetoothDiscovery(TestCase, BluetoothTestCommon):
+    """
+    This tests device discovery using the `WebBluetooth API`_ including:
+
+    - Enabling and disabling bluetooth
+    - Getting the default bluetooth adapter
+    - Setting the bluetooth device name
+    - Entering discoverable mode
+    - Discovery of other bluetooth devices
+
+    .. _`WebBluetooth API`: https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API
+    """
+
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestBluetoothDiscovery, self).setUp()

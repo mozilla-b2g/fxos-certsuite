@@ -9,6 +9,16 @@ from webapi_tests.wifi import WifiTestCommon
 
 
 class TestWifiBasic(TestCase, WifiTestCommon):
+    """
+    This is a test for the `WiFi Information API`_ which will:
+
+    - Test enabling and disabling the device WiFi via settings
+    - Use the mozWifiManager to get the available WiFi networks
+    - Verify that at least one WiFi network was found, and it has SSID and BSSID values
+
+    .. _`WiFi Information API`: https://developer.mozilla.org/en-US/docs/Web/API/WiFi_Information_API
+    """
+
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestWifiBasic, self).setUp()

@@ -5,6 +5,15 @@ from webapi_tests.semiauto import TestCase
 
 
 class TestTime(TestCase):
+    """
+    This is a test for the `MozTime API`_ which will:
+
+    - Get the current date/time and ask the test user to verify
+    - Set the current date/time to a user-specified value, and ask the test user verify
+
+    .. _`MozTime API`: https://developer.mozilla.org/en-US/docs/Web/API/Time_and_Clock_API
+    """
+
     def test_time_set(self):
         get_current_time = """
             var curDate  = new Date();

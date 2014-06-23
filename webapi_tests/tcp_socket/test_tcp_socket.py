@@ -112,6 +112,15 @@ class TcpSocketTestCase(TestCase):
 
 
 class TestTcpSocketFormality(TestCase):
+    """
+    This is a basic test for the `TCP Socket API`_ which will:
+
+    - Verify that the API is available
+    - Check the default mozTCPSocket properties
+
+    .. _`TCP Socket API`: https://developer.mozilla.org/en-US/docs/Web/API/TCP_Socket_API
+    """
+
     def prop(self, pp, obj):
         return self.marionette.execute_script("return %s.%s" % (pp, obj))
 

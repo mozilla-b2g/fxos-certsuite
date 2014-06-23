@@ -9,6 +9,14 @@ from webapi_tests.geolocation import GeolocationTestCommon
 
 
 class TestGeolocationBasic(TestCase, GeolocationTestCommon):
+    """
+    This is a basic test of the `Geolocation API`_ including:
+
+    - Enabling and disabling geolocation
+    - Retrieving the current device location
+
+    .. _`Geolocation API`: https://developer.mozilla.org/en-US/docs/Web/API/Geolocation
+    """
 
     def setUp(self):
         super(TestGeolocationBasic, self).setUp()

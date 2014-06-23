@@ -10,7 +10,10 @@ from webapi_tests.fm_radio import FMRadioTestCommon
 
 class TestFMRadioBasic(TestCase, FMRadioTestCommon):
     """
-    This tests basic functionality of the `WebFM API`_
+    This tests basic functionality of the `WebFM API`_ including:
+
+    - Recognition of the insertion and removal of the antenna/headset
+    - Turning on and off the FM Radio
 
     .. _`WebFM API`: https://developer.mozilla.org/en-US/docs/WebAPI/WebFM_API
     """
