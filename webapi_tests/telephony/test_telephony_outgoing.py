@@ -17,9 +17,9 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
     - Ask the test user to specify a destination phone number for the test call
     - Setup mozTelephonyCall event listeners for the outgoing call
     - Use the API to initiate the outgoing call
-    - Ask the test user to answer the call on the destination phone 
+    - Ask the test user to answer the call on the destination phone
     - Keep the call active for 5 seconds, then hang up the call via the API
-    - Verify that the corresponding mozTelephonyCall events were triggered 
+    - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
     This test is currently only enabled in version 1.3 of the certification test suite.

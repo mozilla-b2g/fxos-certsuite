@@ -19,7 +19,7 @@ class TestTelephonyIncoming(TestCase, TelephonyTestCommon):
     - Verify that the mozTelephony incoming call event is triggered
     - Answer the incoming call via the API, keep the call active for 5 seconds
     - Hang up the call via the API
-    - Verify that the corresponding mozTelephonyCall events were triggered 
+    - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
     This test is currently only enabled in version 1.3 of the certification test suite.

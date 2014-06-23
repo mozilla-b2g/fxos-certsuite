@@ -13,7 +13,7 @@ class TestTime(TestCase):
 
     .. _`MozTime API`: https://developer.mozilla.org/en-US/docs/Web/API/Time_and_Clock_API
     """
-    
+
     def test_time_set(self):
         get_current_time = """
             var curDate  = new Date();
