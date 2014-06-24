@@ -2,8 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from semiauto import TestCase
-from device_storage import DeviceStorageTestCommon
+from webapi_tests.semiauto import TestCase
+from webapi_tests.device_storage import DeviceStorageTestCommon
 
 
 class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
