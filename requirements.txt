@@ -2,9 +2,10 @@ fxos-appgen >= 0.5
 marionette_client >= 0.7.1.1
 marionette_extension >= 0.4
 mozdevice >= 0.33
-mozlog >= 1.8
+mozlog >= 2.0
 moznetwork >= 0.24
 mozprocess >= 0.18
+py == 1.4.20
 wptserve >= 1.0.1
 wptrunner >= 0.3.11
 moztest == 0.5
