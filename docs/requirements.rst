@@ -25,6 +25,9 @@ The device must have a SIM card with a functioning phone
 subscription to receive SMS messages for a subset of the tests to
 pass.
 
+The device must have a *sdcard* with some free space available for a subset of
+the tests to pass.
+
 Network
 -------
 
