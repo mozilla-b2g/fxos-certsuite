@@ -374,7 +374,7 @@ def cli():
     for section in config.sections():
         report['application_ini'][section] = dict(config.items(section))
 
-    logger.suite_start([])
+    logger.suite_start(tests=[])
     # run the omni.ja analyzer
     if 'omni-analyzer' in test_groups:
         omni_results_path = pkg_resources.resource_filename(

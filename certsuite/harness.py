@@ -175,7 +175,11 @@ class TestRunner(object):
 
     def run_suite(self, suite, groups, output_zip):
         with TemporaryDirectory() as temp_dir:
-            result_files, failures = self.run_test(suite, groups, temp_dir)
+            result_files, structured_log = self.run_test(suite, groups, temp_dir)
+            failures = get_test_failures(structured_log)
+            html_log = structured_log.replace('.log', '.html')
+            result_files.append(html_log)
+            write_html_output(structured_log, html_log)
 
             for path in result_files:
                 file_name = os.path.split(path)[1]
@@ -200,10 +204,6 @@ class TestRunner(object):
             proc.run()
             proc.wait()
             logger.debug("Process finished")
-            failures = get_test_failures(structured_log)
-            html_log = structured_log.replace('.log', '.html')
-            output_files.append(html_log)
-            write_html_output(structured_log, html_log)
 
         except Exception:
             logger.critical("Error running suite %s:\n%s" %(suite, traceback.format_exc()))
@@ -214,7 +214,7 @@ class TestRunner(object):
             except:
                 pass
 
-        return output_files, failures
+        return output_files, structured_log
 
     def build_command(self, suite, groups, temp_dir):
         suite_opts = self.config["suites"][suite]
@@ -290,7 +290,6 @@ def get_test_failures(raw_log):
     return failures
 
 def write_html_output(structured_log, html_log):
-    shutil.copy(structured_log, "/tmp")
     handler = handlers.StreamHandler(open(html_log, 'wb'), formatters.HTMLFormatter())
     reader.handle_log(reader.read(open(structured_log)), handler)
 
