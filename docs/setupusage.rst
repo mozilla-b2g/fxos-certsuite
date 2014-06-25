@@ -83,4 +83,5 @@ working directory. Please e-mail this file to fxos-cert@mozilla.com.
 Known Issues
 ------------
 
-* None
+* Bug 1030238 - Semi-auto WebAPI tests do not produce a log file
+* Bug 1026259 - web-platform tests sometimes lose wifi connection
