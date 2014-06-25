@@ -27,31 +27,6 @@ def create_logger():
     return logger
 
 
-def get_free_port(start_port, exclude=None):
-    """Get the first port number after start_port (inclusive) that is
-    not currently bound.
-
-    :param start_port: Integer port number at which to start testing.
-    :param exclude: Set of port numbers to skip.
-    
-    """
-
-    port = start_port
-    while True:
-        if exclude and port in exclude:
-            port += 1
-            continue
-        s = socket.socket()
-        try:
-            s.bind(("127.0.0.1", port))
-        except socket.error:
-            port += 1
-        else:
-            return port
-        finally:
-            s.close()
-
-
 def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
         failfast=False, catch_break=False, buffer=True, **kwargs):
     """A simple test runner.
@@ -81,7 +56,7 @@ def run(suite, logger=None, spawn_browser=True, verbosity=1, quiet=False,
         logger = create_logger()
 
     env = environment.get(environment.InProcessTestEnvironment,
-                          addr=("localhost", get_free_port(6666)),
+                          addr=None if spawn_browser else ("127.0.0.1", 6666),
                           verbose=(verbosity > 1))
 
     url = "http://%s:%d/" % (env.server.addr[0], env.server.addr[1])
@@ -151,8 +126,6 @@ tests in the current working directory (".").\
                       help="Buffer stdout and stderr during test runs")
     parser.add_option("--pattern", "-p", dest="pattern",
                       help='Pattern to match tests ("test_*.py" default)')
-    parser.add_option("--reuse-browser", dest="reuse_browser",
-                      help="Reuse an existing browser session.")
 
     opts, args = parser.parse_args(argv[1:])
     tests = []
