@@ -3,4 +3,4 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from webapi_tests.device_storage.device_storage_test import DeviceStorageTestCommon
-from webapi_tests.device_stoage.test_sdcard_storage import TestSdcardStorage
+from webapi_tests.device_storage.test_sdcard_storage import TestSdcardStorage

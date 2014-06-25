@@ -9,11 +9,11 @@ from webapi_tests.device_storage import DeviceStorageTestCommon
 class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
 
     def setUp(self):
+        self.file_name = "test_sdcard_certsuite"
+        self.file_contents = "This is a sample text file"
         self.addCleanup(self.clean_up)
         super(TestSdcardStorage, self).setUp()
         self.marionette.execute_script("window.wrappedJSObject.sdcard = navigator.getDeviceStorage(\"sdcard\")")
-        self.file_name = "test_sdcard_certsuite"
-        self.file_contents = "This is a sample text file"
 
     def test_sdcard_availability(self):
         ret_check_sdcard = self.is_sdcard_available()
@@ -26,6 +26,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
             #add the file to sdcard
             ret_add_namedfile_sdcard = self.add_namedfile_sdcard(self.file_name,
                                                             self.file_contents)
+
             self.assertEqual(True, ret_add_namedfile_sdcard, "Unable "
                              "to add the file")
             #delete the file for cleanup
@@ -54,7 +55,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
             if self.add_namedfile_sdcard(self.file_name, self.file_contents):
                 #delete the file
                 ret_file_delete_sdcard = self.delete_file_sdcard(self.file_name)
-                self.assertEqual(True, ret_file_delete_sdcard, "Unabled to "
+                self.assertEqual(True, ret_file_delete_sdcard, "Unable to "
                                 "delete the file")
             else:
                 self.fail("Unable to add the file")
@@ -78,6 +79,10 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
             self.fail("Sdcard is unavailable")
 
     def clean_up(self):
+        #As each test is using the same file, get and delete the file if any test fails in between
+        if self.get_file_sdcard(self.file_name) is True:
+            if self.delete_file_sdcard(self.file_name) is False:
+                self.fail("Failed to delete the file in clean up")
         self.file_name = None
         self.file_contents = None
         self.marionette.execute_script("window.wrappedJSObject.sdcard = null")

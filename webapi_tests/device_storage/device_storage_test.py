@@ -55,7 +55,8 @@ class DeviceStorageTestCommon(object):
         var request = window.wrappedJSObject.sdcard.get(file_name);
 
         request.onsuccess = function () {
-            marionetteScriptFinished(this.result.name);
+            //file name will be stored in this.result.name
+            marionetteScriptFinished(true);
         };
         request.onerror = function () {
             console.log("Unable to get the file: " + this.error.name);
@@ -68,7 +69,6 @@ class DeviceStorageTestCommon(object):
         ret_file_delete_sdcard = self.marionette.execute_async_script("""
         var delete_file = arguments[0];
         var request = window.wrappedJSObject.sdcard.delete(delete_file);
-
         request.onsuccess = function () {
             marionetteScriptFinished(true);
         }
@@ -93,8 +93,7 @@ class DeviceStorageTestCommon(object):
                 // Then we move to the next result, which calls the cursor
                 // success possibly with the next file as result.
                 this.continue();
-            }
-            else {
+            } else {
                 marionetteScriptFinished(file_list);
             }
         };
