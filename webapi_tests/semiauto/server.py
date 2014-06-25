@@ -33,7 +33,7 @@ class NoCacheStaticFileHandler(web.StaticFileHandler):
 
 class FrontendServer(object):
     def __init__(self, addr, io_loop=None, verbose=False):
-        self.addr = addr
+        self._addr = addr
         self.io_loop = io_loop or IOLoop.instance()
         self.started = False
         if verbose:
@@ -50,7 +50,7 @@ class FrontendServer(object):
     def start(self):
         """Start blocking FrontendServer."""
         self.started = True
-        self.server.listen(self.addr[1])
+        self.server.listen(self._addr[1], address=self._addr[0])
         self.io_loop.start()
 
     def stop(self):
@@ -60,6 +60,16 @@ class FrontendServer(object):
 
     def is_alive(self):
         return self.started
+
+    @property
+    def addr(self):
+	# tornado doesn't guarantee that HTTPServer.listen listens
+	# before it returns, hence leaving its _socket property
+	# unpopulated until its subprocesses have bound properly.
+        assert self.is_alive()
+        while len(self.server._sockets) == 0:
+            True
+        return self.server._sockets.itervalues().next().getsockname()
 
 
 class BlockingPromptMixin(object):
