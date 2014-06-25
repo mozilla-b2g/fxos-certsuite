@@ -5,7 +5,6 @@
 import os
 
 import fxos_appgen
-import mozdevice
 
 from marionette import MarionetteException
 
@@ -48,10 +47,8 @@ def install(marionette=None):
                              marionette=marionette)
 
 
-# Issue filed: https://github.com/mozilla-b2g/fxos-appgen/issues/7
 def is_installed():
-    device = mozdevice.DeviceManagerADB()
-    return device.dirExists("/data/local/webapps/%s" % canonical_name)
+    return fxos_appgen.is_installed(name)
 
 
 def switch_to_app_management(marionette):
