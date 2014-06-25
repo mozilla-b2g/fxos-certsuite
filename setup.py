@@ -4,7 +4,7 @@
 
 from setuptools import setup, find_packages
 
-PACKAGE_VERSION = '0.1'
+PACKAGE_VERSION = '1.3.0.9'
 
 # dependencies
 with open('requirements.txt') as f:
