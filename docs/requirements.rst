@@ -22,8 +22,11 @@ location of the Android SDK::
     export PATH=$SDK_HOME:$PATH
 
 The device must have a SIM card with a functioning phone
-subscription to receive SMS messages for a subset of the tests to
-pass.
+subscription to receive SMS messages and phone calls for a subset of the tests
+to pass.
+
+The device must have an SD card inserted with some free space available for
+a subset of the tests to pass.
 
 Network
 -------
