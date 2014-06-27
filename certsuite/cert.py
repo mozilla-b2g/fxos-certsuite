@@ -164,17 +164,16 @@ def test_open_remote_window(logger, version, addr):
 
         running_apps = get_runningapps()
         for app in running_apps:
-            if app.find('Remote Window') != -1:
+            if app == 'window:Remote Window,source:app://' + installed_appname:
                 result = True
                 kill(app)
 
         # We uninstall rather than using kill() as kill seems unhappy when
         # the popup is open.
+        logger.debug('uninstalling: %s' % appname)
         fxos_appgen.uninstall_app(appname)
 
         results['open-remote-window-' + value] = result
-
-    logger.debug('uninstalling: %s' % appname)
 
     return results
 
@@ -449,7 +448,8 @@ def cli():
     # results. The metaharness will reset these values for us.
     if not (set_preference('screen.timeout', 0) or
             set_preference('lockscreen.enabled', 'false')):
-        print 'Could not disable timeout and/or locksreen. Expect test timeouts'
+        logger.error('Could not disable timeout and/or lockscreen. '
+                     'Expect test timeouts')
 
     # get build properties
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
@@ -559,7 +559,6 @@ def cli():
         for apptype in ['web', 'privileged', 'certified']:
             results = {}
             expected_webapi_results = None
-
 
             appname = 'Default Permissions Test App'
             fxos_appgen.uninstall_app(appname)
