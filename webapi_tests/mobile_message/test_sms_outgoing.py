@@ -27,7 +27,8 @@ class TestSmsOutgoing(TestCase, MobileMessageTestCommon):
 
     def test_sms_outgoing(self):
         # send sms via the webapi and verify body
-        self.user_guided_outgoing_sms()
+        self.msg_type = "SMS"
+        self.user_guided_outgoing_msg()
 
         # verify other fields
         self.assertEqual(self.out_msg['type'], 'sms', "Sent SMS MozSmsMessage.type should be 'sms'")

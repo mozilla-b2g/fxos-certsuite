@@ -12,7 +12,7 @@ class TestSmsIncomingGetMessage(TestCase, MobileMessageTestCommon):
 
     - Receive an incoming SMS (sent by the test user)
     - Verify that the SMS can be retrieved
-    - Verify the retrieved mozMobileMessage attributes
+    - Verify the retrieved mozSmsMessage attributes
 
     .. _`WebSMS API`: https://developer.mozilla.org/en-US/docs/Web/API/WebSMS_API
     """
@@ -26,7 +26,8 @@ class TestSmsIncomingGetMessage(TestCase, MobileMessageTestCommon):
 
     def test_sms_incoming_get_message(self):
         # have user send an sms to the Firefox OS device
-        self.user_guided_incoming_sms()
+        self.msg_type = "SMS"
+        self.user_guided_incoming_msg()
 
         # test mozMobileMessage.getMessage with valid id
         sms = self.get_message(self.in_msg['id'])
@@ -42,8 +43,8 @@ class TestSmsIncomingGetMessage(TestCase, MobileMessageTestCommon):
         self.assertEqual(sms['delivery'], self.in_msg['delivery'], "Found SMS MozSmsMessage.delivery should match")
         self.assertEqual(sms['deliveryStatus'], self.in_msg['deliveryStatus'],
                           "Found SMS MozSmsMessage.deliveryStatus should match")
-        # cant guarantee user didn't read message; just ensure is valid
-        self.assertTrue(sms['read'] is False or event_sms['read'] is True,
+        # can't guarantee user didn't read message; just ensure is valid
+        self.assertTrue(sms['read'] is False or sms['read'] is True,
                         "Found SMS MozSmsMessage.read field should be False or True")
         self.assertEqual(sms['receiver'], self.in_msg['receiver'], "Found SMS MozSmsMessage.receiver should match")
         self.assertEqual(sms['sender'], self.in_msg['sender'], "Found SMS MozSmsMessage.sender field should match")

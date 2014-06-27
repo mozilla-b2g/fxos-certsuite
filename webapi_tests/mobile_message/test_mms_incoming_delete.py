@@ -8,13 +8,13 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.mobile_message import MobileMessageTestCommon
 
 
-class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
+class TestMmsIncomingDelete(TestCase, MobileMessageTestCommon):
     """
     This is a test for the `WebSMS API`_ which will:
 
-    - Receive an incoming SMS (sent by the test user)
-    - Delete the SMS
-    - Verify that the SMS can no longer be retrieved
+    - Receive an incoming MMS (sent by the test user)
+    - Delete the MMS
+    - Verify that the MMS can no longer be retrieved
 
     .. _`WebSMS API`: https://developer.mozilla.org/en-US/docs/Web/API/WebSMS_API
     """
@@ -24,20 +24,20 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
             SpecialPowers.removePermission("sms", document);
             SpecialPowers.setBoolPref("dom.sms.enabled", false);
         """)
-        super(TestSmsIncomingDelete, self).tearDown()
+        super(TestMmsIncomingDelete, self).tearDown()
 
-    def test_sms_incoming_delete(self):
-        # have user send sms to the Firefox OS device
-        self.msg_type = "SMS"
+    def test_mms_incoming_delete(self):
+        # have user send mms to the Firefox OS device
+        self.msg_type = "MMS"
         self.user_guided_incoming_msg()
 
         # delete fails sometimes without a sleep (because of the msg notification?)
         time.sleep(5)
 
-        # delete the SMS using the webapi
-        sms_to_delete = self.in_msg['id']
-        self.delete_message(sms_to_delete)
+        # delete the mms using the webapi
+        mms_to_delete = self.in_msg['id']
+        self.delete_message(mms_to_delete)
 
         # now verify the message has been deleted by trying to get it, should fail
-        sms = self.get_message(sms_to_delete)
-        self.assertIsNone(sms, "The SMS should not have been found because it was deleted")
+        mms = self.get_message(mms_to_delete)
+        self.assertIsNone(mms, "The MMS should not have been found because it was deleted")
