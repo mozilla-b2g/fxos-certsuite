@@ -14,6 +14,8 @@ class TestIdleActive(TestCase, IdleActiveTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestIdleActive, self).setUp()
+        self.marionette.execute_script("window.wrappedJSObject.rcvd_idle = false;")
+        self.marionette.execute_script("window.wrappedJSObject.rcvd_active = false;")
         #get screen current brightness
         brightness = self.get_screen_brightness()
         self.marionette.execute_script("window.wrappedJSObject.brightness = arguments[0];", script_args=[brightness])
@@ -24,8 +26,16 @@ class TestIdleActive(TestCase, IdleActiveTestCommon):
     def test_idle_state(self):
         self.instruct("About to test idle state. Please click OK and then watch the screen, but do not touch the screen")
 
-        #setup idleobserver
-        self.is_idle_state()
+        self.marionette.execute_script("""
+        window.wrappedJSObject.testIdleObserver = {
+            time : 5,
+            onidle : function() {
+                window.navigator.mozPower.screenBrightness = 0.1;
+                window.wrappedJSObject.rcvd_idle = true;
+            }
+        };
+        navigator.addIdleObserver(window.wrappedJSObject.testIdleObserver);
+        """)
 
         #wait for device to go idle
         wait = Wait(self.marionette, timeout=15, interval=0.5)
@@ -39,8 +49,21 @@ class TestIdleActive(TestCase, IdleActiveTestCommon):
     @unittest.skip("Bug 1033248 - Device does not enter from idle state to active state")
     def test_active_state(self):
         self.instruct("About to test active state. Please click OK and then watch the screen")
-        #setup activeobserver
-        self.is_active_state()
+
+        self.marionette.execute_script("""
+        window.wrappedJSObject.testActiveObserver = {
+            time : 5,
+            onidle : function() {
+                window.navigator.mozPower.screenBrightness = 0.1;
+                window.wrappedJSObject.rcvd_idle = true;
+            },
+            onactive : function() {
+                window.navigator.mozPower.screenBrightness = 0.5;
+                window.wrappedJSObject.rcvd_active = true;
+            }
+        };
+        navigator.addIdleObserver(window.wrappedJSObject.testActiveObserver);
+        """)
 
         wait = Wait(self.marionette, timeout=10, interval=0.5)
         try:

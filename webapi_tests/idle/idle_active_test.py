@@ -20,34 +20,3 @@ class IdleActiveTestCommon(object):
         };
         """)
         return result
-
-    def is_idle_state(self):
-        self.marionette.execute_script("""
-        window.wrappedJSObject.rcvd_idle = false;
-        window.wrappedJSObject.testIdleObserver = {
-            time : 5,
-            onidle : function() {
-                window.navigator.mozPower.screenBrightness = 0.1;
-                window.wrappedJSObject.rcvd_idle = true;
-            }
-        };
-        navigator.addIdleObserver(window.wrappedJSObject.testIdleObserver);
-        """)
-
-    def is_active_state(self):
-        self.marionette.execute_script("""
-        window.wrappedJSObject.rcvd_active = false;
-        window.wrappedJSObject.rcvd_idle = false;
-        window.wrappedJSObject.testActiveObserver = {
-            time : 5,
-            onidle : function() {
-                window.navigator.mozPower.screenBrightness = 0.1;
-                window.wrappedJSObject.rcvd_idle = true;
-            },
-            onactive : function() {
-                window.navigator.mozPower.screenBrightness = 0.5;
-                window.wrappedJSObject.rcvd_active = true;
-            }
-        };
-        navigator.addIdleObserver(window.wrappedJSObject.testActiveObserver);
-        """)
