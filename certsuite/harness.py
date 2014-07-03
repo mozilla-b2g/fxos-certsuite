@@ -22,13 +22,9 @@ import zipfile
 from collections import OrderedDict
 from datetime import datetime
 from mozfile import TemporaryDirectory
-from mozlog.structured import (
-    structuredlog,
-    handlers,
-    formatters,
-    reader,
-)
+from mozlog.structured import structuredlog, handlers, formatters
 
+import report
 
 logger = None
 config_path = os.path.abspath(
@@ -176,12 +172,16 @@ class TestRunner(object):
     def run_suite(self, suite, groups, output_zip):
         with TemporaryDirectory() as temp_dir:
             result_files, structured_log = self.run_test(suite, groups, temp_dir)
-            failures = get_test_failures(structured_log)
-            html_log = structured_log.replace('.log', '.html')
-            result_files.append(html_log)
-            write_html_output(structured_log, html_log)
+
+            failures = report.get_test_failures(structured_log)
+            html_path = os.path.splitext(structured_log)[0] + ".html"
+            report.subsuite.create(structured_log, html_path)
+            result_files.append(html_path)
+
+            print result_files
 
             for path in result_files:
+                print path
                 file_name = os.path.split(path)[1]
                 output_zip.write(path, "%s/%s" % (suite, file_name))
             return failures
@@ -275,23 +275,6 @@ def list_tests(args, config):
     print '''To run a set of tests, pass those test names on the commandline, like:
 runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
     return 0
-
-def get_test_failures(raw_log):
-    '''
-    Return the list of test failures contained within a structured log file.
-    '''
-    failures = []
-    def test_status(data):
-        if data['status'] == 'FAIL':
-            failures.append(data)
-    with open(raw_log, 'r') as f:
-        reader.each_log(reader.read(f),
-                        {'test_status':test_status})
-    return failures
-
-def write_html_output(structured_log, html_log):
-    handler = handlers.StreamHandler(open(html_log, 'wb'), formatters.HTMLFormatter())
-    reader.handle_log(reader.read(open(structured_log)), handler)
 
 def write_static_files(zip_f):
     '''

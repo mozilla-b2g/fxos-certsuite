@@ -1,0 +1,51 @@
+body {
+    font-family: 'DejaVu Sans', 'Sans';
+    font-size: 14px;
+}
+
+.condition {
+    font-variant: small-caps;
+    color: white;
+    text-align: center;
+    font-size: 1.1em;
+    width:5em;
+}
+.PASS { background-color: green }
+.FAIL { background-color: red }
+.TIMEOUT { background-color: blue }
+.ERROR { background-color: purple }
+
+.message {
+    font-family: "DejaVu Sans Mono", Monospace
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+th {
+    padding:0.5em 1em 0.5em 1em;
+    background-color: #eee;
+    font-weight: bold;
+}
+
+td {
+    padding: 0.5em;
+    border-top: thin solid #fff;
+    border-bottom: thin solid #fff;
+}
+
+tbody > tr:nth-child(2n) { background-color: #f4f4f4 }
+
+td.parent_test {
+    font-family: "DejaVu Sans Mono", Monospace;
+}
+
+td.parent_test.even {
+    background-color: #fff;
+}
+
+td.parent_test.odd {
+    background-color: #f4f4f4;
+}
