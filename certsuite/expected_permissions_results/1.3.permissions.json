@@ -1,0 +1,127 @@
+{
+  "alarms": [
+    "window.navigator.mozAlarms"
+  ], 
+  "attention": [], 
+  "audio-capture": [], 
+  "audio-channel-alarm": [
+    "audio-channel-alarm"
+  ], 
+  "audio-channel-content": [
+    "audio-channel-content"
+  ], 
+  "audio-channel-normal": [], 
+  "audio-channel-notification": [
+    "audio-channel-notification"
+  ], 
+  "audio-channel-publicnotification": [
+    "audio-channel-publicnotification"
+  ], 
+  "audio-channel-ringer": [
+    "audio-channel-ringer"
+  ], 
+  "audio-channel-telephony": [
+    "audio-channel-telephony"
+  ], 
+  "background-sensors": [], 
+  "backgroundservice": [], 
+  "bluetooth": [
+    "window.navigator.mozBluetooth"
+  ], 
+  "browser": [
+    "browser", 
+    "window.0", 
+    "window.1"
+  ], 
+  "camera": [
+    "window.navigator.mozCameras"
+  ], 
+  "cellbroadcast": [
+    "window.navigator.mozCellBroadcast"
+  ], 
+  "contacts": [], 
+  "deprecated-hwvideo": [], 
+  "desktop-notification": [], 
+  "device-storage:apps": [], 
+  "device-storage:crashes": [], 
+  "device-storage:music": [], 
+  "device-storage:pictures": [], 
+  "device-storage:sdcard": [], 
+  "device-storage:videos": [], 
+  "embed-apps": [], 
+  "fmradio": [
+    "window.navigator.mozFMRadio"
+  ], 
+  "geolocation": [], 
+  "idle": [
+    "window.navigator.addIdleObserver", 
+    "window.navigator.removeIdleObserver"
+  ], 
+  "input": [
+    "window.MozInputMethod", 
+    "window.navigator.mozInputMethod"
+  ], 
+  "input-manage": [
+    "window.navigator.mozKeyboard"
+  ], 
+  "mobileconnection": [
+    "window.navigator.mozIccManager", 
+    "window.navigator.mozMobileConnections"
+  ], 
+  "mobilenetwork": [
+    "window.navigator.mozMobileConnections"
+  ], 
+  "network-events": [], 
+  "networkstats-manage": [
+    "window.navigator.mozNetworkStats"
+  ], 
+  "nfc": [], 
+  "nfc-manager": [], 
+  "open-remote-window": {
+    "open-remote-window-allow": true, 
+    "open-remote-window-deny": false
+  }, 
+  "permissions": [
+    "window.navigator.mozPermissionSettings"
+  ], 
+  "phonenumberservice": [
+    "window.navigator.mozPhoneNumberService.normalize", 
+    "window.navigator.mozPhoneNumberService.fuzzyMatch"
+  ], 
+  "power": [
+    "window.navigator.mozPower"
+  ], 
+  "push": [
+    "window.navigator.push"
+  ], 
+  "settings": [], 
+  "sms": [
+    "window.navigator.mozMobileMessage"
+  ], 
+  "speaker-control": [
+    "speaker-control"
+  ], 
+  "storage": [], 
+  "systemXHR": [
+    "systemXHR"
+  ], 
+  "tcp-socket": [], 
+  "telephony": [
+    "window.navigator.mozTelephony"
+  ], 
+  "time": [
+    "window.navigator.mozTime"
+  ], 
+  "voicemail": [
+    "window.navigator.mozVoicemail"
+  ], 
+  "wappush": [], 
+  "webapps-manage": [
+    "device-storage:apps", 
+    "window.1", 
+    "window.navigator.mozApps.mgmt"
+  ], 
+  "wifi-manage": [
+    "window.navigator.mozWifiManager"
+  ]
+}

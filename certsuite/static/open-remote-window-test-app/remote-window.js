@@ -1,13 +1,6 @@
-function closeMe()
+function runTest()
 {
-  document.body.style.background = '#ff00ff';
-
-  var xmlHttp = null;
-  xmlHttp = new XMLHttpRequest();
-  xmlHttp.open( "POST", RESULTS_URI, true );
-  xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-  xmlHttp.send("results={}");
-  document.body.style.background = '#ff00ff';
+  document.body.style.background = '#00ffff';
 }
 
-window.addEventListener('load', function () {setTimeout(closeMe, 100);}, false);
+window.addEventListener('load', function () {setTimeout(runTest, 100);}, false);

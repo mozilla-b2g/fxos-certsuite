@@ -101,29 +101,29 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"ArchiveRequest\" is not Function.prototype expected function \"function () {\n}\" but got function \"function DOMRequest() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of ArchiveRequest.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object DOMRequestPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: attribute reader", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_equals: prototype of window's property \"Attr\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Node() {\n    [native code]\n}\"", 
@@ -961,427 +961,427 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"BluetoothAdapter\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of BluetoothAdapter.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute address", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute class", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute discovering", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute name", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute discoverable", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute discoverableTimeout", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute devices", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute uuids", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute ondevicefound", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute ondiscoverystatechanged", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute onpairedstatuschanged", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute ona2dpstatuschanged", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute onhfpstatuschanged", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute onscostatuschanged", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: attribute onrequestmediaplaystatus", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation setName(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation setDiscoverable(boolean)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation setDiscoverableTimeout(UnsignedLong)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation startDiscovery()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation stopDiscovery()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation pair(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation unpair(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation getPairedDevices()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation getConnectedDevices(UnsignedShort)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation setPinCode(String,String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation setPasskey(String,UnsignedLong)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation setPairingConfirmation(String,boolean)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 2 but got 1", 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation connect(BluetoothDevice (Wrapper),UnsignedShort)", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 2 but got 1", 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation disconnect(BluetoothDevice (Wrapper),UnsignedShort)", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation sendFile(String,Blob (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation stopSendingFile(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation confirmReceivingFile(String,boolean)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation connectSco()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation disconnectSco()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation isScoConnected()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation answerWaitingCall()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation ignoreWaitingCall()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation toggleCalls()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation sendMediaMetaData(MediaMetaData (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: window does not have own property \"BluetoothAdapter\" expected property \"BluetoothAdapter\" missing", 
       "name": "BluetoothAdapter interface: operation sendMediaPlayStatus(MediaPlayStatus (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"BluetoothDeviceEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDeviceEvent\" expected property \"BluetoothDeviceEvent\" missing", 
       "name": "BluetoothDeviceEvent interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for BluetoothDeviceEvent.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDeviceEvent\" expected property \"BluetoothDeviceEvent\" missing", 
       "name": "BluetoothDeviceEvent interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of BluetoothDeviceEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDeviceEvent\" expected property \"BluetoothDeviceEvent\" missing", 
       "name": "BluetoothDeviceEvent interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDeviceEvent\" expected property \"BluetoothDeviceEvent\" missing", 
       "name": "BluetoothDeviceEvent interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDeviceEvent\" expected property \"BluetoothDeviceEvent\" missing", 
       "name": "BluetoothDeviceEvent interface: attribute device", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDeviceEvent\" expected property \"BluetoothDeviceEvent\" missing", 
       "name": "BluetoothDeviceEvent interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"BluetoothDevice\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of BluetoothDevice.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute address", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute name", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute icon", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute connected", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute paired", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute class", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute uuids", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDevice\" expected property \"BluetoothDevice\" missing", 
       "name": "BluetoothDevice interface: attribute services", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"BluetoothDiscoveryStateChangedEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDiscoveryStateChangedEvent\" expected property \"BluetoothDiscoveryStateChangedEvent\" missing", 
       "name": "BluetoothDiscoveryStateChangedEvent interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for BluetoothDiscoveryStateChangedEvent.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDiscoveryStateChangedEvent\" expected property \"BluetoothDiscoveryStateChangedEvent\" missing", 
       "name": "BluetoothDiscoveryStateChangedEvent interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of BluetoothDiscoveryStateChangedEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDiscoveryStateChangedEvent\" expected property \"BluetoothDiscoveryStateChangedEvent\" missing", 
       "name": "BluetoothDiscoveryStateChangedEvent interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDiscoveryStateChangedEvent\" expected property \"BluetoothDiscoveryStateChangedEvent\" missing", 
       "name": "BluetoothDiscoveryStateChangedEvent interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothDiscoveryStateChangedEvent\" expected property \"BluetoothDiscoveryStateChangedEvent\" missing", 
       "name": "BluetoothDiscoveryStateChangedEvent interface: attribute discovering", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"BluetoothDiscoveryStateChangedEvent\" expected property \"BluetoothDiscoveryStateChangedEvent\" missing", 
       "name": "BluetoothDiscoveryStateChangedEvent interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"BluetoothManager\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of BluetoothManager.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: attribute enabled", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: attribute onenabled", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: attribute ondisabled", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: attribute onadapteradded", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: operation isConnected(UnsignedShort)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothManager\" expected property \"BluetoothManager\" missing", 
       "name": "BluetoothManager interface: operation getDefaultAdapter()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"BluetoothStatusChangedEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for BluetoothStatusChangedEvent.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of BluetoothStatusChangedEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface: attribute address", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface: attribute status", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"BluetoothStatusChangedEvent\" expected property \"BluetoothStatusChangedEvent\" missing", 
       "name": "BluetoothStatusChangedEvent interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
@@ -1451,9 +1451,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of window's property \"CameraControl\" is not Function.prototype expected function \"function () {\n}\" but got function \"function MediaStream() {\n    [native code]\n}\"", 
       "name": "CameraControl interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -1461,9 +1461,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of CameraControl.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object MediaStreamPrototype]\"", 
       "name": "CameraControl interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -1591,7 +1591,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getPreviewStreamVideoMode\" missing", 
       "name": "CameraControl interface: operation getPreviewStreamVideoMode(Any,CameraPreviewStreamCallback (Wrapper),CameraErrorCallback (Wrapper))", 
       "result": "FAIL"
     }, 
@@ -1606,7 +1606,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getPreviewStream\" missing", 
       "name": "CameraControl interface: operation getPreviewStream(Any,CameraPreviewStreamCallback (Wrapper),CameraErrorCallback (Wrapper))", 
       "result": "FAIL"
     }, 
@@ -1641,9 +1641,9 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": null, 
       "name": "CameraManager interface: operation getCamera(CameraSelector (Wrapper),GetCameraCallback (Wrapper),CameraErrorCallback (Wrapper))", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -2466,7 +2466,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "mozContact interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -2821,9 +2821,9 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"backgroundBlendMode\" expected true got false", 
+      "message": null, 
       "name": "CSS2Properties interface: attribute backgroundBlendMode", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -4776,9 +4776,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: wrong value for DeviceMotionEvent.length expected 0 but got 1", 
       "name": "DeviceMotionEvent interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_equals: prototype of DeviceMotionEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
@@ -6171,7 +6171,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "DOMParser interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -6361,7 +6361,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://web-webapi-verifier/testharness.js:651\nmake_message@app://web-webapi-verifier/testharness.js:2073\nassert@app://web-webapi-verifier/testharness.js:2060\nassert_equals@app://web-webapi-verifier/testharness.js:700\nIdlInterface.prototype.test_self/<@app://web-webapi-verifier/idlharness.js:1259\nTest.prototype.step@app://web-webapi-verifier/testharness.js:1159\ntest@app://web-webapi-verifier/testharness.js:442\nIdlInterface.prototype.test_self@app://web-webapi-verifier/idlharness.js:1281\nIdlExceptionOrInterface.prototype.test@app://web-webapi-verifier/idlharness.js:706\nIdlArray.prototype.test@app://web-webapi-verifier/idlharness.js:435\nrunTest@app://web-webapi-verifier/main.js:95\n)", 
+      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://web-webapi-verifier/testharness.js:651:20\nmake_message@app://web-webapi-verifier/testharness.js:2073:17\nassert@app://web-webapi-verifier/testharness.js:2060:1\nassert_equals@app://web-webapi-verifier/testharness.js:700:1\nIdlInterface.prototype.test_self/<@app://web-webapi-verifier/idlharness.js:1259:1\nTest.prototype.step@app://web-webapi-verifier/testharness.js:1159:13\ntest@app://web-webapi-verifier/testharness.js:442:9\nIdlInterface.prototype.test_self@app://web-webapi-verifier/idlharness.js:1281:1\nIdlExceptionOrInterface.prototype.test@app://web-webapi-verifier/idlharness.js:706:9\nIdlArray.prototype.test@app://web-webapi-verifier/idlharness.js:435:9\nrunTest@app://web-webapi-verifier/main.js:95:3\n)", 
       "name": "DOMSettableTokenList interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
@@ -7541,7 +7541,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "FormData interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -8896,14 +8896,14 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "HTMLDocument interface: operation captureEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "HTMLDocument interface: operation releaseEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_true: The prototype object must have a property \"location\" expected true got false", 
@@ -10726,9 +10726,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"controllers\" expected true got false", 
       "name": "HTMLInputElement interface: attribute controllers", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -14111,9 +14111,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: wrong value for ImageData.length expected 0 but got 2", 
       "name": "ImageData interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -15606,44 +15606,44 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for MozNdefRecord.length expected 0 but got 4", 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute tnf", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute type", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute id", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute payload", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -17291,14 +17291,14 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "OscillatorNode interface: operation start(double)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "OscillatorNode interface: operation stop(double)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -18016,7 +18016,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "Range interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -18336,7 +18336,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "mozRTCIceCandidate interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -18571,7 +18571,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "mozRTCSessionDescription interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -18981,82 +18981,82 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"SpeechRecognitionError\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for SpeechRecognitionError.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of SpeechRecognitionError.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: attribute error", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: attribute message", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"SpeechRecognitionEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for SpeechRecognitionEvent.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of SpeechRecognitionEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute resultIndex", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute results", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute interpretation", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute emma", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
@@ -21986,19 +21986,19 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"filterResX\" expected true got false", 
       "name": "SVGFilterElement interface: attribute filterResX", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"filterResY\" expected true got false", 
       "name": "SVGFilterElement interface: attribute filterResY", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setFilterRes\" missing", 
       "name": "SVGFilterElement interface: operation setFilterRes(UnsignedLong,UnsignedLong)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -25426,7 +25426,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "TextDecoder interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -25456,7 +25456,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "TextEncoder interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -26201,9 +26201,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "'toString' called on an object that does not implement interface URL.(stack: IdlInterface.prototype.test_self/<@app://web-webapi-verifier/idlharness.js:1278:13\nTest.prototype.step@app://web-webapi-verifier/testharness.js:1159:13\ntest@app://web-webapi-verifier/testharness.js:442:9\nIdlInterface.prototype.test_self@app://web-webapi-verifier/idlharness.js:1281:1\nIdlExceptionOrInterface.prototype.test@app://web-webapi-verifier/idlharness.js:706:9\nIdlArray.prototype.test@app://web-webapi-verifier/idlharness.js:435:9\nrunTest@app://web-webapi-verifier/main.js:95:3\n)", 
       "name": "URL interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -27951,14 +27951,14 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "Window interface: operation captureEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "Window interface: operation releaseEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -28126,12 +28126,12 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"pkcs11\" expected true got false", 
       "name": "Window interface: attribute pkcs11", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: setter must be undefined for readonly attributes expected (undefined) undefined but got (function) function \"function controllers() {\n    [native code]\n}\"", 
+      "message": "assert_true: The prototype object must have a property \"controllers\" expected true got false", 
       "name": "Window interface: attribute controllers", 
       "result": "FAIL"
     }, 
@@ -28966,7 +28966,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "XMLSerializer interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -29026,7 +29026,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "XPathEvaluator interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -29069,7 +29069,6 @@
   "windowList": {
     "AnalyserNode": true, 
     "AnimationEvent": true, 
-    "ArchiveRequest": true, 
     "Array": true, 
     "ArrayBuffer": true, 
     "Attr": true, 
@@ -29090,12 +29089,6 @@
     "BiquadFilterNode": true, 
     "Blob": true, 
     "BlobEvent": true, 
-    "BluetoothAdapter": true, 
-    "BluetoothDevice": true, 
-    "BluetoothDeviceEvent": true, 
-    "BluetoothDiscoveryStateChangedEvent": true, 
-    "BluetoothManager": true, 
-    "BluetoothStatusChangedEvent": true, 
     "Boolean": true, 
     "CDATASection": true, 
     "CFStateChangeEvent": true, 
@@ -29421,24 +29414,7 @@
     "CSSValueList": true, 
     "CallEvent": true, 
     "CallGroupErrorEvent": true, 
-    "CameraCapabilities": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "CameraCapabilities": true, 
     "CameraControl": true, 
     "CameraManager": true, 
     "CanvasGradient": true, 
@@ -29492,69 +29468,16 @@
     "DataContainerEvent": true, 
     "DataErrorEvent": true, 
     "DataStoreCursor": true, 
-    "DataTransfer": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "DataTransfer": true, 
     "DataView": true, 
     "Date": true, 
     "DelayNode": true, 
     "DesktopNotification": true, 
     "DesktopNotificationCenter": true, 
-    "DeviceAcceleration": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "DeviceLightEvent": true, 
     "DeviceMotionEvent": true, 
     "DeviceOrientationEvent": true, 
     "DeviceProximityEvent": true, 
-    "DeviceRotationRate": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "DeviceStorage": true, 
     "DeviceStorageChangeEvent": true, 
     "Document": true, 
@@ -29657,6 +29580,7 @@
     "HTMLQuoteElement": true, 
     "HTMLScriptElement": true, 
     "HTMLSelectElement": true, 
+    "HTMLShadowElement": true, 
     "HTMLSourceElement": true, 
     "HTMLSpanElement": true, 
     "HTMLStyleElement": true, 
@@ -29718,28 +29642,6 @@
     }, 
     "KeyEvent": true, 
     "KeyboardEvent": true, 
-    "LoadStatus": {
-      "LOADED": true, 
-      "QueryInterface": true, 
-      "RECEIVING": true, 
-      "REQUESTED": true, 
-      "UNINITIALIZED": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "LocalMediaStream": true, 
     "Location": true, 
     "LockedFile": {
@@ -29822,24 +29724,7 @@
     "MediaElementAudioSourceNode": true, 
     "MediaError": true, 
     "MediaList": true, 
-    "MediaQueryList": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "MediaQueryList": true, 
     "MediaRecorder": true, 
     "MediaStream": true, 
     "MediaStreamAudioDestinationNode": true, 
@@ -29910,24 +29795,6 @@
     }, 
     "MozCellBroadcast": true, 
     "MozCellBroadcastEvent": true, 
-    "MozConnection": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "MozContactChangeEvent": true, 
     "MozEmergencyCbModeEvent": true, 
     "MozIcc": true, 
@@ -30142,10 +30009,10 @@
       "valueOf": true, 
       "watch": true
     }, 
+    "MozNDEFRecord": true, 
     "MozNFCPeer": true, 
     "MozNFCTag": true, 
     "MozNamedAttrMap": true, 
-    "MozNdefRecord": true, 
     "MozOtaStatusEvent": true, 
     "MozPowerManager": true, 
     "MozSettingsEvent": true, 
@@ -30192,24 +30059,7 @@
     "MozTimeManager": true, 
     "MozVoicemail": true, 
     "MozVoicemailEvent": true, 
-    "MozWakeLock": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "MozWakeLock": true, 
     "MozWifiConnectionInfoEvent": true, 
     "MozWifiStatusChangeEvent": true, 
     "MutationEvent": true, 
@@ -30246,6 +30096,7 @@
     "PopupBlockedEvent": true, 
     "ProcessingInstruction": true, 
     "ProgressEvent": true, 
+    "Promise": true, 
     "PropertyNodeList": true, 
     "Proxy": true, 
     "QueryInterface": true, 
@@ -30295,6 +30146,7 @@
     "SVGFEDiffuseLightingElement": true, 
     "SVGFEDisplacementMapElement": true, 
     "SVGFEDistantLightElement": true, 
+    "SVGFEDropShadowElement": true, 
     "SVGFEFloodElement": true, 
     "SVGFEFuncAElement": true, 
     "SVGFEFuncBElement": true, 
@@ -30428,31 +30280,13 @@
     "Screen": true, 
     "ScriptProcessorNode": true, 
     "ScrollAreaEvent": true, 
-    "Selection": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": {}, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "Selection": true, 
     "Set": true, 
     "SettingsLock": true, 
     "SettingsManager": true, 
+    "SharedWorker": true, 
     "SimpleGestureEvent": true, 
     "SmartCardEvent": true, 
-    "SpeechRecognitionError": true, 
-    "SpeechRecognitionEvent": true, 
     "SpeechSynthesis": true, 
     "SpeechSynthesisEvent": true, 
     "SpeechSynthesisUtterance": true, 
@@ -30517,6 +30351,7 @@
     "UNTESTED_IDL": null, 
     "URIError": true, 
     "URL": true, 
+    "URLSearchParams": true, 
     "USSDReceivedEvent": true, 
     "Uint16Array": true, 
     "Uint32Array": true, 
@@ -30791,35 +30626,42 @@
     "close": true, 
     "closed": true, 
     "confirm": true, 
-    "console": true, 
-    "constructor": true, 
-    "content": true, 
-    "controllers": {
-      "QueryInterface": true, 
+    "console": {
       "__defineGetter__": true, 
       "__defineSetter__": true, 
       "__lookupGetter__": true, 
       "__lookupSetter__": true, 
-      "appendController": true, 
+      "__noSuchMethod__": true, 
+      "assert": true, 
       "constructor": true, 
-      "getControllerAt": true, 
-      "getControllerById": true, 
-      "getControllerCount": true, 
-      "getControllerForCommand": true, 
-      "getControllerId": true, 
+      "count": true, 
+      "debug": true, 
+      "dir": true, 
+      "error": true, 
+      "exception": true, 
+      "group": true, 
+      "groupCollapsed": true, 
+      "groupEnd": true, 
       "hasOwnProperty": true, 
-      "insertControllerAt": true, 
+      "info": true, 
       "isPrototypeOf": true, 
+      "log": true, 
+      "profile": true, 
+      "profileEnd": true, 
       "propertyIsEnumerable": true, 
-      "removeController": true, 
-      "removeControllerAt": true, 
+      "time": true, 
+      "timeEnd": true, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
+      "trace": true, 
       "unwatch": true, 
       "valueOf": true, 
+      "warn": true, 
       "watch": true
     }, 
+    "constructor": true, 
+    "content": true, 
     "crypto": {
       "__defineGetter__": true, 
       "__defineSetter__": true, 
@@ -31098,7 +30940,28 @@
         "volumeControlChannel": true, 
         "watch": true
       }, 
-      "mozConnection": true, 
+      "mozConnection": {
+        "__defineGetter__": true, 
+        "__defineSetter__": true, 
+        "__lookupGetter__": true, 
+        "__lookupSetter__": true, 
+        "addEventListener": true, 
+        "bandwidth": true, 
+        "constructor": true, 
+        "dispatchEvent": true, 
+        "hasOwnProperty": true, 
+        "isPrototypeOf": true, 
+        "metered": true, 
+        "onchange": null, 
+        "propertyIsEnumerable": true, 
+        "removeEventListener": true, 
+        "toLocaleString": true, 
+        "toSource": true, 
+        "toString": true, 
+        "unwatch": true, 
+        "valueOf": true, 
+        "watch": true
+      }, 
       "mozContacts": {
         "__defineGetter__": true, 
         "__defineSetter__": true, 
@@ -31126,6 +30989,7 @@
         "valueOf": true, 
         "watch": true
       }, 
+      "mozDownloadManager": null, 
       "mozGetUserMedia": true, 
       "mozHasPendingMessage": true, 
       "mozId": true, 
@@ -31472,7 +31336,6 @@
       "watch": true
     }, 
     "personalbar": true, 
-    "pkcs11": null, 
     "postMessage": true, 
     "print": true, 
     "prompt": true, 

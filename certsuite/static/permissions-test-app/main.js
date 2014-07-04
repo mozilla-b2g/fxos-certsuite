@@ -4,20 +4,51 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+function getTheNames(obj, visited)
+{
+  var orig_obj = obj;
+
+  var result = {};
+  visited[obj] = result;
+
+  while (obj) {
+    for (var name of Object.getOwnPropertyNames(obj)) {
+      try {
+        var value = orig_obj[name];
+        var value_visited = visited[value];
+      } catch(err) {
+        // We can hit a few exceptions here:
+        // * some objects will throw "NS_ERROR_XPC_BAD_OP_ON_WN_PROTO: Illegal operation on WrappedNative prototype object" for the prototype property
+        // * some objects will throw "Method not implemented" or similar when trying to access them by name
+        result[name] = err;
+        continue;
+      }
+
+      if (value === null) {
+        result[name] = null;
+      } else if (typeof value === "object") {
+        if (value_visited === undefined) {
+          result[name] = getTheNames(value, visited);
+        } else {
+          result[name] = true;
+        }
+      } else {
+        result[name] = true;
+      }
+    }
+
+    obj = Object.getPrototypeOf(obj);
+  }
+
+  return result;
+}
+
 function permissionsTests()
 {
   // Create one promise for all of the synchronous APIs
   var syncAPIPromise = new Promise(
     function(resolve, reject) {
       var permissionsResults = {};
-
-      // alarms
-      permissionsResults['alarms'] = navigator.mozAlarms !== null;
-
-      // attention
-      // This should only be available to system apps, but we can see
-      // if it shows up here.
-      permissionsResults['attention'] = 'AttentionScreen' in window;
 
       // For audio channel types, if we attempt to assign something for
       // which we do not have permissions, the channel type will remain
@@ -58,36 +89,11 @@ function permissionsTests()
       audio.mozAudioChannelType = 'publicnotification';
       permissionsResults['audio-channel-publicnotification'] = audio.mozAudioChannelType;
 
-      // background-sensors
-      // TODO: it appears this is only a planned feature at the moment
-
-      // backgroundservice
-      // TODO: it appears this is only a planned feature at the moment
-
-      // bluetooth
-      permissionsResults['bluetooth'] = 'mozBluetooth' in navigator;
-
       // browser
       // if mozbrowser is supported, we will see additional methods on the
       // iframe.
       var iframe = document.getElementById('test-mozbrowser');
       permissionsResults['browser'] = 'getScreenshot' in iframe;
-
-      // camera
-      permissionsResults['camera'] = 'mozCameras' in navigator;
-
-      // cellbroadcast
-      permissionsResults['cellbroadcast'] = 'mozCellBroadcast' in navigator;
-
-      // contacts
-      permissionsResults['contacts'] = navigator.mozContacts !== null;
-
-      // deprecated-hwvideo
-      // TODO: it appears this is only available to system apps and isn't
-      //       testable here.
-
-      // desktop-notification
-      permissionsResults['desktop-notification'] = window.Notification !== null;
 
       // device-storage
       permissionsResults['device-storage:apps'] = navigator.getDeviceStorage('apps') !== null;
@@ -96,86 +102,6 @@ function permissionsTests()
       permissionsResults['device-storage:videos'] = navigator.getDeviceStorage('videos') !== null;
       permissionsResults['device-storage:music'] = navigator.getDeviceStorage('music') !== null;
       permissionsResults['device-storage:sdcard'] = navigator.getDeviceStorage('sdcard') !== null;
-
-      // downloads
-      // TODO: Although this shows up in PermissionsTable.jsm,
-      //       when installing we get PermissionsInstaller.jsm: 'downloads'
-      //       is not a valid Webapps permission name.
-
-      // embed apps
-      // This is tested by running a separate app in an iframe which posts
-      // its own results.
-
-      // feature-detection
-      // See: https://wiki.mozilla.org/WebAPI/Navigator.hasFeature
-      permissionsResults['feature-detection'] = 'hasFeature' in navigator;
-
-      // fmradio
-      permissionsResults['fmradio'] = navigator.mozFMRadio !== null;
-
-      // geolocation
-      permissionsResults['geolocation'] = navigator.geolocation !== null;
-
-      // idle
-      permissionsResults['idle'] = 'addIdleObserver' in navigator;
-
-      // input
-      // See https://wiki.mozilla.org/WebAPI/KeboardIME
-      permissionsResults['input'] = 'mozInputMethod' in navigator;
-
-      // input-manage
-      if ('mozInputMethod' in navigator) {
-        permissionsResults['input-manage'] = 'mgmt' in navigator.mozInputMethod;
-      } else {
-        permissionsResults['input-manage'] = false;
-      }
-
-      // keyboard
-      permissionsResults['keyboard'] = navigator.mozKeyboard !== null;
-
-      // mobileconnection
-      permissionsResults['mobileconnection'] = navigator.mozMobileConnection !== null;
-
-      // mobilenetwork
-      permissionsResults['mobilenetwork'] = 'mozMobileConnections' in navigator;
-
-      // nfc
-      permissionsResults['nfc'] = 'mozNfc' in navigator;
-
-      // nfc-manager
-      if (permissionsResults['nfc']) {
-        //TODO: this seems to allow additional nfc capabilities for the
-        //      system app, but I don't have mozNfc, so I can't verify
-        permissionsResults['nfc-manager'] = false;
-      }
-
-      // networkstats-manage
-      // TODO: this appears to be used internally by the costcontrol app.
-      //       not sure if there is anything to test here.
-
-      // open-remote-window
-      // This needs to be tested in a separate app. Opening the remote
-      // window could cause this app to stop which means the tests never
-      // complete.
-
-      // permissions
-      permissionsResults['permissions'] = navigator.mozPermissions !== null;
-
-      // phone number service
-      // normalize and fuzzyMatch only exposed if permissions exist
-      permissionsResults['phonenumberservice'] = 'normalize' in navigator.mozPhoneNumberService;
-
-      // power
-      permissionsResults['power'] = 'mozPower' in navigator;
-
-      // push
-      permissionsResults['push'] = navigator.push !== null;
-
-      // settings
-      permissionsResults['settings'] = navigator.mozSettings !== null;
-
-      // sms
-      permissionsResults['sms'] = 'mozMobileMessage' in navigator;
 
       // speaker-control
       permissionsResults['speaker-control'] = true;
@@ -200,24 +126,6 @@ function permissionsTests()
           system_xhr = false;
       }
       permissionsResults['systemXHR'] = system_xhr;
-
-      // time
-      permissionsResults['time'] = 'mozTime' in navigator;
-
-      // tcp-socket
-      permissionsResults['tcp-socket'] = navigator.mozTCPSocket !== null;
-
-      // telephony
-      permissionsResults['telephony'] = 'mozTelephony' in navigator;
-
-      // voicemail
-      permissionsResults['voicemail'] = 'mozVoicemail' in navigator;
-
-      // webapps-manage
-      permissionsResults['webapps-manage'] = navigator.mozApps.mgmt !== null;
-
-      // wifi-manage
-      permissionsResults['wifi-manager'] = navigator.mozWifiManager !== null;
 
       resolve(permissionsResults);
   });
@@ -291,14 +199,20 @@ function permissionsTests()
 
 function runTest()
 {
+
+  var results = {}
+  results['window'] = getTheNames(window, {});
+
   var permissionsPromise = permissionsTests();
   permissionsPromise.then(function(result) {
-    results = {};
 
     //combine results into one object
     result.forEach(function (o) {
       for (key in o) {
-        results[key] = o[key];
+        // only report true values for permissions
+        if (o[key]) {
+          results[key] = o[key];
+        }
       }
     });
 
