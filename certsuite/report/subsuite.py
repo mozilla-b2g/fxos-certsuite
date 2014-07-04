@@ -1,70 +1,56 @@
-import os
-from collections import defaultdict
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from mozlog.structured import reader
+import os
+
 from py.xml import html, raw
 
 here = os.path.split(__file__)[0]
 
-result_status = dict((v,k) for k,v in
-                     enumerate(["PASS", "FAIL", "OK", "ERROR", "TIMEOUT", "CRASH"]))
-
-def is_regression(data):
-    if "expected" not in data:
-        return False
-
-    return result_status[data["status"]] > result_status[data["expected"]]
-
-class LogHandler(reader.LogHandler):
-    def __init__(self):
-        self.suite_name = None
-        self.regressions = defaultdict(dict)
-
-    def suite_start(self, data):
-        self.suite_name = data["source"]
-
-    def test_id(self, data):
-        if isinstance(data["test"], unicode):
-            return data["test"]
-        else:
-            return tuple(data["test"])
-
-    def test_status(self, data):
-        test_id = self.test_id(data)
-
-        if is_regression(data):
-            self.regressions[test_id][data["subtest"]] = data
-
-    def test_end(self, data):
-        test_id = self.test_id(data)
-
-        if is_regression(data):
-            self.regressions[test_id][None] = data
-
 class HTMLBuilder(object):
-    def make_report(self, suite_name, regressions):
+    def make_report(self, results):
+        self.results = results
         return html.html(
-            self.make_head(suite_name),
-            self.make_body(suite_name, regressions)
+            self.make_head(),
+            self.make_body()
         )
 
-    def make_head(self, suite_name):
-        with open(os.path.join(here, "subsuite.css")) as f:
+    def make_head(self):
+        with open(os.path.join(here, "report.css")) as f:
             style = html.style(raw(f.read()))
 
         return html.head(
             html.meta(charset="utf-8"),
-            html.title("FirefoxOS Certification Suite Report: %s" % suite_name),
+            html.title("FirefoxOS Certification Suite Report: %s" % self.results.name),
             style
         )
 
-    def make_body(self, suite_name, regressions):
+    def make_body(self):
+        body_parts = [html.h1("FirefoxOS Certification Suite Report: %s" % self.results.name)]
+
+        if self.results.has_errors:
+            body_parts.append(html.h2("Errors During Run"))
+            body_parts.append(self.make_errors_table(self.results.errors))
+        if self.results.has_regressions:
+            body_parts.append(html.h2("Test Regressions"))
+            body_parts.append(self.make_regression_table())
+
         return html.body(
-            html.h1("FirefoxOS Certification Suite Report: %s" % suite_name),
-            self.make_failure_table(regressions)
+            body_parts
         )
 
-    def make_failure_table(self, regressions):
+    def make_errors_table(self, errors):
+        rows = []
+        for error in errors:
+            rows.append(html.tr(
+                html.td(error["level"],
+                        class_="log_%s" % error["level"]),
+                html.td(error.get("message", ""))
+            ))
+        return html.table(rows, id_="errors")
+
+    def make_regression_table(self):
         return html.table(
             html.thead(
                 html.tr(
@@ -76,11 +62,13 @@ class HTMLBuilder(object):
                 )
             ),
             html.tbody(
-                *self.make_table_rows(regressions)
+                *self.make_table_rows()
             )
         )
 
-    def make_table_rows(self, regressions):
+    def make_table_rows(self):
+        regressions = self.results.regressions
+
         rv = []
         tests = sorted(regressions.keys())
         for i, test in enumerate(tests):
@@ -95,7 +83,7 @@ class HTMLBuilder(object):
                             class_="condition %s" % subtest_data["expected"]),
                     html.td(subtest_data["status"].title(),
                             class_="condition %s" % subtest_data["status"]),
-                    html.td(subtest_data["message"],
+                    html.td(subtest_data.get("message", ""),
                             class_="message")
                 ])
                 tr = html.tr(cells)
@@ -118,24 +106,10 @@ class HTMLBuilder(object):
         else:
             return [html.td(test_name, rowspan=len(test_data), class_="parent_test %s" % pos_cls)], True
 
-def make_report(log_file):
-    regression_handler = LogHandler()
-    reader.handle_log(reader.read(log_file),
-                      regression_handler)
-
-    suite_name = regression_handler.suite_name
-    regressions = regression_handler.regressions
-
-    doc = HTMLBuilder().make_report(suite_name, regressions)
+def make_report(results):
+    doc = HTMLBuilder().make_report(results)
 
     return u"<!DOCTYPE html>\n" + doc.unicode(indent=2)
-
-def create(input_path, output_path):
-    with open(input_path) as f:
-        data = make_report(f)
-
-    with open(output_path, "w") as out_f:
-        out_f.write(data)
 
 if __name__ == "__main__":
     import sys

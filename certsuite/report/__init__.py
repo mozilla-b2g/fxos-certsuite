@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 from mozlog.structured import (
     structuredlog,
     handlers,
@@ -5,17 +9,13 @@ from mozlog.structured import (
     reader,
 )
 
+import results
 import subsuite
+import summary
 
-def get_test_failures(raw_log):
-    '''
-    Return the list of test failures contained within a structured log file.
-    '''
-    failures = []
-    def test_status(data):
-        if data['status'] == 'FAIL':
-            failures.append(data)
-    with open(raw_log, 'r') as f:
-        reader.each_log(reader.read(f),
-                        {'test_status':test_status})
-    return failures
+def parse_log(path):
+    with open(path) as f:
+        regression_handler = results.LogHandler()
+        reader.handle_log(reader.read(f),
+                          regression_handler)
+        return regression_handler.results

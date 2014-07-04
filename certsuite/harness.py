@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import traceback
 import zipfile
 
@@ -31,8 +32,9 @@ config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "config.json"))
 
 
-def setup_logging(log_f):
+def setup_logging(log_manager):
     global logger
+    log_f = log_manager.structured_file
     logger = structuredlog.StructuredLogger("firefox-os-cert-suite")
     logger.add_handler(handlers.StreamHandler(sys.stderr,
                                               formatters.MachFormatter()))
@@ -73,19 +75,47 @@ def log_metadata():
         logger.info("fxos-certsuite %s: %s" % (key, metadata[key]))
 
 class LogManager(object):
-    def __init__(self, path, zip_file):
-        self.path = path
-        self.zip_file = zip_file
-        self.file = None
+    def __init__(self):
+        self.time = datetime.now()
+        self.structured_path = "run.log"
+        self.zip_path = 'firefox-os-certification_%s.zip' % (time.strftime("%Y%m%d%H%M%S"))
+        self.structured_file = None
+        self.subsuite_results = []
+
+    def add_file(self, path, file_obj):
+        self.zip_file.write(path, file_obj)
+
+    def add_subsuite_report(self, path):
+        results = report.parse_log(path)
+        self.subsuite_results.append(results)
+        if not results.is_pass:
+            html_str = report.subsuite.make_report(results)
+            path = "%s/report.html" % results.name
+        self.zip_file.writestr(path, html_str)
+
+    def add_summary_report(self, path):
+        summary_results = report.parse_log(path)
+        html_str = report.summary.make_report(self.time,
+                                              summary_results,
+                                              self.subsuite_results)
+        path = "report.html"
+        self.zip_file.writestr(path, html_str)
 
     def __enter__(self):
-        self.file = open(self.path, "w")
-        return self.file
+        self.zip_file = zipfile.ZipFile(self.zip_path, 'w', zipfile.ZIP_DEFLATED)
+        self.structured_file = open(self.structured_path, "w")
+        return self
 
     def __exit__(self, *args, **kwargs):
-        self.file.__exit__(*args, **kwargs)
-        self.zip_file.write(self.path)
-        os.unlink(self.path)
+        try:
+            self.structured_file.__exit__(*args, **kwargs)
+            self.zip_file.write(self.structured_path)
+            self.add_summary_report(self.structured_path)
+        finally:
+            try:
+                os.unlink(self.structured_path)
+            finally:
+                self.zip_file.__exit__(*args, **kwargs)
 
 class DeviceBackup(object):
     def __init__(self):
@@ -169,22 +199,15 @@ class TestRunner(object):
         for suite, groups in d.iteritems():
             yield suite, groups
 
-    def run_suite(self, suite, groups, output_zip):
+    def run_suite(self, suite, groups, log_manager):
         with TemporaryDirectory() as temp_dir:
-            result_files, structured_log = self.run_test(suite, groups, temp_dir)
-
-            failures = report.get_test_failures(structured_log)
-            html_path = os.path.splitext(structured_log)[0] + ".html"
-            report.subsuite.create(structured_log, html_path)
-            result_files.append(html_path)
-
-            print result_files
+            result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
             for path in result_files:
-                print path
                 file_name = os.path.split(path)[1]
-                output_zip.write(path, "%s/%s" % (suite, file_name))
-            return failures
+                log_manager.add_file(path, "%s/%s" % (suite, file_name))
+
+            log_manager.add_subsuite_report(structured_path)
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -263,7 +286,7 @@ def install_marionette(version):
         try:
             marionette_install(version)
         except AlreadyInstalledException:
-            print "Marionette is already installed"
+            logger.info("Marionette is already installed")
     except subprocess.CalledProcessError, e:
         logger.critical('Error installing marionette extension: %s' % e)
         sys.exit(1)
@@ -276,50 +299,35 @@ def list_tests(args, config):
 runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
     return 0
 
-def write_static_files(zip_f):
-    '''
-    Add static files to the results zip file.
-    '''
-    for file in ['results.html', 'results.js']:
-        path = pkg_resources.resource_filename(__name__,
-                                               os.path.join('html_output', file))
-        zip_f.write(path, file)
 
 def run_tests(args, config):
-    output_zipfile = 'firefox-os-certification_%s.zip' % (datetime.now().strftime("%Y%m%d%H%M%S"),)
-    output_logfile = "run.log"
     error = False
+    output_zipfile = None
 
     try:
-        with zipfile.ZipFile(output_zipfile, 'w', zipfile.ZIP_DEFLATED) as zip_f:
-            write_static_files(zip_f)
-            with LogManager(output_logfile, zip_f) as log_f:
-                setup_logging(log_f)
+        with LogManager() as log_manager:
+            output_zipfile = log_manager.zip_path
+            setup_logging(log_manager)
 
-                log_metadata()
-                check_adb()
-                install_marionette(config['version'])
-                results = []
+            log_metadata()
+            check_adb()
+            install_marionette(config['version'])
 
-                with DeviceBackup() as device:
-                    runner = TestRunner(args, config)
+            with DeviceBackup() as device:
+                runner = TestRunner(args, config)
+                results = OrderedDict()
 
-                    for suite, groups in runner.iter_suites():
-                        try:
-                            failures = runner.run_suite(suite, groups, zip_f)
-                            results.append({'passed': len(failures) == 0,
-                                            'shortname': suite,
-                                            #TODO: put human-readable names in config.json
-                                            'name': suite})
-                        except:
-                            logger.critical("Encountered error:\n%s" % traceback.format_exc())
-                            error = True
-                        finally:
-                            device.restore()
+                for suite, groups in runner.iter_suites():
+                    try:
+                        runner.run_suite(suite, groups, log_manager)
+                    except:
+                        logger.critical("Encountered error:\n%s" % traceback.format_exc())
+                        error = True
+                    finally:
+                        device.restore()
 
-                if error:
-                    logger.critical("Encountered errors during run")
-                zip_f.writestr('result_data.js', 'var results = %s;\n' % json.dumps(results))
+            if error:
+                logger.critical("Encountered errors during run")
 
     except (SystemExit, KeyboardInterrupt):
         raise
@@ -327,7 +335,8 @@ def run_tests(args, config):
         error = True
         print "Encountered error at top level:\n%s" % traceback.format_exc()
 
-    sys.stderr.write('Results saved in %s\n' % output_zipfile)
+    if output_zipfile:
+        sys.stderr.write('Results saved in %s\n' % output_zipfile)
 
     return int(error)
 

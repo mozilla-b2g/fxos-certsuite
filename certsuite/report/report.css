@@ -1,6 +1,14 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public */
+/* License, v. 2.0. If a copy of the MPL was not distributed with this file, */
+/* You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 body {
     font-family: 'DejaVu Sans', 'Sans';
     font-size: 14px;
+}
+
+:link {
+    text-decoration:none;
 }
 
 .condition {
@@ -14,6 +22,14 @@ body {
 .FAIL { background-color: red }
 .TIMEOUT { background-color: blue }
 .ERROR { background-color: purple }
+
+.log_ERROR {
+    color:orange;
+}
+
+.log_CRITICAL {
+    color:red;
+}
 
 .message {
     font-family: "DejaVu Sans Mono", Monospace
@@ -36,7 +52,21 @@ td {
     border-bottom: thin solid #fff;
 }
 
+td > a {
+  display: inline-block;
+  height:100%;
+  width:100%;
+}
+
+.details {
+    text-align:center;
+}
+
 tbody > tr:nth-child(2n) { background-color: #f4f4f4 }
+
+table#errors tr {
+    background-color: white;
+}
 
 td.parent_test {
     font-family: "DejaVu Sans Mono", Monospace;
