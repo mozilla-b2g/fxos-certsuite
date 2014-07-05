@@ -315,7 +315,6 @@ def run_tests(args, config):
 
             with DeviceBackup() as device:
                 runner = TestRunner(args, config)
-                results = OrderedDict()
 
                 for suite, groups in runner.iter_suites():
                     try:
