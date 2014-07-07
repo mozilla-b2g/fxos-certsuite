@@ -1,0 +1,81 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public */
+/* License, v. 2.0. If a copy of the MPL was not distributed with this file, */
+/* You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+body {
+    font-family: 'DejaVu Sans', 'Sans';
+    font-size: 14px;
+}
+
+:link {
+    text-decoration:none;
+}
+
+.condition {
+    font-variant: small-caps;
+    color: white;
+    text-align: center;
+    font-size: 1.1em;
+    width:5em;
+}
+.PASS { background-color: green }
+.FAIL { background-color: red }
+.TIMEOUT { background-color: blue }
+.ERROR { background-color: purple }
+
+.log_ERROR {
+    color:orange;
+}
+
+.log_CRITICAL {
+    color:red;
+}
+
+.message {
+    font-family: "DejaVu Sans Mono", Monospace
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+th {
+    padding:0.5em 1em 0.5em 1em;
+    background-color: #eee;
+    font-weight: bold;
+}
+
+td {
+    padding: 0.5em;
+    border-top: thin solid #fff;
+    border-bottom: thin solid #fff;
+}
+
+td > a {
+  display: inline-block;
+  height:100%;
+  width:100%;
+}
+
+.details {
+    text-align:center;
+}
+
+tbody > tr:nth-child(2n) { background-color: #f4f4f4 }
+
+table#errors tr {
+    background-color: white;
+}
+
+td.parent_test {
+    font-family: "DejaVu Sans Mono", Monospace;
+}
+
+td.parent_test.even {
+    background-color: #fff;
+}
+
+td.parent_test.odd {
+    background-color: #f4f4f4;
+}
