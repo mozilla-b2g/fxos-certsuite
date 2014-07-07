@@ -229,6 +229,7 @@ class TelephonyTestCommon(object):
     def disable_dialer(self):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app
+        cur_frame = self.marionette.get_active_frame()
         self.marionette.switch_to_frame() # system app
         try:
             self.marionette.execute_async_script("""
@@ -237,13 +238,13 @@ class TelephonyTestCommon(object):
             marionetteScriptFinished(1);
             """, special_powers=True)
         except:
-            self.marionette.switch_to_frame(self.app["frame"])
             self.fail("failed to disable dialer agent")
         finally:
-            self.marionette.switch_to_frame(self.app["frame"])
+            self.marionette.switch_to_frame(cur_frame)
 
     def enable_dialer(self):
         # enable system dialer agent to handle calls
+        cur_frame = self.marionette.get_active_frame()
         self.marionette.switch_to_frame() # system app
         try:
             self.marionette.execute_async_script("""
@@ -252,7 +253,6 @@ class TelephonyTestCommon(object):
             marionetteScriptFinished(1);
             """, special_powers=True)
         except:
-            self.marionette.switch_to_frame(self.app["frame"])
             self.fail("failed to disable dialer agent")
         finally:
-            self.marionette.switch_to_frame(self.app["frame"])
+            self.marionette.switch_to_frame(cur_frame)

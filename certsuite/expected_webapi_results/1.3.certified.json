@@ -101,29 +101,29 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"ArchiveRequest\" is not Function.prototype expected function \"function () {\n}\" but got function \"function DOMRequest() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of ArchiveRequest.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object DOMRequestPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ArchiveRequest\" expected property \"ArchiveRequest\" missing", 
       "name": "ArchiveRequest interface: attribute reader", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_equals: prototype of window's property \"Attr\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Node() {\n    [native code]\n}\"", 
@@ -1451,9 +1451,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of window's property \"CameraControl\" is not Function.prototype expected function \"function () {\n}\" but got function \"function MediaStream() {\n    [native code]\n}\"", 
       "name": "CameraControl interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -1461,9 +1461,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of CameraControl.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object MediaStreamPrototype]\"", 
       "name": "CameraControl interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -1591,7 +1591,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getPreviewStreamVideoMode\" missing", 
       "name": "CameraControl interface: operation getPreviewStreamVideoMode(Any,CameraPreviewStreamCallback (Wrapper),CameraErrorCallback (Wrapper))", 
       "result": "FAIL"
     }, 
@@ -1606,7 +1606,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getPreviewStream\" missing", 
       "name": "CameraControl interface: operation getPreviewStream(Any,CameraPreviewStreamCallback (Wrapper),CameraErrorCallback (Wrapper))", 
       "result": "FAIL"
     }, 
@@ -1641,9 +1641,9 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": null, 
       "name": "CameraManager interface: operation getCamera(CameraSelector (Wrapper),GetCameraCallback (Wrapper),CameraErrorCallback (Wrapper))", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -2466,7 +2466,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "mozContact interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -2821,9 +2821,9 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"backgroundBlendMode\" expected true got false", 
+      "message": null, 
       "name": "CSS2Properties interface: attribute backgroundBlendMode", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -4776,9 +4776,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: wrong value for DeviceMotionEvent.length expected 0 but got 1", 
       "name": "DeviceMotionEvent interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_equals: prototype of DeviceMotionEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
@@ -6171,7 +6171,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "DOMParser interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -6361,7 +6361,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://certified-webapi-verifier/testharness.js:651\nmake_message@app://certified-webapi-verifier/testharness.js:2073\nassert@app://certified-webapi-verifier/testharness.js:2060\nassert_equals@app://certified-webapi-verifier/testharness.js:700\nIdlInterface.prototype.test_self/<@app://certified-webapi-verifier/idlharness.js:1259\nTest.prototype.step@app://certified-webapi-verifier/testharness.js:1159\ntest@app://certified-webapi-verifier/testharness.js:442\nIdlInterface.prototype.test_self@app://certified-webapi-verifier/idlharness.js:1281\nIdlExceptionOrInterface.prototype.test@app://certified-webapi-verifier/idlharness.js:706\nIdlArray.prototype.test@app://certified-webapi-verifier/idlharness.js:435\nrunTest@app://certified-webapi-verifier/main.js:95\n)", 
+      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://certified-webapi-verifier/testharness.js:651:20\nmake_message@app://certified-webapi-verifier/testharness.js:2073:17\nassert@app://certified-webapi-verifier/testharness.js:2060:1\nassert_equals@app://certified-webapi-verifier/testharness.js:700:1\nIdlInterface.prototype.test_self/<@app://certified-webapi-verifier/idlharness.js:1259:1\nTest.prototype.step@app://certified-webapi-verifier/testharness.js:1159:13\ntest@app://certified-webapi-verifier/testharness.js:442:9\nIdlInterface.prototype.test_self@app://certified-webapi-verifier/idlharness.js:1281:1\nIdlExceptionOrInterface.prototype.test@app://certified-webapi-verifier/idlharness.js:706:9\nIdlArray.prototype.test@app://certified-webapi-verifier/idlharness.js:435:9\nrunTest@app://certified-webapi-verifier/main.js:95:3\n)", 
       "name": "DOMSettableTokenList interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
@@ -7541,7 +7541,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "FormData interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -8896,14 +8896,14 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "HTMLDocument interface: operation captureEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "HTMLDocument interface: operation releaseEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_true: The prototype object must have a property \"location\" expected true got false", 
@@ -10726,9 +10726,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"controllers\" expected true got false", 
       "name": "HTMLInputElement interface: attribute controllers", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -14111,9 +14111,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: wrong value for ImageData.length expected 0 but got 2", 
       "name": "ImageData interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -15606,44 +15606,44 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for MozNdefRecord.length expected 0 but got 4", 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute tnf", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute type", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute id", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"MozNdefRecord\" expected property \"MozNdefRecord\" missing", 
       "name": "MozNdefRecord interface: attribute payload", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -17291,14 +17291,14 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "OscillatorNode interface: operation start(double)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "OscillatorNode interface: operation stop(double)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -18016,7 +18016,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "Range interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -18336,7 +18336,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "mozRTCIceCandidate interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -18571,7 +18571,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "mozRTCSessionDescription interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -18981,82 +18981,82 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"SpeechRecognitionError\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for SpeechRecognitionError.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of SpeechRecognitionError.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: attribute error", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: attribute message", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionError\" expected property \"SpeechRecognitionError\" missing", 
       "name": "SpeechRecognitionError interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"SpeechRecognitionEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: wrong value for SpeechRecognitionEvent.length expected 0 but got 1", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of SpeechRecognitionEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute resultIndex", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute results", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute interpretation", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute emma", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
+      "message": "assert_own_property: window does not have own property \"SpeechRecognitionEvent\" expected property \"SpeechRecognitionEvent\" missing", 
       "name": "SpeechRecognitionEvent interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
@@ -21986,19 +21986,19 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"filterResX\" expected true got false", 
       "name": "SVGFilterElement interface: attribute filterResX", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"filterResY\" expected true got false", 
       "name": "SVGFilterElement interface: attribute filterResY", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setFilterRes\" missing", 
       "name": "SVGFilterElement interface: operation setFilterRes(UnsignedLong,UnsignedLong)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -25426,7 +25426,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "TextDecoder interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -25456,7 +25456,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "TextEncoder interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -26201,9 +26201,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "'toString' called on an object that does not implement interface URL.(stack: IdlInterface.prototype.test_self/<@app://certified-webapi-verifier/idlharness.js:1278:13\nTest.prototype.step@app://certified-webapi-verifier/testharness.js:1159:13\ntest@app://certified-webapi-verifier/testharness.js:442:9\nIdlInterface.prototype.test_self@app://certified-webapi-verifier/idlharness.js:1281:1\nIdlExceptionOrInterface.prototype.test@app://certified-webapi-verifier/idlharness.js:706:9\nIdlArray.prototype.test@app://certified-webapi-verifier/idlharness.js:435:9\nrunTest@app://certified-webapi-verifier/main.js:95:3\n)", 
       "name": "URL interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -27951,14 +27951,14 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "Window interface: operation captureEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "Window interface: operation releaseEvents(Long)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -28126,12 +28126,12 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"pkcs11\" expected true got false", 
       "name": "Window interface: attribute pkcs11", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: setter must be undefined for readonly attributes expected (undefined) undefined but got (function) function \"function controllers() {\n    [native code]\n}\"", 
+      "message": "assert_true: The prototype object must have a property \"controllers\" expected true got false", 
       "name": "Window interface: attribute controllers", 
       "result": "FAIL"
     }, 
@@ -28966,7 +28966,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "XMLSerializer interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -29026,7 +29026,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a function function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
       "name": "XPathEvaluator interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -29069,7 +29069,6 @@
   "windowList": {
     "AnalyserNode": true, 
     "AnimationEvent": true, 
-    "ArchiveRequest": true, 
     "Array": true, 
     "ArrayBuffer": true, 
     "Attr": true, 
@@ -29421,24 +29420,7 @@
     "CSSValueList": true, 
     "CallEvent": true, 
     "CallGroupErrorEvent": true, 
-    "CameraCapabilities": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "CameraCapabilities": true, 
     "CameraControl": true, 
     "CameraManager": true, 
     "CanvasGradient": true, 
@@ -29475,6 +29457,7 @@
     "Crypto": true, 
     "CustomEvent": true, 
     "DOMCursor": true, 
+    "DOMDownload": true, 
     "DOMError": true, 
     "DOMException": true, 
     "DOMImplementation": true, 
@@ -29494,74 +29477,22 @@
     "DataStore": true, 
     "DataStoreChangeEvent": true, 
     "DataStoreCursor": true, 
-    "DataTransfer": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "DataTransfer": true, 
     "DataView": true, 
     "Date": true, 
     "DelayNode": true, 
     "DesktopNotification": true, 
     "DesktopNotificationCenter": true, 
-    "DeviceAcceleration": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "DeviceLightEvent": true, 
     "DeviceMotionEvent": true, 
     "DeviceOrientationEvent": true, 
     "DeviceProximityEvent": true, 
-    "DeviceRotationRate": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "DeviceStorage": true, 
     "DeviceStorageChangeEvent": true, 
     "Document": true, 
     "DocumentFragment": true, 
     "DocumentType": true, 
+    "DownloadEvent": true, 
     "DragEvent": true, 
     "DynamicsCompressorNode": true, 
     "Element": true, 
@@ -29659,6 +29590,7 @@
     "HTMLQuoteElement": true, 
     "HTMLScriptElement": true, 
     "HTMLSelectElement": true, 
+    "HTMLShadowElement": true, 
     "HTMLSourceElement": true, 
     "HTMLSpanElement": true, 
     "HTMLStyleElement": true, 
@@ -29720,28 +29652,6 @@
     }, 
     "KeyEvent": true, 
     "KeyboardEvent": true, 
-    "LoadStatus": {
-      "LOADED": true, 
-      "QueryInterface": true, 
-      "RECEIVING": true, 
-      "REQUESTED": true, 
-      "UNINITIALIZED": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "LocalMediaStream": true, 
     "Location": true, 
     "LockedFile": {
@@ -29824,24 +29734,7 @@
     "MediaElementAudioSourceNode": true, 
     "MediaError": true, 
     "MediaList": true, 
-    "MediaQueryList": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "MediaQueryList": true, 
     "MediaRecorder": true, 
     "MediaStream": true, 
     "MediaStreamAudioDestinationNode": true, 
@@ -29912,24 +29805,6 @@
     }, 
     "MozCellBroadcast": true, 
     "MozCellBroadcastEvent": true, 
-    "MozConnection": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "MozContactChangeEvent": true, 
     "MozEmergencyCbModeEvent": true, 
     "MozIcc": true, 
@@ -30145,10 +30020,11 @@
       "valueOf": true, 
       "watch": true
     }, 
+    "MozNDEFRecord": true, 
     "MozNFCPeer": true, 
     "MozNFCTag": true, 
     "MozNamedAttrMap": true, 
-    "MozNdefRecord": true, 
+    "MozNfc": true, 
     "MozOtaStatusEvent": true, 
     "MozPowerManager": true, 
     "MozSettingsEvent": true, 
@@ -30195,25 +30071,11 @@
     "MozTimeManager": true, 
     "MozVoicemail": true, 
     "MozVoicemailEvent": true, 
-    "MozWakeLock": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "MozWakeLock": true, 
     "MozWifiConnectionInfoEvent": true, 
+    "MozWifiP2pGroupOwner": true, 
+    "MozWifiP2pManager": true, 
+    "MozWifiP2pStatusChangeEvent": true, 
     "MozWifiStatusChangeEvent": true, 
     "MutationEvent": true, 
     "MutationObserver": true, 
@@ -30299,6 +30161,7 @@
     "SVGFEDiffuseLightingElement": true, 
     "SVGFEDisplacementMapElement": true, 
     "SVGFEDistantLightElement": true, 
+    "SVGFEDropShadowElement": true, 
     "SVGFEFloodElement": true, 
     "SVGFEFuncAElement": true, 
     "SVGFEFuncBElement": true, 
@@ -30432,31 +30295,13 @@
     "Screen": true, 
     "ScriptProcessorNode": true, 
     "ScrollAreaEvent": true, 
-    "Selection": {
-      "QueryInterface": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "prototype": {}, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
+    "Selection": true, 
     "Set": true, 
     "SettingsLock": true, 
     "SettingsManager": true, 
+    "SharedWorker": true, 
     "SimpleGestureEvent": true, 
     "SmartCardEvent": true, 
-    "SpeechRecognitionError": true, 
-    "SpeechRecognitionEvent": true, 
     "SpeechSynthesis": true, 
     "SpeechSynthesisEvent": true, 
     "SpeechSynthesisUtterance": true, 
@@ -30521,6 +30366,7 @@
     "UNTESTED_IDL": null, 
     "URIError": true, 
     "URL": true, 
+    "URLSearchParams": true, 
     "USSDReceivedEvent": true, 
     "Uint16Array": true, 
     "Uint32Array": true, 
@@ -30795,35 +30641,42 @@
     "close": true, 
     "closed": true, 
     "confirm": true, 
-    "console": true, 
-    "constructor": true, 
-    "content": true, 
-    "controllers": {
-      "QueryInterface": true, 
+    "console": {
       "__defineGetter__": true, 
       "__defineSetter__": true, 
       "__lookupGetter__": true, 
       "__lookupSetter__": true, 
-      "appendController": true, 
+      "__noSuchMethod__": true, 
+      "assert": true, 
       "constructor": true, 
-      "getControllerAt": true, 
-      "getControllerById": true, 
-      "getControllerCount": true, 
-      "getControllerForCommand": true, 
-      "getControllerId": true, 
+      "count": true, 
+      "debug": true, 
+      "dir": true, 
+      "error": true, 
+      "exception": true, 
+      "group": true, 
+      "groupCollapsed": true, 
+      "groupEnd": true, 
       "hasOwnProperty": true, 
-      "insertControllerAt": true, 
+      "info": true, 
       "isPrototypeOf": true, 
+      "log": true, 
+      "profile": true, 
+      "profileEnd": true, 
       "propertyIsEnumerable": true, 
-      "removeController": true, 
-      "removeControllerAt": true, 
+      "time": true, 
+      "timeEnd": true, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
+      "trace": true, 
       "unwatch": true, 
       "valueOf": true, 
+      "warn": true, 
       "watch": true
     }, 
+    "constructor": true, 
+    "content": true, 
     "crypto": {
       "__defineGetter__": true, 
       "__defineSetter__": true, 
@@ -31189,7 +31042,28 @@
         "valueOf": true, 
         "watch": true
       }, 
-      "mozConnection": true, 
+      "mozConnection": {
+        "__defineGetter__": true, 
+        "__defineSetter__": true, 
+        "__lookupGetter__": true, 
+        "__lookupSetter__": true, 
+        "addEventListener": true, 
+        "bandwidth": true, 
+        "constructor": true, 
+        "dispatchEvent": true, 
+        "hasOwnProperty": true, 
+        "isPrototypeOf": true, 
+        "metered": true, 
+        "onchange": null, 
+        "propertyIsEnumerable": true, 
+        "removeEventListener": true, 
+        "toLocaleString": true, 
+        "toSource": true, 
+        "toString": true, 
+        "unwatch": true, 
+        "valueOf": true, 
+        "watch": true
+      }, 
       "mozContacts": {
         "__defineGetter__": true, 
         "__defineSetter__": true, 
@@ -31210,6 +31084,29 @@
         "remove": true, 
         "removeEventListener": true, 
         "save": true, 
+        "toLocaleString": true, 
+        "toSource": true, 
+        "toString": true, 
+        "unwatch": true, 
+        "valueOf": true, 
+        "watch": true
+      }, 
+      "mozDownloadManager": {
+        "__defineGetter__": true, 
+        "__defineSetter__": true, 
+        "__lookupGetter__": true, 
+        "__lookupSetter__": true, 
+        "addEventListener": true, 
+        "clearAllDone": true, 
+        "constructor": true, 
+        "dispatchEvent": true, 
+        "getDownloads": true, 
+        "hasOwnProperty": true, 
+        "isPrototypeOf": true, 
+        "ondownloadstart": null, 
+        "propertyIsEnumerable": true, 
+        "remove": true, 
+        "removeEventListener": true, 
         "toLocaleString": true, 
         "toSource": true, 
         "toString": true, 
@@ -31267,7 +31164,26 @@
         "hasOwnProperty": true, 
         "inputcontext": null, 
         "isPrototypeOf": true, 
-        "mgmt": {}, 
+        "mgmt": {
+          "__defineGetter__": true, 
+          "__defineSetter__": true, 
+          "__lookupGetter__": true, 
+          "__lookupSetter__": true, 
+          "constructor": true, 
+          "hasOwnProperty": true, 
+          "hide": true, 
+          "isPrototypeOf": true, 
+          "next": true, 
+          "propertyIsEnumerable": true, 
+          "showAll": true, 
+          "supportsSwitching": true, 
+          "toLocaleString": true, 
+          "toSource": true, 
+          "toString": true, 
+          "unwatch": true, 
+          "valueOf": true, 
+          "watch": true
+        }, 
         "oninputcontextchange": null, 
         "propertyIsEnumerable": true, 
         "removeEventListener": true, 
@@ -31342,6 +31258,7 @@
         "constructor": true, 
         "getAllAlarms": true, 
         "getAvailableNetworks": true, 
+        "getAvailableServiceTypes": true, 
         "getSamples": true, 
         "hasOwnProperty": true, 
         "isPrototypeOf": true, 
@@ -31349,6 +31266,32 @@
         "propertyIsEnumerable": true, 
         "removeAlarms": true, 
         "sampleRate": true, 
+        "toLocaleString": true, 
+        "toSource": true, 
+        "toString": true, 
+        "unwatch": true, 
+        "valueOf": true, 
+        "watch": true
+      }, 
+      "mozNfc": {
+        "__defineGetter__": true, 
+        "__defineSetter__": true, 
+        "__lookupGetter__": true, 
+        "__lookupSetter__": true, 
+        "addEventListener": true, 
+        "checkP2PRegistration": true, 
+        "constructor": true, 
+        "dispatchEvent": true, 
+        "getNFCPeer": true, 
+        "getNFCTag": true, 
+        "hasOwnProperty": true, 
+        "isPrototypeOf": true, 
+        "notifySendFileStatus": true, 
+        "notifyUserAcceptedP2P": true, 
+        "onpeerlost": null, 
+        "onpeerready": null, 
+        "propertyIsEnumerable": true, 
+        "removeEventListener": true, 
         "toLocaleString": true, 
         "toSource": true, 
         "toString": true, 
@@ -31633,6 +31576,37 @@
         "watch": true, 
         "wps": true
       }, 
+      "mozWifiP2pManager": {
+        "__defineGetter__": true, 
+        "__defineSetter__": true, 
+        "__lookupGetter__": true, 
+        "__lookupSetter__": true, 
+        "addEventListener": true, 
+        "connect": true, 
+        "constructor": true, 
+        "disconnect": true, 
+        "dispatchEvent": true, 
+        "enabled": true, 
+        "getPeerList": true, 
+        "groupOwner": null, 
+        "hasOwnProperty": true, 
+        "isPrototypeOf": true, 
+        "ondisabled": null, 
+        "onenabled": null, 
+        "onpeerinfoupdate": null, 
+        "onstatuschange": null, 
+        "propertyIsEnumerable": true, 
+        "removeEventListener": true, 
+        "setDeviceName": true, 
+        "setPairingConfirmation": true, 
+        "setScanEnabled": true, 
+        "toLocaleString": true, 
+        "toSource": true, 
+        "toString": true, 
+        "unwatch": true, 
+        "valueOf": true, 
+        "watch": true
+      }, 
       "onLine": true, 
       "oscpu": true, 
       "platform": true, 
@@ -31901,7 +31875,6 @@
       "watch": true
     }, 
     "personalbar": true, 
-    "pkcs11": null, 
     "postMessage": true, 
     "print": true, 
     "prompt": true, 

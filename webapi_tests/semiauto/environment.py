@@ -26,13 +26,12 @@ def get(environ, *args, **kwargs):
 
 
 class InProcessTestEnvironment(object):
-    def __init__(self, addr=("localhost", 6666), server_cls=None,
-                 io_loop=None, verbose=False):
-        self.addr = addr
+    def __init__(self, addr=None, server_cls=None, io_loop=None, verbose=False):
         self.io_loop = io_loop or IOLoop()
         self.started = False
         self.handler = None
-
+        if addr is None:
+            addr = ("127.0.0.1", 0)
         if server_cls is None:
             server_cls = FrontendServer
         self.server = server_cls(addr, io_loop=self.io_loop,
@@ -47,7 +46,6 @@ class InProcessTestEnvironment(object):
         """
 
         self.started = True
-
         if block:
             self.server.start()
         else:
@@ -56,12 +54,8 @@ class InProcessTestEnvironment(object):
             self.server_thread.start()
 
     def stop(self):
-        """Stop the test environment.
-
-        If the test environment is not running, this method has no effect.
-
-        """
-
+	"""Stop the test environment.  If the test environment is
+	not running, this method has no effect."""
         if self.started:
             try:
                 self.server.stop()
