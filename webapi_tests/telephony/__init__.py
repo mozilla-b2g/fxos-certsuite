@@ -5,3 +5,5 @@
 from webapi_tests.telephony.telephony_test import TelephonyTestCommon
 from webapi_tests.telephony.test_telephony_incoming import TestTelephonyIncoming
 from webapi_tests.telephony.test_telephony_outgoing import TestTelephonyOutgoing
+from webapi_tests.telephony.test_telephony_incoming_rejection import TestTelephonyIncomingRejection
+from webapi_tests.telephony.test_telephony_incoming_hold_hangup import TestTelephonyIncomingHoldHangup

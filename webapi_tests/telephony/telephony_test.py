@@ -146,6 +146,91 @@ class TelephonyTestCommon(object):
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls" )
 
+    def user_guided_incoming_call_reject(self):
+        # ask user to call the device; hangup and verify via webapi
+        self.setup_incoming_call()
+        self.instruct("From a different phone, call the Firefox OS device, and when you \
+                      hear the ringing signal click 'OK'")
+        self.verify_incoming_call()
+        self.hangup_incoming_call()
+
+    def hangup_incoming_call(self):
+        # hangup the incoming call, verify
+        self.marionette.execute_async_script("""
+        let incoming = window.wrappedJSObject.incoming_call;
+
+        window.wrappedJSObject.disconnecting_call_ok = false;
+        incoming.ondisconnecting = function ondisconnecting(event) {
+          log("Received 'ondisconnecting' call event.");
+          if (event.call.state == "disconnecting") {
+            window.wrappedJSObject.disconnecting_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.disconnected_call_ok = false;
+        incoming.ondisconnected = function ondisconnected(event) {
+          log("Received 'ondisconnected' call event.");
+          if (event.call.state == "disconnected") {
+            window.wrappedJSObject.disconnected_call_ok = true;
+          };
+        };
+
+        incoming.hangUp();
+        marionetteScriptFinished(1);
+        """, special_powers=True)
+
+        # should have received both events associated with a call hangup
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
+        except:
+            # failed to hangup
+            self.fail("Failed to hangup call")
+
+        # verify no incoming call
+        self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
+        self.assertTrue(self.incoming_call, None)
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls" )
+
+    def hold_active_call(self):
+        self.marionette.execute_async_script("""
+
+        let active = window.wrappedJSObject.active_call;
+        window.wrappedJSObject.onholding_call_ok = false;
+        active.onholding = function ondisconnecting(event) {
+          log("Received 'onholding' call event.");
+          if (event.call.state == "holding") {
+            window.wrappedJSObject.onholding_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.onheld_call_ok = false;
+        active.onheld = function ondisconnected(event) {
+          log("Received 'onheld' call event.");
+          if (event.call.state == "held") {
+            window.wrappedJSObject.onheld_call_ok = true;
+          };
+        };
+
+        active.hold();
+        marionetteScriptFinished(1);
+        """, special_powers=True)
+
+        # should have received both events associated with a call on hold
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onholding_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+        except:
+            # failed to hold
+            self.fail("Failed to hold call")
+
+        # verify the hold call
+        self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
+        self.assertEqual(self.active_call['state'], "held", "Call state shoould he 'held'")
+
     def initiate_outgoing_call(self, destination):
         # use the webapi to initiate a call to the specified number
         self.marionette.execute_async_script("""
