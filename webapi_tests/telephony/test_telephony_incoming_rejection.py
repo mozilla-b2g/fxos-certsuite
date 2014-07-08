@@ -30,13 +30,15 @@ class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
         self.addCleanup(self.clean_up)
         super(TestTelephonyIncomingRejection, self).setUp()
         # disable the default dialer manager so it doesn't grab our calls
-        self.disable_dialer()
+        #self.disable_dialer()
 
-    @unittest.skip("Currently disabled in 1.4")
+    #@unittest.skip("Currently disabled in 1.4")
     def test_telephony_incoming_rejection(self):
         # ask user to call the device and reject via webapi
         self.user_guided_incoming_call_reject()
 
     def clean_up(self):
         # re-enable the default dialer manager
-        self.enable_dialer()
+        #self.enable_dialer()
+        # remove this pass once enable_dialer is uncommented
+        pass
