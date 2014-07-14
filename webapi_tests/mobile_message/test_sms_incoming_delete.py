@@ -20,10 +20,6 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
     """
 
     def tearDown(self):
-        self.marionette.execute_script("""
-            SpecialPowers.removePermission("sms", document);
-            SpecialPowers.setBoolPref("dom.sms.enabled", false);
-        """)
         super(TestSmsIncomingDelete, self).tearDown()
 
     def test_sms_incoming_delete(self):

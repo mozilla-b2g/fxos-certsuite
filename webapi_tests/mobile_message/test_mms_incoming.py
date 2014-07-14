@@ -18,22 +18,18 @@ class TestMmsIncoming(TestCase, MobileMessageTestCommon):
     """
 
     def tearDown(self):
-        self.marionette.execute_script("""
-            SpecialPowers.removePermission("sms", document);
-            SpecialPowers.setBoolPref("dom.sms.enabled", false);
-        """)
         super(TestMmsIncoming, self).tearDown()
 
     def test_mms_incoming(self):
         # have user send mms to the Firefox OS device
         self.msg_type = "MMS"
-        self.user_guided_incoming_msg()
+        self.user_guided_incoming_msg(type="MMS")
 
         # verify message contents
         self.assertEqual(self.in_msg['type'], 'mms', "Received MMS MozMmsMessage.type should be 'mms'")
         self.assertGreater(self.in_msg['id'], 0, "Received MMS MozMmsMessage.id should be > 0")
         self.assertGreater(self.in_msg['threadId'], 0, "Received MMS MozMmsMessage.threadId should be > 0")
-        self.assertTrue(self.in_msg['delivery'] in ['received', 'not-download'], "Received MMS MozMmsMessage.delivery "
+        self.assertIn(self.in_msg['delivery'], ['received', 'not-download'], "Received MMS MozMmsMessage.delivery "
                         "should be 'received' or 'not-download")
         # cannot guarantee end-user didn't read message; test that specifically in a different test
         self.assertTrue(self.in_msg['read'] is False or self.in_msg['read'] is True,

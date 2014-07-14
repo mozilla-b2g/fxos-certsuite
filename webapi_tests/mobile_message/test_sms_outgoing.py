@@ -19,10 +19,6 @@ class TestSmsOutgoing(TestCase, MobileMessageTestCommon):
     """
 
     def tearDown(self):
-        self.marionette.execute_script("""
-            SpecialPowers.removePermission("sms", document);
-            SpecialPowers.setBoolPref("dom.sms.enabled", false);
-        """)
         super(TestSmsOutgoing, self).tearDown()
 
     def test_sms_outgoing(self):

@@ -20,16 +20,12 @@ class TestMmsIncomingDelete(TestCase, MobileMessageTestCommon):
     """
 
     def tearDown(self):
-        self.marionette.execute_script("""
-            SpecialPowers.removePermission("sms", document);
-            SpecialPowers.setBoolPref("dom.sms.enabled", false);
-        """)
         super(TestMmsIncomingDelete, self).tearDown()
 
     def test_mms_incoming_delete(self):
         # have user send mms to the Firefox OS device
         self.msg_type = "MMS"
-        self.user_guided_incoming_msg()
+        self.user_guided_incoming_msg(type="MMS")
 
         # delete fails sometimes without a sleep (because of the msg notification?)
         time.sleep(5)
