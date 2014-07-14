@@ -37,12 +37,13 @@ class TestTelephonyIncoming(TestCase, TelephonyTestCommon):
     def test_telephony_incoming(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
+        self.answer_call()
 
         # keep call active for awhile
         time.sleep(5)
 
         # disconnect the call
-        self.hangup_active_call()
+        self.hangup_call(self.active_call)
 
     def clean_up(self):
         # re-enable the default dialer manager

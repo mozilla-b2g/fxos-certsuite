@@ -18,7 +18,7 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
     - Ask the test user to phone the Firefox OS device from a second phone
     - Verify that the mozTelephony incoming call event is triggered
     - Answer the incoming call via the API, keep the call active for 5 seconds
-    - Hold the call using  API
+    - Hold the call using the API and ask the test user to verify
     - Hangup the hold call via the API,
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
@@ -38,15 +38,16 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
     def test_telephony_incoming_hold_hangup(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
+        self.answer_call()
 
         # keep call active for a while
         time.sleep(5)
 
         self.hold_active_call()
-        self.confirm("Please confirm if call is on hold?")
+        self.confirm("Is the call now on hold?")
 
         #hangup the hold call
-        self.hangup_active_call()
+        self.hangup_call(self.active_call)
 
     def clean_up(self):
         # re-enable the default dialer manager

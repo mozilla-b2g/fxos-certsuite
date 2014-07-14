@@ -45,7 +45,7 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         time.sleep(5)
 
         # disconnect the call
-        self.hangup_active_call()
+        self.hangup_call(self.active_call)
 
     def clean_up(self):
         # re-enable the default dialer manager

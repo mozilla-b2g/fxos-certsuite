@@ -35,7 +35,8 @@ class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
     #@unittest.skip("Currently disabled in 1.4")
     def test_telephony_incoming_rejection(self):
         # ask user to call the device and reject via webapi
-        self.user_guided_incoming_call_reject()
+        self.user_guided_incoming_call()
+        self.hangup_call(self.incoming_call)
 
     def clean_up(self):
         # re-enable the default dialer manager
