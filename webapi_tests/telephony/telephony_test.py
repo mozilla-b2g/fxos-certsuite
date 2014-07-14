@@ -31,7 +31,7 @@ class TelephonyTestCommon(object):
             received = self.marionette.execute_script("return window.wrappedJSObject.received_incoming")
             self.assertTrue(received, "Incoming call not received (Telephony.onincoming event not found)")
             self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-            self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call" )
+            self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call")
             self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
             self.assertEqual(self.incoming_call['state'], "incoming", "Call state should be 'incoming'")
             self.assertEqual(self.calls['0'], self.incoming_call)
@@ -81,7 +81,7 @@ class TelephonyTestCommon(object):
         # should have received both events associated with answering a call
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
-            if incoming: # only receive 'onconnecting' for incoming call
+            if incoming:  # only receive 'onconnecting' for incoming call
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connecting_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connected_call_ok"))
         except:
@@ -95,7 +95,7 @@ class TelephonyTestCommon(object):
         else:
             self.assertEqual(self.active_call['number'], self.outgoing_call['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 active call" )
+        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual(self.calls['0'], self.active_call)
 
     def user_guided_incoming_call(self):
@@ -194,7 +194,7 @@ class TelephonyTestCommon(object):
             self.assertTrue(self.incoming_call, None)
 
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 0, "There should be 0 calls" )
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def hold_active_call(self):
         self.marionette.execute_async_script("""
@@ -232,7 +232,7 @@ class TelephonyTestCommon(object):
         # verify the hold call
         self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
         self.assertEqual(self.active_call['state'], "held", "Call state shoould he 'held'")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 call" )
+        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
 
     def initiate_outgoing_call(self, destination):
         # use the webapi to initiate a call to the specified number
@@ -289,7 +289,7 @@ class TelephonyTestCommon(object):
 
         # verify one outgoing call
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 call" )
+        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
         self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
         self.assertEqual(self.outgoing_call['state'], "alerting", "Call state should be 'alerting'")
         self.assertEqual(self.calls['0'], self.outgoing_call)
@@ -306,7 +306,7 @@ class TelephonyTestCommon(object):
         self.assertGreater(len(destination), 3, "Destination phone number entered is incomplete")
 
         # ask user to confirm destination number
-        self.confirm('Warning: A test call will be made from the Firefox OS device to "%s" is this number correct?' %destination)
+        self.confirm('Warning: A test call will be made from the Firefox OS device to "%s" is this number correct?' % destination)
 
         # make the call via webapi
         self.initiate_outgoing_call(destination)
@@ -318,7 +318,7 @@ class TelephonyTestCommon(object):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app
         cur_frame = self.marionette.get_active_frame()
-        self.marionette.switch_to_frame() # system app
+        self.marionette.switch_to_frame()  # system app
         try:
             self.marionette.execute_async_script("""
             log("disabling system dialer agent");
@@ -333,7 +333,7 @@ class TelephonyTestCommon(object):
     def enable_dialer(self):
         # enable system dialer agent to handle calls
         cur_frame = self.marionette.get_active_frame()
-        self.marionette.switch_to_frame() # system app
+        self.marionette.switch_to_frame()  # system app
         try:
             self.marionette.execute_async_script("""
             log("enabling system dialer agent");
