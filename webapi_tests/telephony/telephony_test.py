@@ -111,84 +111,58 @@ class TelephonyTestCommon(object):
         window.wrappedJSObject.recvd_active_call_hangup = false;
         window.wrappedJSObject.recvd_incoming_call_hangup = false;
         """)
+
         if call_to_hangup['state'] == "incoming":
-            self.marionette.execute_script("window.wrappedJSObject.recvd_incoming_call_hangup = true;")
+            self.marionette.execute_script("window.wrappedJSObject.recvd_incoming_call_hangup = true")
         elif call_to_hangup['state'] == "connected" or call_to_hangup['state'] == "held":
-            self.marionette.execute_script("window.wrappedJSObject.recvd_active_call_hangup = true;")
+            self.marionette.execute_script("window.wrappedJSObject.recvd_active_call_hangup = true")
 
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
-
-        if (window.wrappedJSObject.recvd_active_call_hangup) {
-          let active = window.wrappedJSObject.active_call;
-
-          window.wrappedJSObject.disconnecting_active_call_ok = false;
-          active.ondisconnecting = function ondisconnecting(event) {
-            log("Received 'ondisconnecting' call event.");
-            if (event.call.state == "disconnecting") {
-              window.wrappedJSObject.disconnecting_active_call_ok = true;
-            };
-          };
-
-          window.wrappedJSObject.disconnected_active_call_ok = false;
-          active.ondisconnected = function ondisconnected(event) {
-            log("Received 'ondisconnected' call event.");
-            if (event.call.state == "disconnected") {
-              window.wrappedJSObject.disconnected_active_call_ok = true;
-            };
-          };
-
-        active.hangUp();
+        let call_to_hangup = "";
+        if (window.wrappedJSObject.recvd_incoming_call_hangup) {
+          call_to_hangup = window.wrappedJSObject.incoming_call;
         }
-        else if (window.wrappedJSObject.recvd_incoming_call_hangup) {
-          let incoming = window.wrappedJSObject.incoming_call;
-
-          window.wrappedJSObject.disconnecting_incoming_call_ok = false;
-          incoming.ondisconnecting = function ondisconnecting(event) {
-            log("Received 'ondisconnecting' call event.");
-            if (event.call.state == "disconnecting") {
-              window.wrappedJSObject.disconnecting_incoming_call_ok = true;
-            };
-          };
-
-          window.wrappedJSObject.disconnected_incoming_call_ok = false;
-          incoming.ondisconnected = function ondisconnected(event) {
-            log("Received 'ondisconnected' call event.");
-            if (event.call.state == "disconnected") {
-              window.wrappedJSObject.disconnected_incoming_call_ok = true;
-            };
-          };
-
-        incoming.hangUp();
+        else if(window.wrappedJSObject.recvd_active_call_hangup) {
+          call_to_hangup = window.wrappedJSObject.active_call;
         }
+
+        window.wrappedJSObject.disconnecting_call_ok = false;
+        call_to_hangup.ondisconnecting = function ondisconnecting(event) {
+          log("Received 'ondisconnecting' call event.");
+          if (event.call.state == "disconnecting") {
+            window.wrappedJSObject.disconnecting_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.disconnected_call_ok = false;
+        call_to_hangup.ondisconnected = function ondisconnected(event) {
+          log("Received 'ondisconnected' call event.");
+          if (event.call.state == "disconnected") {
+            window.wrappedJSObject.disconnected_call_ok = true;
+          };
+        };
+
+        call_to_hangup.hangUp();
 
         marionetteScriptFinished(1);
         """, special_powers=True)
 
-        if self.marionette.execute_script("return window.wrappedJSObject.recvd_active_call_hangup"):
-            # should have received both events associated with a active call hangup
-            wait = Wait(self.marionette, timeout=90, interval=0.5)
-            try:
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_active_call_ok"))
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_active_call_ok"))
-            except:
-                # failed to hangup
-                self.fail("Failed to hangup active call")
+        # should have received both events associated with a active call hangup
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
+        except:
+            # failed to hangup
+            self.fail("Failed to hangup call")
 
+        if  self.marionette.execute_script("return window.wrappedJSObject.recvd_active_call_hangup"):
             # verify no active call
             self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
             self.assertTrue(self.active_call, None)
 
         if self.marionette.execute_script("return window.wrappedJSObject.recvd_incoming_call_hangup"):
-            # should have received both events associated with a incoming call hangup
-            wait = Wait(self.marionette, timeout=90, interval=0.5)
-            try:
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_incoming_call_ok"))
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_incoming_call_ok"))
-            except:
-                # failed to hangup
-                self.fail("Failed to hangup incoming call")
-
             # verify no incoming call
             self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
             self.assertTrue(self.incoming_call, None)
@@ -231,7 +205,7 @@ class TelephonyTestCommon(object):
 
         # verify the hold call
         self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
-        self.assertEqual(self.active_call['state'], "held", "Call state shoould he 'held'")
+        self.assertEqual(self.active_call['state'], "held", "Call state should he 'held'")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
 
     def initiate_outgoing_call(self, destination):
