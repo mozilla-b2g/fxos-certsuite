@@ -86,5 +86,6 @@ Known Issues
 
 * Bug 1026259 - web-platform tests sometimes lose wifi connection
 * Bug 1039042 - Semi-auto tests wait forever for browser to be closed, if it launched the browser initially
+* Bug 1039060 - "WebIDL2 is not defined" during web-platform-tests
 
 For a full list of known bugs, see:  https://bugzilla.mozilla.org/showdependencytree.cgi?id=970615&hide_resolved=1
