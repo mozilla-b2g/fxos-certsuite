@@ -91,7 +91,7 @@ class LogManager(object):
         if not results.is_pass:
             html_str = report.subsuite.make_report(results)
             path = "%s/report.html" % results.name
-        self.zip_file.writestr(path, html_str)
+            self.zip_file.writestr(path, html_str)
 
     def add_summary_report(self, path):
         summary_results = report.parse_log(path)
