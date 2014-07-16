@@ -13,10 +13,6 @@ class MobileMessageTestCommon(object):
         self.in_msg = None
         self.out_msg = None
         self.out_destination = None
-        self.marionette.execute_script("""
-        SpecialPowers.setBoolPref("dom.sms.enabled", true);
-        SpecialPowers.addPermission("sms", true, document);
-        """, special_powers=True)
 
     def setup_receiving_listener(self):
         self.marionette.execute_script("""
@@ -39,24 +35,23 @@ class MobileMessageTestCommon(object):
         };
         """)
 
-    def assert_sms_received(self):
+    def assert_msg_received(self):
         received = self.marionette.execute_script("return window.wrappedJSObject.received_msg")
-        self.assertTrue(received, "SMS message not received (mozMobileMessage.onreceived event not found)")
-        # verify message body
+        self.assertTrue(received, "Message not received (mozMobileMessage.onreceived event not found)")
         self.in_msg = self.marionette.execute_script("return window.wrappedJSObject.in_msg")
-        self.assertTrue(len(self.in_msg['body']) > 0, "Received SMS has no message body (was text included in the sent SMS message?)")
+        self.assertIsNotNone(self.in_msg, "Incoming message object doesn't exist")
 
-    def user_guided_incoming_sms(self):
+    def user_guided_incoming_msg(self, msg_type="SMS"):
         self.setup_receiving_listener()
         try:
-            self.confirm("From a different phone, send an SMS to the Firefox OS device and wait for it to arrive. "
-                         "Did the SMS arrive?")
-            self.assert_sms_received()
+            self.confirm("From a different phone, send an %s to the Firefox OS device and wait for it to arrive. "
+                         "Did the %s message arrive?" % (msg_type, msg_type))
+            self.assert_msg_received()
         finally:
             self.remove_receiving_listener()
 
     def get_message(self, msg_id):
-        """ Get the sms for the given id. Return the sms, or none if it doesn't exist"""
+        """ Get the sms or mms for the given id. Return the message, or none if it doesn't exist"""
         self.marionette.execute_async_script("""
         var mm = window.navigator.mozMobileMessage;
         window.wrappedJSObject.event_sms = null;
@@ -73,8 +68,9 @@ class MobileMessageTestCommon(object):
             }
         };
 
-        requestRet.onerror = function(event) {
+        requestRet.onerror = function() {
             window.wrappedJSObject.rcvd_event = true;
+            log("Get message returned error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_id], special_powers=True)
@@ -99,15 +95,16 @@ class MobileMessageTestCommon(object):
 
         let requestRet = mm.delete(arguments[0]);
         requestRet.onsuccess = function(event) {
-            if(event.target.result){
+            if (event.target.result) {
                 window.wrappedJSObject.msg_deleted = true;
             } else {
                 window.wrappedJSObject.msg_deleted = false;
             }
         };
 
-        requestRet.onerror = function(event) {
+        requestRet.onerror = function() {
             window.wrappedJSObject.rcvd_error = true;
+            log("Delete message returned error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_id], special_powers=True)
@@ -158,33 +155,44 @@ class MobileMessageTestCommon(object):
         };
         """)
 
-    def send_sms(self, destination, body):
-        """ Use the webapi to send an sms to the specified number, with specified text """
+    def send_msg(self, destination, body, msg_type="SMS"):
+        """ Use the webapi to send an sms or mms to the specified number, with specified text """
+        self.assertIn(msg_type, ["SMS", "MMS"], "Called send_msg with invalid message type")
+
         self.marionette.execute_async_script("""
+        var msg_type = arguments[0];
         var mm = window.navigator.mozMobileMessage;
+        var requestRet = null;
         // Bug 952875
         mm.getThreads();
 
-        let requestRet = mm.send(arguments[0], arguments[1]);
-        ok(requestRet, "smsrequest obj returned");
+        if (msg_type == "SMS") {
+            requestRet = mm.send(arguments[1], arguments[2]);
+        } else {
+            let test_subject = arguments[2];
+            let test_receiver = arguments[1];
+            let mms_params = { subject: test_subject,
+                               receivers: test_receiver,
+                               attachments: [] };
+            requestRet = mm.sendMMS(mms_params);
+        }
+
         requestRet.onsuccess = function(event) {
-            log("Received 'onsuccess' smsrequest event.");
-            if(event.target.result){
+            log("Received 'onsuccess' event.");
+            if (event.target.result) {
                 window.wrappedJSObject.rcvd_req_success = true;
             } else {
-                log("smsrequest returned false for manager.send");
-                ok(false,"SMS send failed");
+                log("request returned false for manager.send");
                 cleanUp();
             }
         };
 
-        requestRet.onerror = function(event) {
-            log("Received 'onerror' smsrequest event.");
+        requestRet.onerror = function() {
+            log("Failed to send message, received error: %s" % requestRet.error.name);
             cleanUp();
         };
         marionetteScriptFinished(1);
-        """, script_args=[destination, body], special_powers=True)
-
+        """, script_args=[msg_type, destination, body], special_powers=True)
         time.sleep(5)
 
     def assert_message_sent(self):
@@ -198,7 +206,7 @@ class MobileMessageTestCommon(object):
             wait.until(lambda m: self.marionette.execute_script("return window.wrappedJSObject.rcvd_req_success"))
         except errors.TimeoutException:
             # msg wasn't sent; either the api is broken or mobile network signal is insufficient
-            self.fail("Failed to send SMS or MMS; mozMobileMessage.send is broken -or- "
+            self.fail("Failed to send message. The API is broken -or- "
                       "perhaps there is no mobile network signal. Please try again")
 
         # verify the remaining msg send events
@@ -212,11 +220,11 @@ class MobileMessageTestCommon(object):
         # get message event
         self.out_msg = self.marionette.execute_script("return window.wrappedJSObject.out_msg")
 
-    def ask_user_for_number(self):
+    def ask_user_for_number(self, msg_type="SMS"):
         """ Prompt user to enter a phone number; check formatting and give three attempts """
         for _ in range(3):
-            destination = self.prompt("Please enter a destination phone number where a test SMS will be sent (not the "
-                                      "Firefox OS device). Digits only with no spaces, brackets, or hyphens.")
+            destination = self.prompt("Please enter a destination phone number where a test %s will be sent (not the "
+                                      "Firefox OS device). Digits only with no spaces, brackets, or hyphens." % msg_type)
             # can't check format as different around the world, just ensure not empty and is digits
             if destination is None or len(destination.strip()) == 0 or destination.isdigit() is False:
                 continue
@@ -224,33 +232,34 @@ class MobileMessageTestCommon(object):
                 return destination.strip()
         self.fail("Failed to enter a valid destination phone number")
 
-    def user_guided_outgoing_sms(self):
+    def user_guided_outgoing_msg(self, msg_type="SMS"):
         # ask user to input destination phone number
-        destination = self.ask_user_for_number()
+        destination = self.ask_user_for_number(msg_type)
 
         # ask user to confirm destination number
-        self.confirm('Warning: An SMS will be sent to "%s" is this number correct?' % destination)
+        self.confirm('Warning: An %s will be sent to "%s" is this number correct?' % (msg_type, destination))
         self.out_destination = destination
 
-        # ask user to input sms body text
-        body = self.prompt("Please enter some text to be sent in the SMS message")
+        # ask user to input body text
+        body = self.prompt("Please enter some text to be sent in the %s message" % msg_type)
         if body is None:
-            self.fail("Must enter some text for the SMS message")
+            self.fail("Must enter some text for the message")
 
         body = body.strip()
-        self.assertTrue(len(body) > 0 and len(body) < 161, "SMS message text entered must be between 1 and 160 chars")
+        self.assertTrue(len(body) > 0 and len(body) < 161, "Message text entered must be between 1 and 160 chars")
 
-        # setup listeners and send the sms via webapi
+        # setup listeners and send the msg via webapi
         self.setup_sending_listeners()
         try:
-            self.send_sms(destination, body)
-            # verify sms was sent from Firefox OS device before asking user to check target
+            self.send_msg(destination, body)
+
+            # verify message was sent from Firefox OS device before asking user to check target
             self.assert_message_sent()
             # user verification that it was received on target, before continue
-            self.confirm('SMS sent to "%s". Please wait a few minutes. Was it '
-                         'received on the target phone?' % destination)
+            self.confirm('%s sent to "%s". Please wait a few minutes. Was it '
+                         'received on the target phone?' % (msg_type, destination))
             # verify sms body
-            self.assertTrue(len(self.out_msg['body']) > 0, "Sent SMS event message has no message body")
-            self.confirm('Sent SMS with text "%s" does this text match what was received on the target phone?' % self.out_msg['body'])
+            self.assertTrue(len(self.out_msg['body']) > 0, "Sent %s event message has no message body" % msg_type)
+            self.confirm('Sent %s with text "%s" does this text match what was received on the target phone?' % (msg_type, self.out_msg['body']))
         finally:
             self.remove_sending_listeners()
