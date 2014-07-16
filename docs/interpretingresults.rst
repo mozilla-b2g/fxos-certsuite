@@ -6,13 +6,13 @@ After running the FxOS Certification Suite, a result file will be generated
 this file are several logs; you need to review two of these to understand the
 cert suite's results.
 
-The results.html file
+The report.html file
 ---------------------
 
-This file contains the results of the web-platform-tests.  To see these results,
-click the 'web-platform-tests' link.  You will see a list of all the tests run,
-and their status.  Any test failures with have a status which begins with
-'UNEXPECTED'.
+This file contains results for all of the test suites; you can click on a link
+to see results for the individual suites.  This report is most useful for
+viewing results for "webapi" and "web-platform-tests".  For the "certsuite"
+tests, more details are available in the results.json file, described below.
 
 The cert/results.json file
 --------------------------
