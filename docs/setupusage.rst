@@ -83,5 +83,7 @@ working directory. Please e-mail this file to fxos-cert@mozilla.com.
 Known Issues
 ------------
 
-* Bug 1030238 - Semi-auto WebAPI tests do not produce a log file
 * Bug 1026259 - web-platform tests sometimes lose wifi connection
+* Bug 1039042 - Semi-auto tests wait forever for browser to be closed, if it launched the browser initially
+
+For a full list of known bugs, see:  https://bugzilla.mozilla.org/showdependencytree.cgi?id=970615&hide_resolved=1
