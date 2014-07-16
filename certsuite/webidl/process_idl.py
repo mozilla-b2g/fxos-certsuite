@@ -100,27 +100,26 @@ def main(argv):
     generates a file containing javascript arrays of json objects for
     each webidl file.
 
-    usage: process_idl.py manifest.json ~/B2G/gecko ~/B2G/objdir-gecko
+    usage: process_idl.py manifest.json ~/B2G
 
     The generated js file can then be included with the test app.
     """
 
     argparser = argparse.ArgumentParser()
     argparser.add_argument("manifest", help="Manifest file for the idl")
-    argparser.add_argument("gecko", help="Path to gecko directory (e.g. B2G/gecko")
-    argparser.add_argument("objdir", help="Path to gecko objdir directory (e.g. B2G/objdir-gecko")
+    argparser.add_argument("b2g", help="Path to b2g directory (e.g. ~/B2G")
     args = argparser.parse_args(argv[1:])
 
     with open(args.manifest, 'r') as f:
         manifest = json.loads(f.read())
 
     # import WebIDL using a path relative to the gecko tree
-    sys.path.append(os.path.join(args.gecko, 'dom', 'bindings', 'parser'))
+    sys.path.append(os.path.join(args.b2g, 'gecko', 'dom', 'bindings', 'parser'))
     import WebIDL
 
     parser = WebIDL.Parser()
 
-    webidl_path = os.path.join(args.objdir, 'dom', 'bindings')
+    webidl_path = args.b2g
 
     # embed idl files in individual script tags
     for filename in manifest['files']:
