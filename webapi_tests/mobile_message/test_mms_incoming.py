@@ -23,7 +23,7 @@ class TestMmsIncoming(TestCase, MobileMessageTestCommon):
     def test_mms_incoming(self):
         # have user send mms to the Firefox OS device
         self.msg_type = "MMS"
-        self.user_guided_incoming_msg(type="MMS")
+        self.user_guided_incoming_msg(msg_type="MMS")
 
         # verify message contents
         self.assertEqual(self.in_msg['type'], 'mms', "Received MMS MozMmsMessage.type should be 'mms'")

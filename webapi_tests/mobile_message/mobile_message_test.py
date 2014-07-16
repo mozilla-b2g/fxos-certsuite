@@ -41,11 +41,11 @@ class MobileMessageTestCommon(object):
         self.in_msg = self.marionette.execute_script("return window.wrappedJSObject.in_msg")
         self.assertIsNotNone(self.in_msg, "Incoming message object doesn't exist")
 
-    def user_guided_incoming_msg(self, type="SMS"):
+    def user_guided_incoming_msg(self, msg_type="SMS"):
         self.setup_receiving_listener()
         try:
             self.confirm("From a different phone, send an %s to the Firefox OS device and wait for it to arrive. "
-                         "Did the %s message arrive?" % (type, type))
+                         "Did the %s message arrive?" % (msg_type, msg_type))
             self.assert_msg_received()
         finally:
             self.remove_receiving_listener()
@@ -68,8 +68,9 @@ class MobileMessageTestCommon(object):
             }
         };
 
-        requestRet.onerror = function(event) {
+        requestRet.onerror = function() {
             window.wrappedJSObject.rcvd_event = true;
+            log("Get message returned error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_id], special_powers=True)
@@ -101,8 +102,9 @@ class MobileMessageTestCommon(object):
             }
         };
 
-        requestRet.onerror = function(event) {
+        requestRet.onerror = function() {
             window.wrappedJSObject.rcvd_error = true;
+            log("Delete message returned error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_id], special_powers=True)
@@ -153,9 +155,9 @@ class MobileMessageTestCommon(object):
         };
         """)
 
-    def send_msg(self, destination, body, type="SMS"):
+    def send_msg(self, destination, body, msg_type="SMS"):
         """ Use the webapi to send an sms or mms to the specified number, with specified text """
-        self.assertIn(type, ["SMS", "MMS"], "Called send_msg with invalid message type")
+        self.assertIn(msg_type, ["SMS", "MMS"], "Called send_msg with invalid message type")
 
         self.marionette.execute_async_script("""
         var msg_type = arguments[0];
@@ -185,12 +187,12 @@ class MobileMessageTestCommon(object):
             }
         };
 
-        requestRet.onerror = function(event) {
-            log("Received 'onerror' request event.");
+        requestRet.onerror = function() {
+            log("Failed to send message, received error: %s" % requestRet.error.name);
             cleanUp();
         };
         marionetteScriptFinished(1);
-        """, script_args=[type, destination, body], special_powers=True)
+        """, script_args=[msg_type, destination, body], special_powers=True)
         time.sleep(5)
 
     def assert_message_sent(self):
@@ -218,11 +220,11 @@ class MobileMessageTestCommon(object):
         # get message event
         self.out_msg = self.marionette.execute_script("return window.wrappedJSObject.out_msg")
 
-    def ask_user_for_number(self, type="SMS"):
+    def ask_user_for_number(self, msg_type="SMS"):
         """ Prompt user to enter a phone number; check formatting and give three attempts """
         for _ in range(3):
             destination = self.prompt("Please enter a destination phone number where a test %s will be sent (not the "
-                                      "Firefox OS device). Digits only with no spaces, brackets, or hyphens." % type)
+                                      "Firefox OS device). Digits only with no spaces, brackets, or hyphens." % msg_type)
             # can't check format as different around the world, just ensure not empty and is digits
             if destination is None or len(destination.strip()) == 0 or destination.isdigit() is False:
                 continue
@@ -230,16 +232,16 @@ class MobileMessageTestCommon(object):
                 return destination.strip()
         self.fail("Failed to enter a valid destination phone number")
 
-    def user_guided_outgoing_msg(self, type="SMS"):
+    def user_guided_outgoing_msg(self, msg_type="SMS"):
         # ask user to input destination phone number
-        destination = self.ask_user_for_number(type)
+        destination = self.ask_user_for_number(msg_type)
 
         # ask user to confirm destination number
-        self.confirm('Warning: An %s will be sent to "%s" is this number correct?' % (type, destination))
+        self.confirm('Warning: An %s will be sent to "%s" is this number correct?' % (msg_type, destination))
         self.out_destination = destination
 
         # ask user to input body text
-        body = self.prompt("Please enter some text to be sent in the %s message" % type)
+        body = self.prompt("Please enter some text to be sent in the %s message" % msg_type)
         if body is None:
             self.fail("Must enter some text for the message")
 
@@ -255,9 +257,9 @@ class MobileMessageTestCommon(object):
             self.assert_message_sent()
             # user verification that it was received on target, before continue
             self.confirm('%s sent to "%s". Please wait a few minutes. Was it '
-                         'received on the target phone?' % (type, destination))
+                         'received on the target phone?' % (msg_type, destination))
             # verify sms body
-            self.assertTrue(len(self.out_msg['body']) > 0, "Sent %s event message has no message body" % type)
-            self.confirm('Sent %s with text "%s" does this text match what was received on the target phone?' % (type, self.out_msg['body']))
+            self.assertTrue(len(self.out_msg['body']) > 0, "Sent %s event message has no message body" % msg_type)
+            self.confirm('Sent %s with text "%s" does this text match what was received on the target phone?' % (msg_type, self.out_msg['body']))
         finally:
             self.remove_sending_listeners()

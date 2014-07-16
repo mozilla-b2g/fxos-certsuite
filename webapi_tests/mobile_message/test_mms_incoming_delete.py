@@ -25,7 +25,7 @@ class TestMmsIncomingDelete(TestCase, MobileMessageTestCommon):
     def test_mms_incoming_delete(self):
         # have user send mms to the Firefox OS device
         self.msg_type = "MMS"
-        self.user_guided_incoming_msg(type="MMS")
+        self.user_guided_incoming_msg(msg_type="MMS")
 
         # delete fails sometimes without a sleep (because of the msg notification?)
         time.sleep(5)
