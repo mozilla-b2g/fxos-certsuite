@@ -1,14 +1,16 @@
 fxos-appgen >= 0.5
-marionette_client >= 0.7.10
+gaiatest >= 0.26
+marionette_client == 0.7.10
 marionette_extension >= 0.4
 mozdevice >= 0.39
 mozlog >= 2.1
 moznetwork >= 0.24
 mozprocess >= 0.18
-py == 1.4.20
-wptserve >= 1.0.1
-wptrunner == 0.3.13
+mozprofile >= 0.21
 mozrunner >= 6.1
 moztest >= 0.6
+py == 1.4.20
 sphinx
 tornado >= 3.2
+wptrunner >= 1.1.1
+wptserve >= 1.0.1
