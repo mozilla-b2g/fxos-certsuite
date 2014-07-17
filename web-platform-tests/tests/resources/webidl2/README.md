@@ -1,4 +1,8 @@
 
+# WebIDL 2
+
+[![NPM version](https://badge.fury.io/js/webidl2.png)](http://badge.fury.io/js/webidl2)
+
 Purpose
 =======
 
@@ -88,6 +92,7 @@ attached to a field called `idlType`:
 
     {
         "sequence": false,
+        "generic": null,
         "nullable": false,
         "array": false,
         "union": false,
@@ -96,7 +101,10 @@ attached to a field called `idlType`:
 
 Where the fields are as follows:
 
-* `sequence`: Boolean indicating whether this is a sequence or not.
+* `sequence`: Boolean indicating whether this is a sequence or not. Deprecated. Use
+  `generic` instead.
+* `generic`: String indicating the generic type (e.g. "Promise", "sequence"). `null`
+  otherwise.
 * `nullable`: Boolean indicating whether this is nullable or not.
 * `array`: Either `false` to indicate that it is not an array, or a number for the level of
   array nesting.
@@ -104,8 +112,41 @@ Where the fields are as follows:
 * `idlType`: Can be different things depending on context. In most cases, this will just
   be a string with the type name. But the reason this field isn't called "typeName" is
   because it can take more complex values. If the type is a union, then this contains an
-  array of the types it unites. If it is a sequence, it contains an IDL type description
-  for the type in the sequence.
+  array of the types it unites. If it is a generic type, it contains the IDL type
+  description for the type in the sequence, the eventual value of the promise, etc.
+
+#### Interactions between `nullable` and `array`
+
+A more complex data model for our AST would likely represent `Foo[][][]` as a series of
+nested types four levels deep with three anonymous array types eventually containing a 
+`Foo` type. But experience shows that such structures are cumbersome to use, and so we
+have a simpler model in which the depth of the array is specified with the `array` field.
+
+This is all fine and well, and in the vast majority of cases is actually simpler. But it
+does run afoul of cases in which it is necessary to distinguish between `Foo[][][]?`,
+`Foo?[][][]`, `Foo[][]?[]`, or even `Foo?[]?[]?[]?`.
+
+For this, when a type is an array type an additional `nullableArray` field is made available
+that captures which of the arrays contain nullable elements. It contains booleans that are
+true if the given array depth contains nullable elements, and false otherwise (mapping that to
+the syntax, and item is true if there is a `?` preceding the `[]`). These examples ought to
+clarify the model:
+
+    Foo[][][]?
+        -> nullable: true
+        -> nullableArray: [false, false, false]
+    Foo?[][][]
+        -> nullable: false
+        -> nullableArray: [true, false, false]
+    Foo[][]?[]
+        -> nullable: false
+        -> nullableArray: [false, false, true]
+    Foo?[]?[]?[]?
+        -> nullable: true
+        -> nullableArray: [true, true, true]
+
+Of particular importance, please note that the overall type is only `nullable` if there is
+a `?` at the end.
 
 ### Interface
 Interfaces look like this:
@@ -152,6 +193,7 @@ A callback looks like this:
       "name": "AsyncOperationCallback",
       "idlType": {
           "sequence": false,
+          "generic": null,
           "nullable": false,
           "array": false,
           "union": false,
@@ -183,6 +225,7 @@ A dictionary looks like this:
                 "name": "fillPattern",
                 "idlType": {
                     "sequence": false,
+                    "generic": null,
                     "nullable": true,
                     "array": false,
                     "union": false,
@@ -229,6 +272,7 @@ An exception looks like this:
                 "name": "code",
                 "idlType": {
                     "sequence": false,
+                    "generic": null,
                     "nullable": false,
                     "array": false,
                     "union": false,
@@ -287,11 +331,13 @@ A typedef looks like this:
         "typeExtAttrs": [],
         "idlType": {
             "sequence": true,
+            "generic": "sequence",
             "nullable": false,
             "array": false,
             "union": false,
             "idlType": {
                 "sequence": false,
+                "generic": null,
                 "nullable": false,
                 "array": false,
                 "union": false,
@@ -344,6 +390,7 @@ An operation looks like this:
         "stringifier": false,
         "idlType": {
             "sequence": false,
+            "generic": null,
             "nullable": false,
             "array": false,
             "union": false,
@@ -357,6 +404,7 @@ An operation looks like this:
                 "extAttrs": [],
                 "idlType": {
                     "sequence": false,
+                    "generic": null,
                     "nullable": false,
                     "array": false,
                     "union": false,
@@ -395,6 +443,7 @@ An attribute member looks like this:
         "readonly": false,
         "idlType": {
             "sequence": false,
+            "generic": null,
             "nullable": false,
             "array": false,
             "union": false,
@@ -456,6 +505,7 @@ examples below that map the IDL to the produced AST.
         "type": "serializer",
         "idlType": {
             "sequence": false,
+            "generic": null,
             "nullable": false,
             "array": false,
             "union": false,
@@ -541,6 +591,7 @@ Iterator members look like this
         "stringifier": false,
         "idlType": {
             "sequence": false,
+            "generic": null,
             "nullable": false,
             "array": false,
             "union": false,
@@ -565,6 +616,7 @@ The arguments (e.g. for an operation) look like this:
             "extAttrs": [],
             "idlType": {
                 "sequence": false,
+                "generic": null,
                 "nullable": false,
                 "array": false,
                 "union": false,
@@ -609,6 +661,8 @@ The fields are as follows:
 * `rhs`: If there is a right-hand side, this will capture its `type` (always
   "identifier" in practice, though it may be extended in the future) and its
   `value`.
+* `typePair`: If the extended attribute is a `MapClass` this will capture the
+  map's key type and value type respectively.
 
 ### Default and Const Values
 
@@ -634,7 +688,6 @@ initialised and up to date:
 
     git submodule init
     git submodule update
-    git pull origin master (in the submodule, once in a while)
 
 Running
 -------
@@ -669,3 +722,4 @@ TODO
 ====
 
 * add some tests to address coverage limitations
+* add a push API for processors that need to process things like comments

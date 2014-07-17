@@ -1073,7 +1073,7 @@ policies and contribution forms [3].
     };
 
     Tests.prototype.timeout = function() {
-        if (this.status.status == this.status.OK) {
+        if (this.status.status === null) {
             this.status.status = this.status.TIMEOUT;
         }
         this.complete();
@@ -1333,10 +1333,11 @@ policies and contribution forms [3].
         }
         var node = output_document.getElementById("log");
         if (!node) {
-            if (!document.body) {
+            if (!document.body || document.readyState == "loading") {
                 return;
             }
             node = output_document.createElement("div");
+            node.id = "log";
             output_document.body.appendChild(node);
         }
         this.output_document = output_document;
@@ -1429,22 +1430,20 @@ policies and contribution forms [3].
                                 ["h2", {}, "Summary"],
                                 function()
                                 {
-                                    if (harness_status.status === harness_status.OK) {
-                                        return null;
-                                    }
 
                                     var status = status_text_harness[harness_status.status];
-                                    var rv = [["p", {"class":status_class(status)}]];
+                                    var rv = [["section", {},
+                                               ["p", {},
+                                                "Harness status: ",
+                                                ["span", {"class":status_class(status)},
+                                                 status
+                                                ],
+                                               ]
+                                              ]];
 
                                     if (harness_status.status === harness_status.ERROR) {
-                                        rv[0].push("Harness encountered an error:");
-                                        rv.push(["pre", {}, harness_status.message]);
-                                    } else if (harness_status.status === harness_status.TIMEOUT) {
-                                        rv[0].push("Harness timed out.");
-                                    } else {
-                                        rv[0].push("Harness got an unexpected status.");
+                                        rv[0].push(["pre", {}, harness_status.message]);
                                     }
-
                                     return rv;
                                 },
                                 ["p", {}, "Found ${num_tests} tests"],
@@ -1462,7 +1461,8 @@ policies and contribution forms [3].
                                         i++;
                                     }
                                     return rv;
-                                }];
+                                },
+                               ];
 
         log.appendChild(render(summary_template, {num_tests:tests.length}, output_document));
 
