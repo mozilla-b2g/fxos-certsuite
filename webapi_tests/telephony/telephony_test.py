@@ -152,8 +152,7 @@ class TelephonyTestCommon(object):
         var telephony = window.navigator.mozTelephony;
         var destination = arguments[0]
 
-        telephony.dial(destination).then(call => {
-            var out_call = call;
+        telephony.dial(destination).then(out_call => {
 
             window.wrappedJSObject.received_dialing = false;
             if (out_call.state == "dialing") {
@@ -186,6 +185,7 @@ class TelephonyTestCommon(object):
               };
             };
         });
+
         marionetteScriptFinished(1);
         """, script_args=[destination], special_powers=True)
 
