@@ -105,27 +105,18 @@ class TelephonyTestCommon(object):
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
 
-    def hangup_call(self, call_to_hangup):
-
-        self.marionette.execute_script("""
-        window.wrappedJSObject.recvd_active_call_hangup = false;
-        window.wrappedJSObject.recvd_incoming_call_hangup = false;
-        """)
-
-        if call_to_hangup['state'] == "incoming":
-            self.marionette.execute_script("window.wrappedJSObject.recvd_incoming_call_hangup = true")
-        elif call_to_hangup['state'] == "connected" or call_to_hangup['state'] == "held":
-            self.marionette.execute_script("window.wrappedJSObject.recvd_active_call_hangup = true")
+    def hangup_call(self, call_type="Active"):
 
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
-        let call_to_hangup = "";
-        if (window.wrappedJSObject.recvd_incoming_call_hangup) {
+        var call_type = arguments[0];
+        var call_to_hangup = "";
+        if (call_type == "Incoming") {
           call_to_hangup = window.wrappedJSObject.incoming_call;
-        }
-        else if(window.wrappedJSObject.recvd_active_call_hangup) {
+        } else if (call_type == "Outgoing") {
+          call_to_hangup = window.wrappedJSObject.outgoing_call; } else {
           call_to_hangup = window.wrappedJSObject.active_call;
-        }
+        };
 
         window.wrappedJSObject.disconnecting_call_ok = false;
         call_to_hangup.ondisconnecting = function ondisconnecting(event) {
@@ -146,7 +137,7 @@ class TelephonyTestCommon(object):
         call_to_hangup.hangUp();
 
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """, script_args=[call_type], special_powers=True)
 
         # should have received both events associated with a active call hangup
         wait = Wait(self.marionette, timeout=90, interval=0.5)
@@ -156,19 +147,6 @@ class TelephonyTestCommon(object):
         except:
             # failed to hangup
             self.fail("Failed to hangup call")
-
-        if  self.marionette.execute_script("return window.wrappedJSObject.recvd_active_call_hangup"):
-            # verify no active call
-            self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
-            self.assertTrue(self.active_call, None)
-
-        if self.marionette.execute_script("return window.wrappedJSObject.recvd_incoming_call_hangup"):
-            # verify no incoming call
-            self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
-            self.assertTrue(self.incoming_call, None)
-
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def hold_active_call(self):
         self.marionette.execute_async_script("""

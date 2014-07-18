@@ -36,7 +36,10 @@ class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
     def test_telephony_incoming_rejection(self):
         # ask user to call the device and reject via webapi
         self.user_guided_incoming_call()
-        self.hangup_call(self.incoming_call)
+        self.hangup_call(call_type="Incoming")
+
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager
