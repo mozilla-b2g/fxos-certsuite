@@ -22,8 +22,6 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
-    This test is currently only enabled in version 1.3 of the certification test suite.
-
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
@@ -33,7 +31,6 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    @unittest.skip("Currently disabled in 1.4")
     def test_telephony_outgoing(self):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
