@@ -181,7 +181,7 @@ class TelephonyTestCommon(object):
             # failed to hold
             self.fail("Failed to hold call")
 
-        # verify the hold call
+        # verify the held call
         self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
         self.assertEqual(self.active_call['state'], "held", "Call state should he 'held'")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
