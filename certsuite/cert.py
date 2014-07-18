@@ -463,7 +463,9 @@ def cli():
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
     for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
                           in line]:
-        (prop, val) = buildprop.split('=')
+        eq = buildprop.find('=')
+        prop = buildprop[:eq]
+        val = buildprop[eq + 1:]
         report['buildprops'][prop] = val
 
     # get process list
