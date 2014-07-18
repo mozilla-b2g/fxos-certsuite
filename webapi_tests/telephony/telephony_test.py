@@ -31,7 +31,7 @@ class TelephonyTestCommon(object):
             received = self.marionette.execute_script("return window.wrappedJSObject.received_incoming")
             self.assertTrue(received, "Incoming call not received (Telephony.onincoming event not found)")
             self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-            self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call" )
+            self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call")
             self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
             self.assertEqual(self.incoming_call['state'], "incoming", "Call state should be 'incoming'")
             self.assertEqual(self.calls['0'], self.incoming_call)
@@ -81,7 +81,7 @@ class TelephonyTestCommon(object):
         # should have received both events associated with answering a call
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
-            if incoming: # only receive 'onconnecting' for incoming call
+            if incoming:  # only receive 'onconnecting' for incoming call
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connecting_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connected_call_ok"))
         except:
@@ -95,7 +95,7 @@ class TelephonyTestCommon(object):
         else:
             self.assertEqual(self.active_call['number'], self.outgoing_call['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 active call" )
+        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual(self.calls['0'], self.active_call)
 
     def user_guided_incoming_call(self):
@@ -104,15 +104,21 @@ class TelephonyTestCommon(object):
         self.instruct("From a different phone, call the Firefox OS device, and when you \
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
-        self.answer_call()
 
-    def hangup_active_call(self):
-        # hangup the active call, verify
+    def hangup_call(self, call_type="Active"):
+        # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
-        let active = window.wrappedJSObject.active_call;
+        var call_type = arguments[0];
+        if (call_type == "Incoming") {
+          var call_to_hangup = window.wrappedJSObject.incoming_call;
+        } else if (call_type == "Outgoing") {
+          var call_to_hangup = window.wrappedJSObject.outgoing_call;
+        } else {
+          var call_to_hangup = window.wrappedJSObject.active_call;
+        };
 
         window.wrappedJSObject.disconnecting_call_ok = false;
-        active.ondisconnecting = function ondisconnecting(event) {
+        call_to_hangup.ondisconnecting = function ondisconnecting(event) {
           log("Received 'ondisconnecting' call event.");
           if (event.call.state == "disconnecting") {
             window.wrappedJSObject.disconnecting_call_ok = true;
@@ -120,18 +126,19 @@ class TelephonyTestCommon(object):
         };
 
         window.wrappedJSObject.disconnected_call_ok = false;
-        active.ondisconnected = function ondisconnected(event) {
+        call_to_hangup.ondisconnected = function ondisconnected(event) {
           log("Received 'ondisconnected' call event.");
           if (event.call.state == "disconnected") {
             window.wrappedJSObject.disconnected_call_ok = true;
           };
         };
 
-        active.hangUp();
-        marionetteScriptFinished(1);
-        """, special_powers=True)
+        call_to_hangup.hangUp();
 
-        # should have received both events associated with a call hangup
+        marionetteScriptFinished(1);
+        """, script_args=[call_type], special_powers=True)
+
+        # should have received both events associated with a active call hangup
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
@@ -140,11 +147,43 @@ class TelephonyTestCommon(object):
             # failed to hangup
             self.fail("Failed to hangup call")
 
-        # verify no active call
+    def hold_active_call(self):
+        self.marionette.execute_async_script("""
+        let active = window.wrappedJSObject.active_call;
+
+        window.wrappedJSObject.onholding_call_ok = false;
+        active.onholding = function ondisconnecting(event) {
+          log("Received 'onholding' call event.");
+          if (event.call.state == "holding") {
+            window.wrappedJSObject.onholding_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.onheld_call_ok = false;
+        active.onheld = function ondisconnected(event) {
+          log("Received 'onheld' call event.");
+          if (event.call.state == "held") {
+            window.wrappedJSObject.onheld_call_ok = true;
+          };
+        };
+
+        active.hold();
+        marionetteScriptFinished(1);
+        """, special_powers=True)
+
+        # should have received both events associated with a call on hold
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onholding_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+        except:
+            # failed to hold
+            self.fail("Failed to hold call")
+
+        # verify the held call
         self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
-        self.assertTrue(self.active_call, None)
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 0, "There should be 0 calls" )
+        self.assertEqual(self.active_call['state'], "held", "Call state should he 'held'")
+        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
 
     def initiate_outgoing_call(self, destination):
         # use the webapi to initiate a call to the specified number
@@ -203,7 +242,7 @@ class TelephonyTestCommon(object):
 
         # verify one outgoing call
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 call" )
+        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
         self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
         self.assertEqual(self.outgoing_call['state'], "alerting", "Call state should be 'alerting'")
         self.assertEqual(self.calls['0'], self.outgoing_call)
@@ -220,7 +259,7 @@ class TelephonyTestCommon(object):
         self.assertGreater(len(destination), 3, "Destination phone number entered is incomplete")
 
         # ask user to confirm destination number
-        self.confirm('Warning: A test call will be made from the Firefox OS device to "%s" is this number correct?' %destination)
+        self.confirm('Warning: A test call will be made from the Firefox OS device to "%s" is this number correct?' % destination)
 
         # make the call via webapi
         self.initiate_outgoing_call(destination)
@@ -232,7 +271,7 @@ class TelephonyTestCommon(object):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app
         cur_frame = self.marionette.get_active_frame()
-        self.marionette.switch_to_frame() # system app
+        self.marionette.switch_to_frame()  # system app
         try:
             self.marionette.execute_async_script("""
             log("disabling system dialer agent");
@@ -247,7 +286,7 @@ class TelephonyTestCommon(object):
     def enable_dialer(self):
         # enable system dialer agent to handle calls
         cur_frame = self.marionette.get_active_frame()
-        self.marionette.switch_to_frame() # system app
+        self.marionette.switch_to_frame()  # system app
         try:
             self.marionette.execute_async_script("""
             log("enabling system dialer agent");

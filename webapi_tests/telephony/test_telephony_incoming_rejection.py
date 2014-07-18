@@ -9,40 +9,37 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
+class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
     - Disable the default gaia dialer, so that the test app can handle calls
-    - Ask the test user to specify a destination phone number for the test call
-    - Setup mozTelephonyCall event listeners for the outgoing call
-    - Use the API to initiate the outgoing call
-    - Ask the test user to answer the call on the destination phone
-    - Keep the call active for 5 seconds, then hang up the call via the API
+    - Setup a mozTelephony event listener for incoming calls
+    - Ask the test user to phone the Firefox OS device from a second phone
+    - Verify that the mozTelephony incoming call event is triggered
+    - Reject the incoming call via the API,
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
+
+    This test is currently only enabled in version 1.3 of the certification test suite.
 
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyOutgoing, self).setUp()
+        super(TestTelephonyIncomingRejection, self).setUp()
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_outgoing(self):
-        # disable the default dialer manager so it doesn't grab our calls
-        self.disable_dialer()
+    #@unittest.skip("Currently disabled in 1.4")
+    def test_telephony_incoming_rejection(self):
+        # ask user to call the device and reject via webapi
+        self.user_guided_incoming_call()
+        self.hangup_call(call_type="Incoming")
 
-        # use the webapi to make an outgoing call to user-specified number; user answer
-        self.user_guided_outgoing_call()
-
-        # keep call active for awhile
-        time.sleep(5)
-
-        # disconnect the call
-        self.hangup_call(self.active_call)
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager

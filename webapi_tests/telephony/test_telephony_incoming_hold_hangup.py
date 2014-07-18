@@ -9,7 +9,7 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyIncoming(TestCase, TelephonyTestCommon):
+class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -18,29 +18,39 @@ class TestTelephonyIncoming(TestCase, TelephonyTestCommon):
     - Ask the test user to phone the Firefox OS device from a second phone
     - Verify that the mozTelephony incoming call event is triggered
     - Answer the incoming call via the API, keep the call active for 5 seconds
-    - Hang up the call via the API
+    - Hold the call using the API and ask the test user to verify
+    - Hangup the hold call via the API,
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
+
+    This test is currently only enabled in version 1.3 of the certification test suite.
 
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyIncoming, self).setUp()
+        super(TestTelephonyIncomingHoldHangup, self).setUp()
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_incoming(self):
+    #@unittest.skip("Currently disabled in 1.4")
+    def test_telephony_incoming_hold_hangup(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
         self.answer_call()
 
-        # keep call active for awhile
+        # keep call active for a while
         time.sleep(5)
 
-        # disconnect the call
-        self.hangup_call(self.active_call)
+        self.hold_active_call()
+        self.confirm("Is the call now on hold?")
+
+        #hangup the hold call
+        self.hangup_call()
+
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager
