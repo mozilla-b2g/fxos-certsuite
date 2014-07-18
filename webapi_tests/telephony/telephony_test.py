@@ -106,16 +106,15 @@ class TelephonyTestCommon(object):
         self.verify_incoming_call()
 
     def hangup_call(self, call_type="Active"):
-
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
         var call_type = arguments[0];
-        var call_to_hangup = "";
         if (call_type == "Incoming") {
-          call_to_hangup = window.wrappedJSObject.incoming_call;
+          var call_to_hangup = window.wrappedJSObject.incoming_call;
         } else if (call_type == "Outgoing") {
-          call_to_hangup = window.wrappedJSObject.outgoing_call; } else {
-          call_to_hangup = window.wrappedJSObject.active_call;
+          var call_to_hangup = window.wrappedJSObject.outgoing_call;
+        } else {
+          var call_to_hangup = window.wrappedJSObject.active_call;
         };
 
         window.wrappedJSObject.disconnecting_call_ok = false;
