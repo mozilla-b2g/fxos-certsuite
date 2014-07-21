@@ -42,7 +42,7 @@ def unzip_omnifile(omnifile, path):
             omnizip.close()
 
 class OmniAnalyzer:
-    def __init__(self, vfile, results, dir, mode=None, vserver=None, dump=False, logger=structuredlog.StructuredLogger("omni-analyzer")):
+    def __init__(self, vfile, results, dir, mode=None, vserver=None, logger=structuredlog.StructuredLogger("omni-analyzer")):
         self.generate_reference = mode
         self.verification_server = vserver
         self.verify_file = vfile
@@ -66,14 +66,6 @@ class OmniAnalyzer:
 
         if os.path.isdir(self.workdir):
             shutil.rmtree(self.workdir)
-
-        # Also print our results to stdout - TODO: Necessary or desired?
-        if dump:
-            print json.dumps(self.results_dict, indent=2)
-        if warnings:
-            print "Found %s changes in omni.ja" % warnings
-        else:
-            print "No warnings detected in omni.ja"
 
     def getomni(self):
         # Get the omni.ja from /system/b2g/omni.ja
@@ -179,7 +171,7 @@ class OmniAnalyzer:
         # Verifies the device JSON structure matches that of the reference JSON for this release
         # If we find a discrepancy, package the file for later analysis
         warn_count = 0
-        self.logger.test_start('omni-verify')
+        self.logger.test_start('omni-analyzer')
         res = {'directories': {}}
         for d in device['directories'].keys():
             dirresults = {}
@@ -189,14 +181,10 @@ class OmniAnalyzer:
                     # File found in device not in reference, partner has added file, so tag it for analysis
                     dirresults[filename] = {'reason': 'PARTNER_FILE', 'file-contents': self._encode_base64(filename)}
                     warn_count += 1
-                    self.logger.test_status('omni-verify', filename, 'FAIL', message='PARTNER_FILE')
                 elif reference['directories'][d][filename] != device['directories'][d][filename]:
                     # Hash mismatch, partner changed file from reference, tag for analysis
                     dirresults[filename] = {'reason': 'PARTNER_CHANGE', 'file-contents': self._encode_base64(filename)}
                     warn_count += 1
-                    self.logger.test_status('omni-verify', filename, 'FAIL', message='PARTNER_CHANGE')
-                else:
-                    self.logger.test_status('omni-verify', filename, 'PASS')
             res['directories'][d] = dirresults
 
         # Also check for files present in reference but missing from device
@@ -206,7 +194,8 @@ class OmniAnalyzer:
                     res['directories'][d][filename] = {'reason': 'PARTNER_CHANGE', 'file-contents': ''}
                     warn_count += 1
 
-        self.logger.test_end('omni-verify', 'PASS' if warn_count == 0 else 'FAIL')
+        self.logger.debug('omni-analyzer found %d changes in omni.ja' % warn_count)
+        self.logger.test_end('omni-analyzer', 'OK')
         return warn_count, res
 
 def main(argv):
@@ -219,11 +208,10 @@ def main(argv):
         default=os.path.join(os.getcwd(), "results.json"))
     parser.add_argument("--workingdir", help="Directory to work in - will be removed",
         default=os.path.join(os.getcwd(), "omnidir"))
-    parser.add_argument("--dump", help="Dumps the resulting json to stdout", action="store_true")
 
     args = parser.parse_args(argv[1:])
     omni_analyzer = OmniAnalyzer(vfile=args.verifyfile, results=args.resultsfile, dir=args.workingdir,
-                                 mode=args.generate, vserver=args.verifyserver, dump=args.dump)
+                                 mode=args.generate, vserver=args.verifyserver)
 
 if __name__ == "__main__":
     main(sys.argv)
