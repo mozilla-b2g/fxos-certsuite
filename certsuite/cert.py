@@ -390,6 +390,7 @@ def cli():
         'omni-analyzer',
         'permissions',
         'webapi',
+        'user-agent'
         ]
     if args.list_test_groups:
         for t in test_groups:
@@ -678,6 +679,19 @@ def cli():
         # clean up embed-apps test app
         logger.debug('uninstalling: %s' % embed_appname)
         fxos_appgen.uninstall_app(embed_appname)
+
+    if 'user-agent' in test_groups:
+        logger.test_start('user-agent')
+        logger.debug('Running user agent tests')
+
+        user_agent_string = run_marionette_script("return navigator.userAgent;")
+        logger.debug('UserAgent: %s' % user_agent_string)
+        valid = test_user_agent(user_agent_string, logger)
+
+        if valid:
+            logger.test_end('user-agent', 'OK')
+        else:
+            logger.test_end('user-agent', 'ERROR')
 
     logger.suite_end()
 
