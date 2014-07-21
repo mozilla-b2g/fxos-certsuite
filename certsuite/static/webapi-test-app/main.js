@@ -6,6 +6,15 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 setup({explicit_done:true, timeout_multiplier:10});
 
+function log(msg)
+{
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "POST", LOG_URI, true );
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xmlHttp.send("log=" + msg);
+}
+
 function getTheNames(obj, visited)
 {
   var orig_obj = obj;
@@ -47,16 +56,13 @@ function getTheNames(obj, visited)
 
 function runTest()
 {
+  log('Starting webapi-test-app runTest()')
 
   // Run WebIDL test suite
   var webIDLResults = []
 
   add_test_started_callback(function (name) {
-    var xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "POST", STARTED_URI, true );
-    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-    xmlHttp.send("test-started=" + name);
+    log('WebIDL test started: ' + name);
   });
 
   add_completion_callback(function (tests) {
@@ -100,11 +106,22 @@ function runTest()
   });
   UNTESTED_IDL = null;
 
-  idl_array.test();
+  log('Running WebIDL tests');
+  try {
+    idl_array.test();
+  } catch (e) {
+    log('caught exception: ' + e.message);
+  }
   done();
 
   //Recursively get property names on window object
-  var winResults = getTheNames(window, {});
+  log('Running "getTheNames" on window');
+  var winResults = {}
+  try {
+    winResults = getTheNames(window, {});
+  } catch (e) {
+    log('caught exception: ' + e.message);
+  }
 
   var results = {};
   results.windowList = winResults;
