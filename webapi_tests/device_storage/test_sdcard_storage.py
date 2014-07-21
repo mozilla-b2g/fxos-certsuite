@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import unittest
+
 from webapi_tests.semiauto import TestCase
 from webapi_tests.device_storage import DeviceStorageTestCommon
 
@@ -15,12 +17,14 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
         super(TestSdcardStorage, self).setUp()
         self.marionette.execute_script("window.wrappedJSObject.sdcard = navigator.getDeviceStorage(\"sdcard\")")
 
+    @unittest.skip("Currently disabled, see bug 1016295")
     def test_sdcard_availability(self):
         ret_check_sdcard = self.is_sdcard_available()
         self.assertEqual(True, ret_check_sdcard, "SDCard is unavailable. "
                         "Please ensure there is an SD card in the device and "
                         "usb storage sharing is not enabled")
 
+    @unittest.skip("Currently disabled, see bug 1016295")
     def test_add_namedfile_sdcard(self):
         if self.is_sdcard_available():
             #add the file to sdcard
@@ -35,6 +39,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
         else:
             self.fail("Sdcard is unavailable")
 
+    @unittest.skip("Currently disabled, see bug 1016295")
     def test_get_file_sdcard(self):
         if self.is_sdcard_available():
             if self.add_namedfile_sdcard(self.file_name, self.file_contents):
@@ -50,6 +55,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
         else:
             self.fail("Sdcard is unavailable")
 
+    @unittest.skip("Currently disabled, see bug 1016295")
     def test_delete_file_sdcard(self):
         if self.is_sdcard_available():
             if self.add_namedfile_sdcard(self.file_name, self.file_contents):
@@ -62,6 +68,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
         else:
             self.fail("Sdcard is unavailable")
 
+    @unittest.skip("Currently disabled, see bug 1016295")
     def test_enumerate_files_sdcard(self):
         if self.is_sdcard_available():
             if self.add_namedfile_sdcard(self.file_name, self.file_contents):
