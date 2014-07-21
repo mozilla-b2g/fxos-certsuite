@@ -34,7 +34,6 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    #@unittest.skip("Currently disabled in 1.4")
     def test_telephony_incoming_hold_hangup(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
