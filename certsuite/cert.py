@@ -390,6 +390,7 @@ def cli():
         'omni-analyzer',
         'permissions',
         'webapi',
+        'crash-reporter',
         ]
     if args.list_test_groups:
         for t in test_groups:
@@ -678,6 +679,18 @@ def cli():
         # clean up embed-apps test app
         logger.debug('uninstalling: %s' % embed_appname)
         fxos_appgen.uninstall_app(embed_appname)
+
+    if 'crash-reporter' in test_groups:
+        logger.test_start('crash-reporter')
+        logger.debug('start checking test reporter')
+        
+        crash_report_toggle = report['application_ini']['Crash Reporter']['enabled']
+
+        if crash_report_toggle == '1':
+            logger.test_end('crash-reporter', 'OK')
+        else:
+            logger.test_end('crash-reporter', 'ERROR')
+
 
     logger.suite_end()
 
