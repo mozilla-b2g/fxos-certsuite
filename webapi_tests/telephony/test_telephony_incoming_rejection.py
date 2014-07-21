@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import time
-import unittest
 
 from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
@@ -21,8 +19,6 @@ class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
-    This test is currently only enabled in version 1.3 of the certification test suite.
-
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
@@ -32,7 +28,6 @@ class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    #@unittest.skip("Currently disabled in 1.4")
     def test_telephony_incoming_rejection(self):
         # ask user to call the device and reject via webapi
         self.user_guided_incoming_call()

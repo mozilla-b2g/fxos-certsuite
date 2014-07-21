@@ -3,7 +3,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
-import unittest
 
 from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
@@ -41,8 +40,8 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         # keep call active for awhile
         time.sleep(5)
 
-        # disconnect the call
-        self.hangup_call(self.active_call)
+        # disconnect the active call
+        self.hangup_call()
 
     def clean_up(self):
         # re-enable the default dialer manager
