@@ -3,7 +3,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
-import unittest
 
 from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
