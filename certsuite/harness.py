@@ -119,7 +119,7 @@ class LogManager(object):
 
 class DeviceBackup(object):
     def __init__(self):
-        self.device = mozdevice.DeviceManagerADB()
+        self.device = mozdevice.DeviceManagerADB(logger=logger)
         self.backup_dirs = ["/data/local",
                             "/data/b2g/mozilla"]
         self.backup_files = ["/system/etc/hosts"]
@@ -273,7 +273,7 @@ def log_result(results, result):
 def check_adb():
     try:
         logger.info("Testing ADB connection")
-        mozdevice.DeviceManagerADB()
+        mozdevice.DeviceManagerADB(logger=logger)
     except mozdevice.DMError, e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \

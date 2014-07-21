@@ -407,7 +407,7 @@ def cli():
 
     # Step 1: Get device information
     try:
-        dm = mozdevice.DeviceManagerADB()
+        dm = mozdevice.DeviceManagerADB(logger=logger)
     except mozdevice.DMError, e:
         print "Error connecting to device via adb (error: %s). Please be " \
             "sure device is connected and 'remote debugging' is enabled." % \
