@@ -4,13 +4,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import logging
+import time
 import threading
 
-from server import FrontendServer
-
+from mozlog.structured import structuredlog
 from tornado.ioloop import IOLoop
 
+from server import FrontendServer
 
 """Used to hold a TestEnvironment in a static field."""
 env = None
@@ -22,6 +22,13 @@ def get(environ, *args, **kwargs):
         env = environ(*args, **kwargs)
         env.start()
     assert env.is_alive()
+
+    timeout = kwargs.pop("timeout", 10)
+    wait = 0
+    if not env.server.is_alive() and wait < timeout:
+        wait += 0.1
+        time.sleep(wait)
+
     return env
 
 
@@ -54,8 +61,8 @@ class InProcessTestEnvironment(object):
             self.server_thread.start()
 
     def stop(self):
-	"""Stop the test environment.  If the test environment is
-	not running, this method has no effect."""
+        """Stop the test environment. If the test environment is
+        not running, this method has no effect."""
         if self.started:
             try:
                 self.server.stop()
@@ -71,7 +78,8 @@ class InProcessTestEnvironment(object):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    structuredlog.set_default_logger()
+
     env = InProcessTestEnvironment()
     print("Listening on %s" % ":".join(str(i) for i in env.server.addr))
     # We ask the environment to block here so that the program won't
