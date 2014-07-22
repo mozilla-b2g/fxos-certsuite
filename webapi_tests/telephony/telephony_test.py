@@ -105,10 +105,11 @@ class TelephonyTestCommon(object):
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
 
-    def hangup_call(self, call_type="Active"):
+    def hangup_call(self, call_type="Active", terminate_from_secondary_caller=False):
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
         var call_type = arguments[0];
+        var terminate_from_secondary_caller = arguments[1];
         if (call_type == "Incoming") {
           var call_to_hangup = window.wrappedJSObject.incoming_call;
         } else if (call_type == "Outgoing") {
@@ -133,19 +134,37 @@ class TelephonyTestCommon(object):
           };
         };
 
-        call_to_hangup.hangUp();
+        if (!terminate_from_secondary_caller) {
+          call_to_hangup.hangUp();
+        }
 
         marionetteScriptFinished(1);
-        """, script_args=[call_type], special_powers=True)
+        """, script_args=[call_type, terminate_from_secondary_caller], special_powers=True)
 
-        # should have received both events associated with a active call hangup
+        if terminate_from_secondary_caller == False:
+            # should have received both events associated with a active call hangup
+            wait = Wait(self.marionette, timeout=90, interval=0.5)
+            try:
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
+            except:
+                # failed to hangup
+                self.fail("Failed to hangup call")
+
+    def verify_call_terminated_from_secondary_device(self):
+        # should have received only disconnected event associated with a active call hangup
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
         except:
             # failed to hangup
             self.fail("Failed to hangup call")
+
+        #verify that the call disconnected from phone which is not the device under test
+        disconnected = self.marionette.execute_script("return window.wrappedJSObject.disconnected_call_ok")
+        self.assertTrue(disconnected, "Telephony.ondisconnected event not found")
+        disconnecting = self.marionette.execute_script("return window.wrappedJSObject.disconnecting_call_ok")
+        self.assertFalse(disconnecting, "Telephony.ondisconnecting event found")
 
     def hold_active_call(self):
         self.marionette.execute_async_script("""
@@ -297,3 +316,10 @@ class TelephonyTestCommon(object):
             self.fail("failed to disable dialer agent")
         finally:
             self.marionette.switch_to_frame(cur_frame)
+
+    def enable_mute(self):
+        self.marionette.execute_script("""
+        log("enabling mute");
+        var telephony = window.navigator.mozTelephony;
+        telephony.muted = true;
+        """, special_powers=True)
