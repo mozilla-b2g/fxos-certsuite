@@ -61,6 +61,7 @@ def iter_test_lists(suites_config):
             for group in subprocess.check_output(cmd).splitlines():
                 yield name, group
         except (subprocess.CalledProcessError, OSError) as e:
+            # There's no logger at this point in the code to log this as an exception
             print >> sys.stderr, "Failed to run command: %s: %s" % (" ".join(cmd), e)
             sys.exit(1)
 
@@ -212,7 +213,6 @@ class TestRunner(object):
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
 
-        failures = []
         try:
             cmd, output_files, structured_log = self.build_command(suite, groups, temp_dir)
 
@@ -228,8 +228,8 @@ class TestRunner(object):
             proc.wait()
             logger.debug("Process finished")
 
-        except Exception:
-            logger.critical("Error running suite %s:\n%s" %(suite, traceback.format_exc()))
+        except Exception, e:
+            logger.error("Error running suite %s:\n%s\n%s" % (suite, e.message, traceback.format_exc()))
             raise
         finally:
             try:
@@ -278,6 +278,7 @@ def check_adb():
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
                         e.msg)
+        logger.exception(e)
         sys.exit(1)
 
 def install_marionette(version):
@@ -319,8 +320,9 @@ def run_tests(args, config):
                 for suite, groups in runner.iter_suites():
                     try:
                         runner.run_suite(suite, groups, log_manager)
-                    except:
-                        logger.critical("Encountered error:\n%s" % traceback.format_exc())
+                    except Exception, e:
+                        logger.error("Encountered error:")
+                        logger.exception(e)
                         error = True
                     finally:
                         device.restore()
