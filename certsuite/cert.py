@@ -17,15 +17,13 @@ import pkg_resources
 import re
 import sys
 import time
+import traceback
 import wptserve
 from zipfile import ZipFile
 import fxos_appgen
 
 from mozlog.structured import (
     commandline,
-    formatters,
-    handlers,
-    structuredlog,
 )
 from omni_analyzer import OmniAnalyzer
 import wait
@@ -414,7 +412,7 @@ def cli():
             print "Error connecting to device via adb (error: %s). Please be " \
                 "sure device is connected and 'remote debugging' is enabled." % \
                 e.msg
-            logger.exception(e)
+            logger.critical(traceback.format_exc())
             sys.exit(1)
 
         # wait here to make sure marionette is running
@@ -439,7 +437,7 @@ def cli():
         if args.version not in supported_versions:
             print "%s is not a valid version. Please enter one of %s" % \
                   (args.version, supported_versions)
-            logger.exception(e)
+            logger.critical(traceback.format_exc())
             sys.exit(1)
 
         result_file_path = args.result_file
@@ -453,7 +451,7 @@ def cli():
             result_file.close()
         except IOError as e:
             print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
-            logger.exception(e)
+            logger.critical(traceback.format_exc())
             sys.exit(1)
 
         # We need to disable the lockscreen and screen timeout to get consistent
@@ -704,7 +702,7 @@ def cli():
 
         logger.debug('Results have been stored in: %s' % result_file_path)
     except Exception, e:
-        logger.exception(e)
+        logger.critical(traceback.format_exc())
         raise e
 
 if __name__ == "__main__":
