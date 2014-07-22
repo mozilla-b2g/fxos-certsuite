@@ -28,6 +28,7 @@ from mozlog.structured import (
     structuredlog,
 )
 from omni_analyzer import OmniAnalyzer
+from StringIO import StringIO
 import wait
 
 """Signalizes whether client has made initial connection to HTTP
@@ -415,6 +416,10 @@ def cli():
             e.msg
         logger.error("Error connecting to device: %s" % e.msg)
         sys.exit(1)
+
+    # If root access is not available shell will raise an exception
+    out = StringIO()
+    dm.shell(['ls'], out, root=True)
 
     # wait here to make sure marionette is running
     logger.debug('Attempting to set up port forwarding for marionette')
