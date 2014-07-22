@@ -278,7 +278,7 @@ def check_adb():
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
                         e.msg)
-        logger.exception(e)
+        logger.critical(traceback.format_exc())
         sys.exit(1)
 
 def install_marionette(version):
@@ -290,6 +290,7 @@ def install_marionette(version):
             logger.info("Marionette is already installed")
     except subprocess.CalledProcessError, e:
         logger.critical('Error installing marionette extension: %s' % e)
+        logger.critical(traceback.format_exc())
         sys.exit(1)
 
 def list_tests(args, config):
@@ -320,9 +321,9 @@ def run_tests(args, config):
                 for suite, groups in runner.iter_suites():
                     try:
                         runner.run_suite(suite, groups, log_manager)
-                    except Exception, e:
+                    except Exception:
                         logger.error("Encountered error:")
-                        logger.exception(e)
+                        logger.critical(traceback.format_exc())
                         error = True
                     finally:
                         device.restore()
