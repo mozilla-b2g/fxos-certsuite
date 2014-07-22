@@ -4,23 +4,35 @@
 
 import Queue
 import json
-import logging
 import os
 import sys
 import unittest
 import uuid
+import time
 
 from tornado import web
 from tornado.ioloop import IOLoop
 import tornado.httpserver
 import tornado.websocket
 
+from mozlog.structured import get_default_logger
+from mozlog.structured import handlers
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
-logger = logging.getLogger(__name__)
 clients = Queue.Queue()
 connect_timeout = 30
+logger = None
 
+class WSHandler(handlers.BaseHandler):
+    """Sends test results over WebSocket to the host browser."""
+
+    def __init__(self, transport):
+        self.transport = transport
+
+    def __call__(self, data):
+        if (("component" not in data or data["component"] is None)
+            and data["action"] != "log"):
+            self.transport.emit(data)
 
 def static_path(path):
     return os.path.join(static_dir, path)
@@ -36,8 +48,8 @@ class FrontendServer(object):
         self._addr = addr
         self.io_loop = io_loop or IOLoop.instance()
         self.started = False
-        if verbose:
-            logger.setLevel(logging.DEBUG)
+        global logger
+        logger = get_default_logger()
 
         self.routes = tornado.web.Application(
             [(r"/tests", TestHandler),
@@ -63,12 +75,12 @@ class FrontendServer(object):
 
     @property
     def addr(self):
-	# tornado doesn't guarantee that HTTPServer.listen listens
-	# before it returns, hence leaving its _socket property
-	# unpopulated until its subprocesses have bound properly.
+        # tornado doesn't guarantee that HTTPServer.listen listens
+        # before it returns, hence leaving its _socket property
+        # unpopulated until its subprocesses have bound properly.
         assert self.is_alive()
         while len(self.server._sockets) == 0:
-            True
+            time.sleep(0.01)
         return self.server._sockets.itervalues().next().getsockname()
 
 
@@ -103,6 +115,7 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         self.id = None
         self.suite = unittest.TestSuite()
         self.connected = False
+        self.msg_handler = WSHandler(self)
 
     def open(self, *args):
         self.id = uuid.uuid4()
@@ -113,25 +126,29 @@ class TestHandler(tornado.websocket.WebSocketHandler,
         global clients
         clients.put(self)
 
-        logger.info("Accepted new client: %s" % self)
+        logger.add_handler(self.msg_handler)
+
+        logger.debug("Accepted new client: %s" % self)
 
     def on_close(self):
+        logger.remove_handler(self.msg_handler)
         self.connected = False
         # Confirmation prompts blocks the handler, and this will
         # release the blocking queue get in
         # BlockingPromptMixin.get_response.
         self.response.put({})
-        logger.info("Client left: %s" % self)
+        logger.debug("Client left: %s" % self)
 
     def emit(self, message):
+        # Note: don't log here since this function is called from a
+        # log handler and the logger will deadlock.
         payload = json.dumps(message)
-        logger.info("Sending %s" % payload)
         self.write_message(payload)
 
     def on_message(self, payload):
         message = json.loads(payload)
         self.response.put(message)
-        logger.info("Received %s" % payload)
+        logger.debug("Received %s" % payload)
 
     def __str__(self):
         return str(self.id)
@@ -147,11 +164,12 @@ def wait_for_client():
     Gets a reference to the WebSocket handler associated with that client that
     we can use to communicate with the browser.  This blocks until a client
     connects, or ``server.connect_timeout`` is reached and a ``ConnectError``
-    is raised.
-
-    """
+    is raised."""
 
     try:
-        return clients.get(block=True, timeout=connect_timeout)
+        logger.debug("Waiting for client")
+        rv = clients.get(block=True, timeout=connect_timeout)
+        logger.debug("Got client")
+        return rv
     except Queue.Empty:
         raise ConnectError("Browser connection not made in time")
