@@ -15,6 +15,8 @@ from server import FrontendServer
 """Used to hold a TestEnvironment in a static field."""
 env = None
 
+class EnvironmentError(Exception):
+    pass
 
 def get(environ, *args, **kwargs):
     global env
@@ -28,6 +30,9 @@ def get(environ, *args, **kwargs):
     if not env.server.is_alive() and wait < timeout:
         wait += 0.1
         time.sleep(wait)
+
+    if not env.server.is_alive():
+        raise EnvironmentError("Starting server failed")
 
     return env
 
