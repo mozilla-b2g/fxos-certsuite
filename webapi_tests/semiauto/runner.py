@@ -3,6 +3,8 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import collections
+import traceback
+import types
 import unittest
 
 def serialize_suite(tests, ov=[]):

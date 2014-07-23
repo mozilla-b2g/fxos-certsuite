@@ -322,8 +322,7 @@ def run_tests(args, config):
                     try:
                         runner.run_suite(suite, groups, log_manager)
                     except:
-                        logger.error("Encountered error:")
-                        logger.critical(traceback.format_exc())
+                        logger.error("Encountered error:\n%s" % traceback.format_exc())
                         error = True
                     finally:
                         device.restore()
