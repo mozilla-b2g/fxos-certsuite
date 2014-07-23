@@ -59,10 +59,12 @@ def run(suite, logger, spawn_browser=True, verbosity=1, quiet=False,
     so.suite = suite
     environment.env.handler = so
 
+    logger.suite_start(tests=tests)
     try:
         results = test_runner.run(suite)
     except (SystemExit, KeyboardInterrupt) as e:
         sys.exit(1)
+    logger.suite_end()
 
     return results
 
