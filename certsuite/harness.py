@@ -321,7 +321,7 @@ def run_tests(args, config):
                 for suite, groups in runner.iter_suites():
                     try:
                         runner.run_suite(suite, groups, log_manager)
-                    except Exception:
+                    except:
                         logger.error("Encountered error:")
                         logger.critical(traceback.format_exc())
                         error = True
