@@ -15,6 +15,7 @@ from moztest.adapters.unit import StructuredTestRunner
 from webapi_tests.semiauto import environment, runner, server
 from webapi_tests.semiauto.loader import TestLoader
 
+
 __all__ = ["run", "main"]
 
 
@@ -38,10 +39,7 @@ def run(suite, logger, spawn_browser=True, verbosity=1, quiet=False,
 
     For example it is possible to automatically discover tests::
 
-        python -m semiauto discover .
-
-    """
-
+        python -m semiauto discover ."""
     if catch_break:
         import unittest.signals
         unittest.signals.installHandler()
@@ -117,15 +115,14 @@ tests in the current working directory (".").\
     commandline.add_logging_group(parser)
     return parser
 
+
 def main(argv):
     parser = get_parser()
     args = parser.parse_args(argv[1:])
-    logger = commandline.setup_logging("webapi", args, {"mach":sys.stdout})
+    logger = commandline.setup_logging("webapi", args, {"mach": sys.stdout})
 
     test_loader = TestLoader()
-
     tests = []
-
     if len(args.tests) >= 1 and args.tests[0] == "discover":
         start_dir = args.tests[1] if len(args.tests) > 1 else "."
         tests = test_loader.discover(start_dir, args.pattern or "test_*.py")
