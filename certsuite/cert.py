@@ -703,9 +703,9 @@ def cli():
 
     try:
         _run(args, logger)
-    except Exception as e:
+    except Exception:
         logger.critical(traceback.format_exc())
-        raise e
+        raise
 
 if __name__ == "__main__":
     cli()
