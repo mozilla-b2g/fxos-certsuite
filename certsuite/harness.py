@@ -228,7 +228,7 @@ class TestRunner(object):
             proc.wait()
             logger.debug("Process finished")
 
-        except Exception as e:
+        except Exception:
             logger.error("Error running suite %s:\n%s" % (suite, traceback.format_exc()))
             raise
         finally:
@@ -274,7 +274,7 @@ def check_adb():
     try:
         logger.info("Testing ADB connection")
         mozdevice.DeviceManagerADB()
-    except mozdevice.DMError, e:
+    except mozdevice.DMError as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
                         e.msg)
@@ -288,7 +288,7 @@ def install_marionette(version):
             marionette_install(version)
         except AlreadyInstalledException:
             logger.info("Marionette is already installed")
-    except subprocess.CalledProcessError, e:
+    except subprocess.CalledProcessError as e:
         logger.critical('Error installing marionette extension: %s' % e)
         logger.critical(traceback.format_exc())
         sys.exit(1)
