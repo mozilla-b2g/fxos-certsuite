@@ -240,6 +240,8 @@ class TelephonyTestCommon(object):
             self.assertFalse(busy, "Received busy signal; ensure target phone is available and try again")
             self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
+        time.sleep(15)
+
         # verify one outgoing call
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
@@ -263,9 +265,6 @@ class TelephonyTestCommon(object):
 
         # make the call via webapi
         self.initiate_outgoing_call(destination)
-
-        # have user answer the call on target, verify
-        self.answer_call(incoming=False)
 
     def disable_dialer(self):
         # disable system dialer agent so it doesn't steal the
