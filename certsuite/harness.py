@@ -228,8 +228,8 @@ class TestRunner(object):
             proc.wait()
             logger.debug("Process finished")
 
-        except Exception, e:
-            logger.error("Error running suite %s:\n%s\n%s" % (suite, e.message, traceback.format_exc()))
+        except Exception as e:
+            logger.error("Error running suite %s:\n%s" % (suite, traceback.format_exc()))
             raise
         finally:
             try:
