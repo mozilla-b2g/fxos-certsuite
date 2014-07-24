@@ -379,8 +379,7 @@ def _run(args, logger):
         print "Error connecting to device via adb (error: %s). Please be " \
             "sure device is connected and 'remote debugging' is enabled." % \
             e.msg
-        logger.critical(traceback.format_exc())
-        sys.exit(1)
+        raise
 
     # wait here to make sure marionette is running
     logger.debug('Attempting to set up port forwarding for marionette')
@@ -404,8 +403,7 @@ def _run(args, logger):
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
               (args.version, supported_versions)
-        logger.critical(traceback.format_exc())
-        sys.exit(1)
+        raise
 
     result_file_path = args.result_file
     if not result_file_path:
@@ -418,8 +416,7 @@ def _run(args, logger):
         result_file.close()
     except IOError as e:
         print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
-        logger.critical(traceback.format_exc())
-        sys.exit(1)
+        raise
 
     # We need to disable the lockscreen and screen timeout to get consistent
     # results. The metaharness will reset these values for us.
