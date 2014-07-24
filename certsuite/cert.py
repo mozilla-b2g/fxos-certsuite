@@ -6,12 +6,8 @@
 
 import argparse
 import ConfigParser
-import fxos_appgen
 import json
 import logging
-import marionette
-import mozdevice
-import moznetwork
 import os
 import pkg_resources
 import re
@@ -20,11 +16,18 @@ import sys
 import time
 import traceback
 import wait
+
+from zipfile import ZipFile
+
+import fxos_appgen
+import marionette
+import mozdevice
+import moznetwork
 import wptserve
 
 from mozlog.structured import commandline
+
 from omni_analyzer import OmniAnalyzer
-from zipfile import ZipFile
 
 """Signalizes whether client has made initial connection to HTTP
 server.
