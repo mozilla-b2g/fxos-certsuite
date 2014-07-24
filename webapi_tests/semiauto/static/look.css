@@ -63,7 +63,13 @@ h6 { font-size: 14px; }
 
 p, ul, ol, dl, hgroup { margin: 0 0 20px; }
 
-table { border-collapse: collapse; width: 100%; word-break: break-all; }
+table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  word-break: break-all;
+}
+
 tr { border-bottom: 1px solid rgba(0,0,0,.2); }
 
 th {
@@ -80,7 +86,12 @@ td {
   min-width: 70%;
 }
 
-td code { margin-top: .5em; display: block; font-size: 90%; }
+td code {
+  display: block;
+  font-size: 90%;
+  margin-top: .5em;
+  overflow: auto;
+}
 
 td.result {
   text-transform: uppercase;
