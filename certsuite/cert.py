@@ -703,7 +703,7 @@ def cli():
 
     try:
         _run(args, logger)
-    except Exception:
+    except:
         logger.critical(traceback.format_exc())
         raise
 
