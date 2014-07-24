@@ -12,7 +12,6 @@ import os
 import pkg_resources
 import re
 import StringIO
-import sys
 import time
 import traceback
 import wait
