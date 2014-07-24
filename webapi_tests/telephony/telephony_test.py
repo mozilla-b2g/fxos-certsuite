@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import time
+
 from marionette.wait import Wait
 
 
@@ -30,11 +32,8 @@ class TelephonyTestCommon(object):
         try:
             received = self.marionette.execute_script("return window.wrappedJSObject.received_incoming")
             self.assertTrue(received, "Incoming call not received (Telephony.onincoming event not found)")
-            self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-            self.assertEqual(self.calls['length'], 1, "There should be 1 incoming call")
             self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
             self.assertEqual(self.incoming_call['state'], "incoming", "Call state should be 'incoming'")
-            self.assertEqual(self.calls['0'], self.incoming_call)
         finally:
             self.marionette.execute_script("window.navigator.mozTelephony.onincoming = null;")
 
@@ -91,12 +90,9 @@ class TelephonyTestCommon(object):
         self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
         self.assertTrue(self.active_call['state'], "connected")
         if incoming:
-            self.assertEqual(self.active_call['number'], self.incoming_call['number'])
+            self.assertEqual(self.active_call['id']['number'], self.incoming_call['id']['number'])
         else:
-            self.assertEqual(self.active_call['number'], self.outgoing_call['number'])
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
-        self.assertEqual(self.calls['0'], self.active_call)
+            self.assertEqual(self.active_call['id']['number'], self.outgoing_call['id']['number'])
 
     def user_guided_incoming_call(self):
         # ask user to call the device; answer and verify via webapi
@@ -105,16 +101,17 @@ class TelephonyTestCommon(object):
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
 
-    def hangup_call(self, call_type="Active"):
+    def hangup_call(self, call_type="Active", active_calls_list=0):
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
         var call_type = arguments[0];
+        var active_calls_list = arguments[1];
         if (call_type == "Incoming") {
           var call_to_hangup = window.wrappedJSObject.incoming_call;
         } else if (call_type == "Outgoing") {
           var call_to_hangup = window.wrappedJSObject.outgoing_call;
         } else {
-          var call_to_hangup = window.wrappedJSObject.active_call;
+          var call_to_hangup = window.wrappedJSObject.calls[active_calls_list];
         };
 
         window.wrappedJSObject.disconnecting_call_ok = false;
@@ -132,11 +129,9 @@ class TelephonyTestCommon(object):
             window.wrappedJSObject.disconnected_call_ok = true;
           };
         };
-
         call_to_hangup.hangUp();
-
         marionetteScriptFinished(1);
-        """, script_args=[call_type], special_powers=True)
+        """, script_args=[call_type, active_calls_list], special_powers=True)
 
         # should have received both events associated with a active call hangup
         wait = Wait(self.marionette, timeout=90, interval=0.5)
@@ -240,6 +235,8 @@ class TelephonyTestCommon(object):
             self.assertFalse(busy, "Received busy signal; ensure target phone is available and try again")
             self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
+        time.sleep(15)
+
         # verify one outgoing call
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
@@ -297,3 +294,10 @@ class TelephonyTestCommon(object):
             self.fail("failed to disable dialer agent")
         finally:
             self.marionette.switch_to_frame(cur_frame)
+
+    def enable_speaker(self):
+        self.marionette.execute_script("""
+        log("enabling speaker");
+        var telephony = window.navigator.mozTelephony;
+        telephony.speakerEnabled = true;
+        """, special_powers=True)
