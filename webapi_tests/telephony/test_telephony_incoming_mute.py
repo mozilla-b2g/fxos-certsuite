@@ -16,8 +16,9 @@ class TestTelephonyIncomingMute(TestCase, TelephonyTestCommon):
     - Setup a mozTelephony event listener for incoming calls
     - Ask the test user to phone the Firefox OS device from a second phone
     - Verify that the mozTelephony incoming call event is triggered
-    - Answer the incoming call via the API, keep the call active for 5 seconds
-    - Mute the call using the API and ask the test user to verify
+    - Answer the incoming call via the API, keep the call active for 3 seconds
+    - Turn on mute using the API and ask the test user to verify
+    - Turn off mute using the API and ask the test user to verify
     - Hangup the call via the API
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
@@ -37,11 +38,17 @@ class TestTelephonyIncomingMute(TestCase, TelephonyTestCommon):
         self.answer_call()
 
         # keep call active for awhile
-        time.sleep(10)
+        time.sleep(3)
 
-        # putting call on mute
-        self.enable_mute()
+        # turn on mute
+        self.mute_call(enable=True)
         self.confirm("Is the call now on mute?")
+
+        # keep a delay for turn off confirmation
+        time.sleep(2)
+        # turn off mute
+        self.mute_call(enable=False)
+        self.confirm("Is the call 'not' on mute now?")
 
         # disconnect the active call
         self.hangup_call()
