@@ -10,6 +10,6 @@
                                       "%(temp_dir)s/cert_results.html"]}],
             ["web-platform-tests", {"cmd": "wptrunner",
                                     "common_args": ["--include-manifest=web-platform-tests/include.ini", "--config=web-platform-tests/wptrunner.ini"],
-                                    "run_args": ["--product=b2g", "--test-type=testharness"]}]
+                                    "run_args": ["--product=b2g", "--test-type=testharness", "--b2g-no-backup"]}]
            ]
 }
