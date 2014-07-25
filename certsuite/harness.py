@@ -6,10 +6,6 @@
 
 import argparse
 import json
-from marionette_extension import install as marionette_install
-from marionette_extension import AlreadyInstalledException
-import mozdevice
-import mozprocess
 import os
 import pkg_resources
 import shutil
@@ -22,8 +18,15 @@ import zipfile
 
 from collections import OrderedDict
 from datetime import datetime
+from StringIO import StringIO
+
+import mozdevice
+import mozprocess
+
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters
+from marionette_extension import install as marionette_install
+from marionette_extension import AlreadyInstalledException
 
 import report
 
@@ -281,6 +284,18 @@ def check_adb():
         logger.critical(traceback.format_exc())
         sys.exit(1)
 
+def check_rooted():
+    try:
+        logger.info("Testing that device is rooted")
+        dm=mozdevice.DeviceManagerADB()
+        out=StringIO()
+        dm.shell(['ls'], out, root=True)
+    except:
+        # mozdevice raises an exception indicating that the device
+        # is not rooted
+        logger.critical(traceback.format_exc())
+        sys.exit(1)
+
 def install_marionette(version):
     try:
         logger.info("Installing marionette extension")
@@ -313,6 +328,7 @@ def run_tests(args, config):
 
             log_metadata()
             check_adb()
+            check_rooted()
             install_marionette(config['version'])
 
             with DeviceBackup() as device:
