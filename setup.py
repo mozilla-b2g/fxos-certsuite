@@ -25,4 +25,5 @@ setup(name='fxos-certsuite',
       install_requires=deps,
       entry_points={"console_scripts": ["runcertsuite = certsuite:harness_main",
                                         "cert = certsuite:certcli",
-                                        "webapirunner = webapi_tests.runner:main"]})
+                                        "webapirunner = webapi_tests.runner:main",
+                                        "uarunner = useragent_tests.runner:main"]})
