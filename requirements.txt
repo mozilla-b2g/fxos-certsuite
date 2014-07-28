@@ -2,7 +2,7 @@ fxos-appgen >= 0.7
 gaiatest == 0.26
 marionette_client == 0.7.10
 marionette_extension >= 0.4
-mozdevice >= 0.39
+mozdevice >= 0.41
 mozlog >= 2.1
 moznetwork >= 0.24
 mozprocess >= 0.18
