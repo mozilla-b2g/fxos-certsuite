@@ -346,19 +346,6 @@ def set_permission(permission, value, app):
     app_url = 'app://' + app
     run_marionette_script(script % (permission, app_url, app_url, value), True)
 
-def set_preference(pref, value):
-    script = """
-      var lock = navigator.mozSettings.createLock();
-      var result = lock.set({'%s': %s});
-      result.onsuccess = function() {
-        marionetteScriptFinished(true);
-      };
-      result.onerror= function() {
-        marionetteScriptFinished(false);
-      };
-    """
-    return run_marionette_script(script % (pref, value), False, True)
-
 def _run(args, logger):
     # This function is to simply make the cli() function easier to handle
 
@@ -422,13 +409,6 @@ def _run(args, logger):
     except IOError as e:
         print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
         raise
-
-    # We need to disable the lockscreen and screen timeout to get consistent
-    # results. The metaharness will reset these values for us.
-    if not (set_preference('screen.timeout', 0) or
-            set_preference('lockscreen.enabled', 'false')):
-        logger.error('Could not disable timeout and/or lockscreen. '
-                     'Expect test timeouts')
 
     # get build properties
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
