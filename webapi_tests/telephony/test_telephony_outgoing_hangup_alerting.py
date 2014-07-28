@@ -8,7 +8,7 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyOutgoingHangup(TestCase, TelephonyTestCommon):
+class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -16,7 +16,7 @@ class TestTelephonyOutgoingHangup(TestCase, TelephonyTestCommon):
     - Ask the test user to specify a destination phone number for the test call
     - Setup mozTelephonyCall event listeners for the outgoing call
     - Use the API to initiate the outgoing call
-    - Keep the call ringing for 5 seconds, then hang up the call via the API
+    - Hang up the call via the API after dialing but before call is connected
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
@@ -25,19 +25,16 @@ class TestTelephonyOutgoingHangup(TestCase, TelephonyTestCommon):
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyOutgoingHangup, self).setUp()
+        super(TestTelephonyOutgoingHangupAlerting, self).setUp()
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_outgoing_hangup(self):
-        # disable the default dialer manager so it doesn't grab our calls
-        self.disable_dialer()
-
+    def test_telephony_outgoing_hangup_alerting(self):
         # use the webapi to make an outgoing call to user-specified number
         self.user_guided_outgoing_call()
 
         # keep call ringing for awhile
-        time.sleep(5)
+        time.sleep(1)
 
         # disconnect the outgoing call
         self.hangup_call(call_type="Outgoing")

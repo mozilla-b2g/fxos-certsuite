@@ -31,10 +31,7 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         self.disable_dialer()
 
     def test_telephony_outgoing(self):
-        # disable the default dialer manager so it doesn't grab our calls
-        self.disable_dialer()
-
-        # use the webapi to make an outgoing call to user-specified number; user answer
+        # use the webapi to make an outgoing call to user-specified number
         self.user_guided_outgoing_call()
 
         # have user answer the call on target
