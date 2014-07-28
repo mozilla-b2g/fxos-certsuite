@@ -6,13 +6,11 @@
 
 import argparse
 import json
-from marionette_extension import install as marionette_install
-from marionette_extension import AlreadyInstalledException
-import mozdevice
-import mozprocess
 import os
 import pkg_resources
+import re
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -20,12 +18,25 @@ import time
 import traceback
 import zipfile
 
+import marionette
+import mozdevice
+import moznetwork
+import mozprocess
+import marionette
+import wptserve
 from collections import OrderedDict
 from datetime import datetime
+from marionette.by import By
+from marionette import expected
+from marionette.wait import Wait
+from marionette_extension import AlreadyInstalledException
+from marionette_extension import install as marionette_install
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters
 
 import report
+
+here = os.path.split(__file__)[0]
 
 logger = None
 config_path = os.path.abspath(
@@ -270,6 +281,24 @@ def log_result(results, result):
         'errors': result.errors,
         }
 
+def check_preconditions(config):
+    check_marionette_installed = lambda: install_marionette(config['version'])
+
+    for precondition in [check_adb,
+                         check_marionette_installed,
+                         check_network,
+                         check_server]:
+        try:
+            passed = precondition()
+        except:
+            logger.critical("Error during precondition check:\n%s" % traceback.format_exc())
+            passed = False
+        if not passed:
+            sys.exit(1)
+
+    logger.info("Passed precondition checks")
+    sys.exit(1)
+
 def check_adb():
     try:
         logger.info("Testing ADB connection")
@@ -278,20 +307,105 @@ def check_adb():
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
                         e.msg)
-        logger.critical(traceback.format_exc())
-        sys.exit(1)
+        return False
+    return True
 
 def install_marionette(version):
+    dm = mozdevice.DeviceManagerADB()
     try:
         logger.info("Installing marionette extension")
         try:
             marionette_install(version)
+            time.sleep(10)
         except AlreadyInstalledException:
             logger.info("Marionette is already installed")
     except subprocess.CalledProcessError as e:
         logger.critical('Error installing marionette extension: %s' % e)
         logger.critical(traceback.format_exc())
-        sys.exit(1)
+        return False
+    return True
+
+def check_network():
+    logger.info("Checking network connection is up")
+    active = False
+    time_out = 0
+    dm = mozdevice.DeviceManagerADB()
+    ip_regexp = re.compile(r'UP\s+([1-9]\d{0,2}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+    while not active and time_out < 40:
+        data = dm.shellCheckOutput(['netcfg'])
+        lines = data.split("\n")
+        for line in lines[1:]:
+            match = ip_regexp.search(line)
+            if match:
+                logger.info("Got ip address %s" % match.groups())
+                active = True
+                break
+        time_out += 1
+        time.sleep(1)
+    if not active:
+        logger.critical("Timed out waiting for net")
+    return active
+
+@wptserve.handlers.handler
+def test_handler(request, response):
+    return "PASS"
+
+def wait_for_b2g_ready(marionette, timeout):
+    logger.info("Waiting for home screen to load")
+    # Wait for the homescreen to finish loading
+    Wait(marionette, timeout).until(expected.element_present(
+        By.CSS_SELECTOR, '#homescreen[loading-state=false]'))
+
+def check_server():
+    logger.info("Checking access to host machine")
+    routes = [("GET", "/", test_handler)]
+
+    dm = mozdevice.DeviceManagerADB()
+
+    dm.forward("tcp:2828", "tcp:2828")
+
+    logger.debug(subprocess.check_output(["adb", "forward", "--list"]))
+
+    m = marionette.Marionette()
+    try:
+        m.start_session()
+    except:
+        logger.critical("Failed to start marionette session")
+        try:
+            logger.debug("\n".join(dm.getLogcat()))
+        except:
+            logger.error("Failed to get logcat")
+        return False
+
+    try:
+        wait_for_b2g_ready(m, 60)
+    except IOError:
+        logger.critical("Error when waiting for homescreen")
+        try:
+            logger.debug("\n".join(dm.getLogcat()))
+        except:
+            logger.error("Failed to get logcat")
+        return False
+
+    host_ip = moznetwork.get_ip()
+
+    for port in [8000, 8001]:
+        try:
+            server = wptserve.WebTestHttpd(host=host_ip, port=port, routes=routes)
+            server.start()
+        except:
+            logger.critical("Error starting server:\n%s" % traceback.format_exc())
+            return False
+
+        try:
+            m.navigate("http://%s:%i" % (host_ip, port))
+        except:
+            logger.critical("Failed to connect to server running on host machine ip %s port %i. Check network configuration." % (host_ip, port))
+            return False
+        finally:
+            m.go_back()
+            server.stop()
+    return True
 
 def list_tests(args, config):
     print 'Tests available:'
@@ -312,8 +426,7 @@ def run_tests(args, config):
             setup_logging(log_manager)
 
             log_metadata()
-            check_adb()
-            install_marionette(config['version'])
+            check_preconditions(config)
 
             with DeviceBackup() as device:
                 runner = TestRunner(args, config)
