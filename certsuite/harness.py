@@ -291,9 +291,9 @@ def check_rooted():
         out=StringIO()
         dm.shell(['ls'], out, root=True)
     except:
+        logger.critical("This device is not rooted; please root it")
         # mozdevice raises an exception indicating that the device
         # is not rooted
-        logger.critical(traceback.format_exc())
         sys.exit(1)
 
 def install_marionette(version):
