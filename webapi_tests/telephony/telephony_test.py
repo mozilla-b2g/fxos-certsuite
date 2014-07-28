@@ -264,9 +264,6 @@ class TelephonyTestCommon(object):
         # make the call via webapi
         self.initiate_outgoing_call(destination)
 
-        # have user answer the call on target, verify
-        self.answer_call(incoming=False)
-
     def disable_dialer(self):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app

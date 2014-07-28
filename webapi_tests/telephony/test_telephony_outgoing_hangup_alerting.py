@@ -8,7 +8,7 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
+class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -16,8 +16,7 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
     - Ask the test user to specify a destination phone number for the test call
     - Setup mozTelephonyCall event listeners for the outgoing call
     - Use the API to initiate the outgoing call
-    - Ask the test user to answer the call on the destination phone
-    - Keep the call active for 5 seconds, then hang up the call via the API
+    - Hang up the call via the API after dialing but before call is connected
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
@@ -26,22 +25,22 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyOutgoing, self).setUp()
+        super(TestTelephonyOutgoingHangupAlerting, self).setUp()
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_outgoing(self):
+    def test_telephony_outgoing_hangup_alerting(self):
         # use the webapi to make an outgoing call to user-specified number
         self.user_guided_outgoing_call()
 
-        # have user answer the call on target
-        self.answer_call(incoming=False)
+        # keep call ringing for awhile
+        time.sleep(1)
 
-        # keep call active for awhile
-        time.sleep(5)
+        # disconnect the outgoing call
+        self.hangup_call(call_type="Outgoing")
 
-        # disconnect the active call
-        self.hangup_call()
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager
