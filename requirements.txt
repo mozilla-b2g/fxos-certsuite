@@ -1,5 +1,5 @@
 fxos-appgen == 0.5
-marionette_client == 0.7.7
+marionette_client == 0.7.10
 marionette_extension == 0.4.3
 mozdevice == 0.38
 mozlog == 2.1
@@ -7,8 +7,8 @@ moznetwork == 0.24
 mozprocess == 0.19
 py == 1.4.20
 wptserve == 1.0.1
-wptrunner == 0.3.11
-moztest == 0.5
+wptrunner == 0.3.13
+moztest == 0.6
 sphinx == 1.2.2
 tornado == 4.0
-mozrunner == 5.37.2
+mozrunner == 6.1
