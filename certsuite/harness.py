@@ -316,7 +316,6 @@ def install_marionette(version):
         logger.info("Installing marionette extension")
         try:
             marionette_install(version)
-            time.sleep(10)
         except AlreadyInstalledException:
             logger.info("Marionette is already installed")
     except subprocess.CalledProcessError as e:
@@ -367,6 +366,8 @@ def check_server():
     logger.debug(subprocess.check_output(["adb", "forward", "--list"]))
 
     m = marionette.Marionette()
+    m.wait_for_port()
+    logger.debug("Got marionette port")
     try:
         m.start_session()
     except:
@@ -376,6 +377,7 @@ def check_server():
         except:
             logger.error("Failed to get logcat")
         return False
+    logger.debug("Started marionette session")
 
     try:
         wait_for_b2g_ready(m, 60)
