@@ -126,26 +126,21 @@ class LogManager(object):
                 self.zip_file.__exit__(*args, **kwargs)
 
 
+# Consider upstreaming this to marionette-client:
 class MarionetteSession(object):
     def __init__(self, adb):
         self.dm = adb
         self.marionette = marionette.Marionette()
 
     def __enter__(self):
-        self.create()
-        self.settings = gaiautils.Settings(self.marionette)
-        self.lock_screen = gaiautils.LockScreen(self.marionette)
-        self.screen = gaiautils.Screen(self.marionette)
-        return self.settings, self.screen, self.lock_screen
+        self.dm.forward("tcp:2828", "tcp:2828")
+        self.marionette.wait_for_port()
+        self.marionette.start_session()
+        return self.marionette
 
     def __exit__(self, *args, **kwargs):
         if self.marionette.session is not None:
             self.marionette.delete_session()
-
-    def create(self):
-        self.dm.forward("tcp:2828", "tcp:2828")
-        self.marionette.wait_for_port()
-        self.marionette.start_session()
 
 
 class Device(object):
@@ -165,11 +160,13 @@ class Device(object):
 
     def __enter__(self):
         logger.info("Setting up device for testing")
-        with MarionetteSession(self.adb) as (settings, screen, lock_screen):
-            screen.on()
+        with MarionetteSession(self.adb) as marionette:
+            gaiautils.Screen(marionette).on()
             self.backup()
+            settings = gaiautils.Settings(marionette)
             for k, v in Device.test_settings.iteritems():
                 settings.set(k, v)
+            lock_screen = gaiautils.LockScreen(marionette)
             if lock_screen.is_locked:
                 lock_screen.unlock()
         return self
@@ -177,10 +174,11 @@ class Device(object):
     def __exit__(self, *args, **kwargs):
         # Original settings are restarted by Device.restore
         logger.info("Tearing down device after testing")
-        with MarionetteSession(self.adb) as (_, screen, lock_screen):
+        with MarionetteSession(self.adb) as marionette:
+            lock_screen = gaiautils.LockScreen(marionette)
             if not lock_screen.is_locked:
                 lock_screen.lock()
-            screen.off()
+            gaiautils.Screen(marionette).off()
         shutil.rmtree(self.backup_path)
 
     def local_dir(self, remote):
