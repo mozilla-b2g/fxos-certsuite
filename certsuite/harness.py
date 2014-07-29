@@ -18,7 +18,6 @@ import zipfile
 
 from collections import OrderedDict
 from datetime import datetime
-from StringIO import StringIO
 
 import mozdevice
 import mozprocess
@@ -276,24 +275,15 @@ def log_result(results, result):
 def check_adb():
     try:
         logger.info("Testing ADB connection")
-        mozdevice.DeviceManagerADB()
+        mozdevice.DeviceManagerADB(runAdbAsRoot=True)
     except mozdevice.DMError as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
                         e.msg)
         logger.critical(traceback.format_exc())
         sys.exit(1)
-
-def check_rooted():
-    try:
-        logger.info("Testing that device is rooted")
-        dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
-        out = StringIO()
-        dm.shell(['ls', '/data/'], out, root=True)
-    except mozdevice.DMError:
-        logger.critical("This device is not rooted; please root it")
-        # mozdevice raises an exception indicating that the device
-        # is not rooted
+    except AssertionError as e:
+        logger.critical(traceback.format_exc())
         sys.exit(1)
 
 def install_marionette(version):
@@ -327,7 +317,6 @@ def run_tests(args, config):
 
             log_metadata()
             check_adb()
-            check_rooted()
             install_marionette(config['version'])
 
             with DeviceBackup() as device:
