@@ -45,6 +45,7 @@ installed = False
 
 webapi_results = None
 webapi_results_embed_app = None
+webapi_tests_started = []
 
 supported_versions = ["1.4", "1.3"]
 
@@ -61,8 +62,14 @@ def webapi_results_embed_apps_handler(request, response):
     global webapi_results_embed_app
     webapi_results_embed_app = json.loads(request.POST["results"])
 
+@wptserve.handlers.handler
+def webapi_test_started_handler(request, response):
+    global webapi_tests_started
+    webapi_tests_started.append(request.POST["test-started"])
+
 routes = [("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_results_embed_apps", webapi_results_embed_apps_handler),
+          ("POST", "/webapi_test_started", webapi_test_started_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
 static_path = os.path.abspath(os.path.join(
@@ -349,6 +356,7 @@ def set_preference(pref, value):
     return run_marionette_script(script % (pref, value), False, True)
 
 def cli():
+    global logger
     global webapi_results
     global webapi_results_embed_app
 
@@ -512,13 +520,16 @@ def cli():
             apppath = os.path.join(static_path, 'webapi-test-app')
             install_app(logger, appname, args.version, apptype, apppath, True,
                         {'results_uri.js':
-                            'RESULTS_URI="http://%s:%s/webapi_results";' % addr},
+                            'RESULTS_URI="http://%s:%s/webapi_results";STARTED_URI="http://%s:%s/webapi_test_started";' % (addr * 2)},
                         True)
 
             try:
                 wait.Wait(timeout=120).until(lambda: webapi_results is not None)
             except wait.TimeoutException:
                 logger.error('Timed out waiting for results')
+                logger.debug('Tests recently started were:')
+                for test in webapi_tests_started[-5:]:
+                    logger.debug(test)
                 errors = True
 
             logger.debug('uninstalling: %s' % appname)

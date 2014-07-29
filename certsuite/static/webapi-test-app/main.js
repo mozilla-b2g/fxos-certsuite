@@ -51,6 +51,14 @@ function runTest()
   // Run WebIDL test suite
   var webIDLResults = []
 
+  add_test_started_callback(function (name) {
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "POST", STARTED_URI, true );
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xmlHttp.send("test-started=" + name);
+  });
+
   add_completion_callback(function (tests) {
     tests.forEach(function (test) {
       var result;
