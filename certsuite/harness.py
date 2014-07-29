@@ -290,7 +290,7 @@ def check_rooted():
         dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
         out = StringIO()
         dm.shell(['ls', '/data/'], out, root=True)
-    except:
+    except mozdevice.DMError:
         logger.critical("This device is not rooted; please root it")
         # mozdevice raises an exception indicating that the device
         # is not rooted
