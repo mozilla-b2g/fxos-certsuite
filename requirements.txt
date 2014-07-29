@@ -7,7 +7,7 @@ moznetwork >= 0.24
 mozprocess >= 0.18
 py == 1.4.20
 wptserve >= 1.0.1
-wptrunner >= 0.3.13
+wptrunner == 0.3.13
 mozrunner >= 6.1
 moztest == 0.5
 sphinx

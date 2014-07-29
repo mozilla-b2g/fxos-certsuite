@@ -28,11 +28,7 @@ Quick Setup and Usage
 
 You can setup your environment and run the tests by running::
 
-    ./run.sh --version=<some version>
-
-The *--version* argument is optional.  If passed, *--version* must
-be one of our supported release versions, either 1.3 or 1.4.  If
-you don't pass a version, 1.3 will be assumed.
+    ./run.sh
 
 This command sets up a virtual environment for you, with all the
 proper packages installed, activates the environment, runs the
