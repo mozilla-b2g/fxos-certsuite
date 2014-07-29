@@ -4,31 +4,29 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import ConfigParser
-import StringIO
 import argparse
+import ConfigParser
 import json
 import logging
-import marionette
-import mozdevice
-import moznetwork
 import os
 import pkg_resources
 import re
-import sys
+import StringIO
 import time
-import wptserve
-from zipfile import ZipFile
-import fxos_appgen
-
-from mozlog.structured import (
-    commandline,
-    formatters,
-    handlers,
-    structuredlog,
-)
-from omni_analyzer import OmniAnalyzer
+import traceback
 import wait
+
+from zipfile import ZipFile
+
+import fxos_appgen
+import marionette
+import mozdevice
+import moznetwork
+import wptserve
+
+from mozlog.structured import commandline
+
+from omni_analyzer import OmniAnalyzer
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -355,36 +353,8 @@ def set_preference(pref, value):
     """
     return run_marionette_script(script % (pref, value), False, True)
 
-def cli():
-    global logger
-    global webapi_results
-    global webapi_results_embed_app
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--version",
-                        help="version of FxOS under test",
-                        default="1.3",
-                        action="store")
-    parser.add_argument("--debug",
-                        help="enable debug logging",
-                        action="store_true")
-    parser.add_argument("--list-test-groups",
-                        help="print test groups available to run",
-                        action="store_true")
-    parser.add_argument("--include",
-                        metavar="TEST-GROUP",
-                        help="include this test group",
-                        action="append")
-    parser.add_argument("--result-file",
-                        help="absolute file path to store the resulting json." \
-                             "Defaults to results.json on your current path",
-                        action="store")
-    parser.add_argument("--generate-reference",
-                        help="Generate expected result files",
-                        action="store_true")
-    commandline.add_logging_group(parser)
-
-    args = parser.parse_args()
+def _run(args, logger):
+    # This function is to simply make the cli() function easier to handle
 
     test_groups = [
         'omni-analyzer',
@@ -401,20 +371,14 @@ def cli():
     report = {'buildprops': {}}
 
     logging.basicConfig()
-    if not args.debug:
-        logging.disable(logging.ERROR)
-
-    logger = commandline.setup_logging("certsuite", vars(args), {})
-
     # Step 1: Get device information
     try:
         dm = mozdevice.DeviceManagerADB()
-    except mozdevice.DMError, e:
+    except mozdevice.DMError as e:
         print "Error connecting to device via adb (error: %s). Please be " \
             "sure device is connected and 'remote debugging' is enabled." % \
             e.msg
-        logger.error("Error connecting to device: %s" % e.msg)
-        sys.exit(1)
+        raise
 
     # wait here to make sure marionette is running
     logger.debug('Attempting to set up port forwarding for marionette')
@@ -438,7 +402,7 @@ def cli():
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
               (args.version, supported_versions)
-        sys.exit(1)
+        raise
 
     result_file_path = args.result_file
     if not result_file_path:
@@ -451,7 +415,7 @@ def cli():
         result_file.close()
     except IOError as e:
         print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
-        sys.exit(1)
+        raise
 
     # We need to disable the lockscreen and screen timeout to get consistent
     # results. The metaharness will reset these values for us.
@@ -700,6 +664,48 @@ def cli():
     result_file.close()
 
     logger.debug('Results have been stored in: %s' % result_file_path)
+
+def cli():
+    global logger
+    global webapi_results
+    global webapi_results_embed_app
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--version",
+                        help="version of FxOS under test",
+                        default="1.3",
+                        action="store")
+    parser.add_argument("--debug",
+                        help="enable debug logging",
+                        action="store_true")
+    parser.add_argument("--list-test-groups",
+                        help="print test groups available to run",
+                        action="store_true")
+    parser.add_argument("--include",
+                        metavar="TEST-GROUP",
+                        help="include this test group",
+                        action="append")
+    parser.add_argument("--result-file",
+                        help="absolute file path to store the resulting json." \
+                             "Defaults to results.json on your current path",
+                        action="store")
+    parser.add_argument("--generate-reference",
+                        help="Generate expected result files",
+                        action="store_true")
+    commandline.add_logging_group(parser)
+
+    args = parser.parse_args()
+
+    if not args.debug:
+        logging.disable(logging.ERROR)
+
+    logger = commandline.setup_logging("certsuite", vars(args), {})
+
+    try:
+        _run(args, logger)
+    except:
+        logger.critical(traceback.format_exc())
+        raise
 
 if __name__ == "__main__":
     cli()
