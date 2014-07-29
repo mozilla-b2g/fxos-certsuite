@@ -287,9 +287,9 @@ def check_adb():
 def check_rooted():
     try:
         logger.info("Testing that device is rooted")
-        dm=mozdevice.DeviceManagerADB()
-        out=StringIO()
-        dm.shell(['ls'], out, root=True)
+        dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
+        out = StringIO()
+        dm.shell(['ls', '/data/'], out, root=True)
     except:
         logger.critical("This device is not rooted; please root it")
         # mozdevice raises an exception indicating that the device
@@ -315,7 +315,6 @@ def list_tests(args, config):
     print '''To run a set of tests, pass those test names on the commandline, like:
 runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
     return 0
-
 
 def run_tests(args, config):
     error = False
