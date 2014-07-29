@@ -84,6 +84,7 @@ def main():
     args = parser.parse_args(sys.argv[1:])
     logger = commandline.setup_logging(
         "webapi", vars(args), {"raw": sys.stdout})
+
     if args.list_test_groups and len(args.include) > 0:
         print >> sys.stderr("%s: error: cannot list and include test "
                             "groups at the same time" % sys.argv[0])
