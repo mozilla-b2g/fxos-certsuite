@@ -151,38 +151,40 @@ class TelephonyTestCommon(object):
         self.marionette.execute_async_script("""
         var telephony = window.navigator.mozTelephony;
         var destination = arguments[0]
-        var out_call = telephony.dial(destination);
 
-        window.wrappedJSObject.received_dialing = false;
-        if (out_call.state == "dialing") {
-            window.wrappedJSObject.received_dialing = true;
-        };
+        telephony.dial(destination).then(out_call => {
 
-        window.wrappedJSObject.received_statechange = false;
-        out_call.onstatechange = function onstatechange(event) {
-          log("Received TelephonyCall 'onstatechange' event.");
-          if (event.call.state == "alerting") {
-            window.wrappedJSObject.received_statechange = true;
-          };
-        };
+            window.wrappedJSObject.received_dialing = false;
+            if (out_call.state == "dialing") {
+                window.wrappedJSObject.received_dialing = true;
+            };
 
-        window.wrappedJSObject.received_alerting = false;
-        out_call.onalerting = function onalerting(event) {
-          log("Received TelephonyCall 'onalerting' event.");
-          if (event.call.state == "alerting") {
-            window.wrappedJSObject.received_alerting = true;
-            window.wrappedJSObject.outgoing_call = out_call;
-            window.wrappedJSObject.calls = telephony.calls;
-          };
-        };
+            window.wrappedJSObject.received_statechange = false;
+            out_call.onstatechange = function onstatechange(event) {
+              log("Received TelephonyCall 'onstatechange' event.");
+              if (event.call.state == "alerting") {
+                window.wrappedJSObject.received_statechange = true;
+              };
+            };
 
-        window.wrappedJSObject.received_busy = false;
-        out_call.onbusy = function onbusy(event) {
-          log("Received TelephonyCall 'onbusy' event.");
-          if (event.call.state == "busy") {
-            window.wrappedJSObject.received_busy = true;
-          };
-        };
+            window.wrappedJSObject.received_alerting = false;
+            out_call.onalerting = function onalerting(event) {
+              log("Received TelephonyCall 'onalerting' event.");
+              if (event.call.state == "alerting") {
+                window.wrappedJSObject.received_alerting = true;
+                window.wrappedJSObject.outgoing_call = out_call;
+                window.wrappedJSObject.calls = telephony.calls;
+              };
+            };
+
+            window.wrappedJSObject.received_busy = false;
+            out_call.onbusy = function onbusy(event) {
+              log("Received TelephonyCall 'onbusy' event.");
+              if (event.call.state == "busy") {
+                window.wrappedJSObject.received_busy = true;
+              };
+            };
+        });
 
         marionetteScriptFinished(1);
         """, script_args=[destination], special_powers=True)
