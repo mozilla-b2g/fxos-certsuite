@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from marionette.wait import Wait
+from unittest import SkipTest
 
 
 class TelephonyTestCommon(object):
@@ -240,7 +241,7 @@ class TelephonyTestCommon(object):
             marionetteScriptFinished(1);
             """, special_powers=True)
         except:
-            self.fail("failed to disable dialer agent")
+            raise SkipTest("Unable to disable dialer agent; bug 997248")
         finally:
             self.marionette.switch_to_frame(cur_frame)
 
