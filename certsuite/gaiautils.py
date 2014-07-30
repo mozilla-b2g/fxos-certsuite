@@ -19,13 +19,15 @@ class Settings(object):
 
     def get(self, key):
         return self.driver.execute_async_script(
-            "return GaiaDataLayer.getSetting('%s')" % key, special_powers=True)
+            "return GaiaDataLayer.getSetting('%s')" % key.replace("'", '"'),
+            special_powers=True)
 
     def set(self, key, value):
         import json
         value = json.dumps(value)
         self.driver.execute_script(
-            "return GaiaDataLayer.setSetting('%s', %s)" % (key, value),
+            "return GaiaDataLayer.setSetting('%s', %s)" %
+            (key.replace("'", '"'), value),
             special_powers=True)
 
 
