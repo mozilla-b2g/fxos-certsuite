@@ -4,6 +4,15 @@ License, v. 2.0. If a copy of the MPL was not distributed with this file,
 You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
+function log(msg)
+{
+    var xmlHttp = null;
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "POST", LOG_URI, true );
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+    xmlHttp.send("log=" + msg);
+}
+
 function getTheNames(obj, visited)
 {
   var orig_obj = obj;
@@ -199,9 +208,14 @@ function permissionsTests()
 
 function runTest()
 {
+  log('Starting permissions-test-app runTest()');
 
   var results = {}
-  results['window'] = getTheNames(window, {});
+  try {
+    results['window'] = getTheNames(window, {});
+  } catch (e) {
+    log('caught exception: ' + e.message);
+  }
 
   var permissionsPromise = permissionsTests();
   permissionsPromise.then(function(result) {
