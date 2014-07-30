@@ -360,7 +360,7 @@ def _run(args, logger):
     logging.basicConfig()
     # Step 1: Get device information
     try:
-        dm = mozdevice.DeviceManagerADB(runAsAdbRoot=True)
+        dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
     except mozdevice.DMError as e:
         print "Error connecting to device via adb (error: %s). Please be " \
             "sure device is connected and 'remote debugging' is enabled." % \
