@@ -17,6 +17,10 @@ class TestMmsIncoming(TestCase, MobileMessageTestCommon):
     .. _`WebSMS API`: https://developer.mozilla.org/en-US/docs/Web/API/WebSMS_API
     """
 
+    def setUp(self):
+        super(TestMmsIncoming, self).setUp()
+        self.check_obj()
+
     def tearDown(self):
         super(TestMmsIncoming, self).tearDown()
 

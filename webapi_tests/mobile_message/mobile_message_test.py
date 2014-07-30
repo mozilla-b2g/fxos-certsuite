@@ -14,6 +14,13 @@ class MobileMessageTestCommon(object):
         self.out_msg = None
         self.out_destination = None
 
+    def check_obj(self):
+        wait = Wait(self.marionette, timeout=2, interval=0.2)
+        try:
+            wait.until(lambda x: x.execute_script("return (window.navigator.mozMobileMessage != undefined)"))
+        except:
+            self.fail("mozMobileMessage object not available")
+
     def setup_receiving_listener(self):
         self.marionette.execute_script("""
         var mm = window.navigator.mozMobileMessage;

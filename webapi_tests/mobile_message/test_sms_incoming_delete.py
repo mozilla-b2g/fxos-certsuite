@@ -19,6 +19,10 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
     .. _`WebSMS API`: https://developer.mozilla.org/en-US/docs/Web/API/WebSMS_API
     """
 
+    def setUp(self):
+        super(TestSmsIncomingDelete, self).setUp()
+        self.check_obj()
+
     def tearDown(self):
         super(TestSmsIncomingDelete, self).tearDown()
 
