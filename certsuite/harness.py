@@ -28,6 +28,8 @@ from mozlog.structured import structuredlog, handlers, formatters
 import report
 
 logger = None
+stdio_handler = handlers.StreamHandler(sys.stderr,
+                                       formatters.MachFormatter())
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "config.json"))
 
@@ -36,9 +38,7 @@ def setup_logging(log_manager):
     global logger
     log_f = log_manager.structured_file
     logger = structuredlog.StructuredLogger("firefox-os-cert-suite")
-    logger.add_handler(handlers.StreamHandler(sys.stderr,
-                                              formatters.MachFormatter()))
-
+    logger.add_handler(stdio_handler)
     logger.add_handler(handlers.StreamHandler(log_f,
                                               formatters.JSONFormatter()))
 
@@ -213,19 +213,39 @@ class TestRunner(object):
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
 
+        def on_output(line):
+            written = False
+            if line.startswith("{"):
+                try:
+                    data = json.loads(line.strip())
+                    if "action" in data:
+                        sub_logger.log_raw(data)
+                        written = True
+                except ValueError:
+                    pass
+            if not written:
+                logger.process_output(proc.pid,
+                                      line.decode("utf8", "replace"),
+                                      command=" ".join(cmd))
+
         try:
-            cmd, output_files, structured_log = self.build_command(suite, groups, temp_dir)
+            cmd, output_files, structured_path = self.build_command(suite, groups, temp_dir)
 
             logger.debug(cmd)
             logger.debug(output_files)
 
             env = dict(os.environ)
             env['PYTHONUNBUFFERED'] = '1'
-            proc = mozprocess.ProcessHandler(cmd, env=env)
+            proc = mozprocess.ProcessHandler(cmd, env=env, processOutputLine=on_output)
             logger.debug("Process '%s' is running" % " ".join(cmd))
             #TODO: move timeout handling to here instead of each test?
-            proc.run()
-            proc.wait()
+            with open(structured_path, "w") as structured_log:
+                sub_logger = structuredlog.StructuredLogger(suite)
+                sub_logger.add_handler(stdio_handler)
+                sub_logger.add_handler(handlers.StreamHandler(structured_log,
+                                                              formatters.JSONFormatter()))
+                proc.run()
+                proc.wait()
             logger.debug("Process finished")
 
         except Exception:
@@ -237,7 +257,7 @@ class TestRunner(object):
             except:
                 pass
 
-        return output_files, structured_log
+        return output_files, structured_path
 
     def build_command(self, suite, groups, temp_dir):
         suite_opts = self.config["suites"][suite]
@@ -249,8 +269,7 @@ class TestRunner(object):
         cmd = [suite_opts['cmd']]
 
         log_name = "%s/%s_structured%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
-        cmd.extend(["--log-raw=%s" % log_name,
-                    "--log-mach=-"])
+        cmd.extend(["--log-raw=-"])
 
         if groups:
             cmd.extend('--include=%s' % g for g in groups)
