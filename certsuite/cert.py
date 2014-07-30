@@ -132,9 +132,9 @@ def test_user_agent(user_agent, logger):
             message = 'Device identifier: "%s" contains forbidden characters' % device
 
     if valid:
-        logger.test_status('webapi', 'user-agent-string', 'PASS')
+        logger.test_status('user-agent', 'user-agent-string', 'PASS')
     else:
-        logger.test_status('webapi', 'user-agent-string', 'FAIL', 'Invalid user-agent string: %s: %s' % (user_agent, message))
+        logger.test_status('user-agent', 'user-agent-string', 'FAIL', 'Invalid user-agent string: %s: %s' % (user_agent, message))
 
     return valid
 
@@ -502,7 +502,6 @@ def _run(args, logger):
 
             if "headers" not in report:
                 report["headers"] = headers
-                test_user_agent(headers['user-agent'], logger)
 
             results_filename = '%s.%s.json' % (args.version, apptype)
             if args.generate_reference:
