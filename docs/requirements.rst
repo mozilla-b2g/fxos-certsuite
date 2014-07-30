@@ -40,7 +40,6 @@ have any existing servers running on them:
 - 2828
 - 8000
 - 8001
-- 8888
 
 Any network firewall must be configured to allow the device to access
 the host computer on the above ports.
