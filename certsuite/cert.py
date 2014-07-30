@@ -105,7 +105,7 @@ def install_app(logger, appname, version, apptype, apppath, all_perms,
     package_app(apppath, files)
 
     logger.debug('installing: %s' % appname)
-    fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+    fxos_appgen.install_app(appname, 'app.zip', script_timeout=120000)
     if launch:
         logger.debug('launching: %s' % appname)
         fxos_appgen.launch_app(appname)
