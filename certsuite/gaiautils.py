@@ -2,13 +2,16 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-
 import os
 
 
+__all__ = ["Settings", "LockScreen", "Screen"]
+
+atoms_dir = os.path.join(__file__, os.path.pardir, "atoms")
+
+
 class Settings(object):
-    atom = os.path.abspath(
-        os.path.join(__file__, os.path.pardir, "atoms", "data_layer.js"))
+    atom = os.path.join(atoms_dir, "data_layer.js")
 
     def __init__(self, driver):
         self.driver = driver
@@ -21,13 +24,13 @@ class Settings(object):
     def set(self, key, value):
         import json
         value = json.dumps(value)
-        result = self.driver.execute_script("return GaiaDataLayer.setSetting('%s', %s)" %
-                                            (key, value), special_powers=True)
+        self.driver.execute_script(
+            "return GaiaDataLayer.setSetting('%s', %s)" % (key, value),
+            special_powers=True)
 
 
 class LockScreen(object):
-    atom = os.path.abspath(
-        os.path.join(__file__, os.path.pardir, "atoms", "lock_screen.js"))
+    atom = os.path.join(atoms_dir, "lock_screen.js")
 
     def __init__(self, driver):
         self.driver = driver
