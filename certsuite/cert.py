@@ -103,7 +103,7 @@ def install_app(logger, appname, version, apptype, apppath, all_perms,
     package_app(apppath, files)
 
     logger.debug('installing: %s' % appname)
-    fxos_appgen.install_app(appname, 'app.zip', script_timeout=30000)
+    fxos_appgen.install_app(appname, 'app.zip', script_timeout=120000)
     if launch:
         logger.debug('launching: %s' % appname)
         fxos_appgen.launch_app(appname)
@@ -580,14 +580,17 @@ def _run(args, logger):
                 if permission is None:
                     expected_webapi_results = webapi_results
                 else:
-                    if expected_webapi_results is None:
-                        logger.error('No expected results for comparison')
-                        errors = True
                     results[permission] = diff_results(expected_webapi_results, webapi_results)
             except wait.TimeoutException:
                 logger.error('Timed out waiting for results')
-                results[permission] = 'timed out'
                 errors = True
+                if permission is not None:
+                    results[permission] = 'timed out'
+                else:
+                    # If we timeout on our baseline results there is
+                    # no point in proceeding.
+                    logger.error('Could not get baseline results for permissions. Skipping tests.')
+                    break
 
             kill('app://' + installed_appname)
             if permission is not None:
