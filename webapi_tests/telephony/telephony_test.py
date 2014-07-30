@@ -8,11 +8,12 @@ from marionette.wait import Wait
 
 
 class TelephonyTestCommon(object):
+    active_call_list = []
+
     def __init__(self):
         self.calls = None
         self.incoming_call = None
         self.outgoing_call = None
-        self.active_call = None
 
     def setup_incoming_call(self):
         # listen for and answer incoming call
@@ -87,12 +88,10 @@ class TelephonyTestCommon(object):
             self.fail("Failed to answer call")
 
         # verify the active call
-        self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
-        self.assertTrue(self.active_call['state'], "connected")
-        if incoming:
-            self.assertEqual(self.active_call['id']['number'], self.incoming_call['id']['number'])
-        else:
-            self.assertEqual(self.active_call['id']['number'], self.outgoing_call['id']['number'])
+        self.active_call_list.append(self.marionette.execute_script("return window.wrappedJSObject.active_call"))
+
+        if incoming == False:
+            self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
 
     def user_guided_incoming_call(self):
         # ask user to call the device; answer and verify via webapi
@@ -101,17 +100,17 @@ class TelephonyTestCommon(object):
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
 
-    def hangup_call(self, call_type="Active", active_calls_list=0):
+    def hangup_call(self, call_type="Active", active_call_selected=0):
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
         var call_type = arguments[0];
-        var active_calls_list = arguments[1];
+        var active_call_selected = arguments[1];
         if (call_type == "Incoming") {
           var call_to_hangup = window.wrappedJSObject.incoming_call;
         } else if (call_type == "Outgoing") {
           var call_to_hangup = window.wrappedJSObject.outgoing_call;
         } else {
-          var call_to_hangup = window.wrappedJSObject.calls[active_calls_list];
+          var call_to_hangup = window.wrappedJSObject.calls[active_call_selected];
         };
 
         window.wrappedJSObject.disconnecting_call_ok = false;
@@ -131,7 +130,7 @@ class TelephonyTestCommon(object):
         };
         call_to_hangup.hangUp();
         marionetteScriptFinished(1);
-        """, script_args=[call_type, active_calls_list], special_powers=True)
+        """, script_args=[call_type, active_call_selected], special_powers=True)
 
         # should have received both events associated with a active call hangup
         wait = Wait(self.marionette, timeout=90, interval=0.5)
@@ -235,8 +234,6 @@ class TelephonyTestCommon(object):
             self.assertFalse(busy, "Received busy signal; ensure target phone is available and try again")
             self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
-        time.sleep(15)
-
         # verify one outgoing call
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
@@ -295,9 +292,15 @@ class TelephonyTestCommon(object):
         finally:
             self.marionette.switch_to_frame(cur_frame)
 
-    def enable_speaker(self):
+    def set_speaker(self, enable=True):
         self.marionette.execute_script("""
-        log("enabling speaker");
+        var enable = arguments[0];
         var telephony = window.navigator.mozTelephony;
-        telephony.speakerEnabled = true;
-        """, special_powers=True)
+        if (enable) {
+          log("enabling speaker");
+          telephony.speakerEnabled = true;
+        } else {
+          log("disabling speaker");
+          telephony.speakerEnabled = false;
+        }
+        """, script_args=[enable], special_powers=True)
