@@ -105,10 +105,11 @@ class TelephonyTestCommon(object):
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
 
-    def hangup_call(self, call_type="Active"):
+    def hangup_call(self, call_type="Active", remote_hangup=False):
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
         var call_type = arguments[0];
+        var remote_hangup = arguments[1];
         if (call_type == "Incoming") {
           var call_to_hangup = window.wrappedJSObject.incoming_call;
         } else if (call_type == "Outgoing") {
@@ -133,19 +134,36 @@ class TelephonyTestCommon(object):
           };
         };
 
-        call_to_hangup.hangUp();
+        if (!remote_hangup) {
+          call_to_hangup.hangUp();
+        }
 
         marionetteScriptFinished(1);
-        """, script_args=[call_type], special_powers=True)
+        """, script_args=[call_type, remote_hangup], special_powers=True)
 
-        # should have received both events associated with a active call hangup
-        wait = Wait(self.marionette, timeout=90, interval=0.5)
-        try:
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
-        except:
-            # failed to hangup
-            self.fail("Failed to hangup call")
+        if remote_hangup == False:
+            # should have received both events associated with a active call hangup
+            wait = Wait(self.marionette, timeout=90, interval=0.5)
+            try:
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
+            except:
+                # failed to hangup
+                self.fail("Failed to hangup call")
+        else:
+            self.instruct("Hangup the call from secondary phone and press 'OK'")
+            # should have received only disconnected event associated with a active call hangup
+            wait = Wait(self.marionette, timeout=90, interval=0.5)
+            try:
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
+            except:
+                # failed to hangup
+                self.fail("Failed to hangup call")
+
+            #verify that the call disconnected from phone which is not the device under test
+            disconnecting = self.marionette.execute_script("return window.wrappedJSObject.disconnecting_call_ok")
+            self.assertFalse(disconnecting, "Telephony.ondisconnecting event found, but should not have been "
+                            "since the call was terminated remotely")
 
     def hold_active_call(self):
         self.marionette.execute_async_script("""
@@ -264,9 +282,6 @@ class TelephonyTestCommon(object):
         # make the call via webapi
         self.initiate_outgoing_call(destination)
 
-        # have user answer the call on target, verify
-        self.answer_call(incoming=False)
-
     def disable_dialer(self):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app
@@ -294,6 +309,19 @@ class TelephonyTestCommon(object):
             marionetteScriptFinished(1);
             """, special_powers=True)
         except:
-            self.fail("failed to disable dialer agent")
+            self.fail("failed to enable dialer agent")
         finally:
             self.marionette.switch_to_frame(cur_frame)
+
+    def mute_call(self, enable=True):
+        self.marionette.execute_script("""
+        var enable = arguments[0];
+        var telephony = window.navigator.mozTelephony;
+        if (enable) {
+          log("enabling mute");
+          telephony.muted = true;
+        } else {
+          log("disabling mute");
+          telephony.muted = false;
+        }
+        """, script_args=[enable], special_powers=True)
