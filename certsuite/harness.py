@@ -122,7 +122,7 @@ class LogManager(object):
 
 class DeviceBackup(object):
     def __init__(self):
-        self.device = mozdevice.DeviceManagerADB()
+        self.device = mozdevice.DeviceManagerADB(runAsAdbRoot=True)
         self.backup_dirs = ["/data/local",
                             "/data/b2g/mozilla"]
         self.backup_files = ["/system/etc/hosts"]
