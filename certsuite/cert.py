@@ -43,7 +43,6 @@ installed = False
 
 webapi_results = None
 webapi_results_embed_app = None
-webapi_tests_started = []
 
 supported_versions = ["1.4", "1.3"]
 
@@ -61,13 +60,12 @@ def webapi_results_embed_apps_handler(request, response):
     webapi_results_embed_app = json.loads(request.POST["results"])
 
 @wptserve.handlers.handler
-def webapi_test_started_handler(request, response):
-    global webapi_tests_started
-    webapi_tests_started.append(request.POST["test-started"])
+def webapi_log_handler(request, response):
+    logger.debug(request.POST["log"])
 
 routes = [("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_results_embed_apps", webapi_results_embed_apps_handler),
-          ("POST", "/webapi_test_started", webapi_test_started_handler),
+          ("POST", "/webapi_log", webapi_log_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
 static_path = os.path.abspath(os.path.join(
@@ -467,16 +465,13 @@ def _run(args, logger):
             apppath = os.path.join(static_path, 'webapi-test-app')
             install_app(logger, appname, args.version, apptype, apppath, True,
                         {'results_uri.js':
-                            'RESULTS_URI="http://%s:%s/webapi_results";STARTED_URI="http://%s:%s/webapi_test_started";' % (addr * 2)},
+                            'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)},
                         True)
 
             try:
                 wait.Wait(timeout=120).until(lambda: webapi_results is not None)
             except wait.TimeoutException:
                 logger.error('Timed out waiting for results')
-                logger.debug('Tests recently started were:')
-                for test in webapi_tests_started[-5:]:
-                    logger.debug(test)
                 errors = True
 
             logger.debug('uninstalling: %s' % appname)
@@ -515,6 +510,7 @@ def _run(args, logger):
 
         # test default permissions
         for apptype in ['web', 'privileged', 'certified']:
+            logger.debug('Testing default permissions: %s' % apptype)
             results = {}
             expected_webapi_results = None
 
@@ -542,6 +538,7 @@ def _run(args, logger):
             fxos_appgen.uninstall_app(appname)
 
         # test individual permissions
+        logger.debug('Testing individual permissions')
         results = {}
 
         # first install test app for embed-apps permission test
@@ -551,14 +548,12 @@ def _run(args, logger):
                     {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr},
                      False)
 
-
-
         appname = 'Permissions Test App'
         installed_appname = appname.lower().replace(" ", "-")
         apppath = os.path.join(static_path, 'permissions-test-app')
         install_app(logger, appname, args.version, 'web', apppath, False,
                 {'results_uri.js':
-                    'RESULTS_URI="http://%s:%s/webapi_results";' % addr})
+                    'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)})
 
         for permission in [None] + permissions:
             webapi_results = None
@@ -585,6 +580,9 @@ def _run(args, logger):
                 if permission is None:
                     expected_webapi_results = webapi_results
                 else:
+                    if expected_webapi_results is None:
+                        logger.error('No expected results for comparison')
+                        errors = True
                     results[permission] = diff_results(expected_webapi_results, webapi_results)
             except wait.TimeoutException:
                 logger.error('Timed out waiting for results')
