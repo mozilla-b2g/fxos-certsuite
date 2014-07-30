@@ -1,9 +1,10 @@
+graft certsuite/atoms
 graft webapi_tests/semiauto/static
 include certsuite/config.json
 include certsuite/report/report.css
 include webapi_tests/app_management.js
-recursive-include certsuite/static *
-recursive-include certsuite/expected_webapi_results *
 recursive-include certsuite/expected_omni_results *
 recursive-include certsuite/expected_permissions_results *
+recursive-include certsuite/expected_webapi_results *
 recursive-include certsuite/html_output *
+recursive-include certsuite/static *
