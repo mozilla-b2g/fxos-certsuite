@@ -16,6 +16,10 @@ class TestProximity(TestCase):
     .. _`Proximity API`: https://developer.mozilla.org/en-US/docs/Web/API/Proximity_Events
     """
 
+    def setUp(self):
+        super(TestProximity, self).setUp()
+        self.wait_for_object("window.addEventListener")
+
     def tearDown(self):
         self.marionette.execute_script("""
         window.removeEventListener('devicelight', window.wrappedJSObject.prox_function);

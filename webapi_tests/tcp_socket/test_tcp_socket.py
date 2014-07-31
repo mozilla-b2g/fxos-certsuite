@@ -121,6 +121,10 @@ class TestTcpSocketFormality(TestCase):
     .. _`TCP Socket API`: https://developer.mozilla.org/en-US/docs/Web/API/TCP_Socket_API
     """
 
+    def setUp(self):
+        super(TestTcpSocketFormality, self).setUp()
+        self.wait_for_object("window.navigator.mozTCPSocket")
+
     def prop(self, pp, obj):
         return self.marionette.execute_script("return %s.%s" % (pp, obj))
 

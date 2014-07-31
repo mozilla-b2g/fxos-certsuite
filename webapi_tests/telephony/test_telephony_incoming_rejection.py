@@ -25,6 +25,7 @@ class TestTelephonyIncomingRejection(TestCase, TelephonyTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestTelephonyIncomingRejection, self).setUp()
+        self.wait_for_object("window.navigator.mozTelephony")
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 

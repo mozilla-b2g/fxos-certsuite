@@ -15,6 +15,7 @@ class TestSdcardStorage(TestCase, DeviceStorageTestCommon):
         self.file_contents = "This is a sample text file"
         self.addCleanup(self.clean_up)
         super(TestSdcardStorage, self).setUp()
+        self.wait_for_object("window.navigator.getDeviceStorage")
         self.marionette.execute_script("window.wrappedJSObject.sdcard = navigator.getDeviceStorage(\"sdcard\")")
 
     @unittest.skip("Currently disabled, see bug 1016295")

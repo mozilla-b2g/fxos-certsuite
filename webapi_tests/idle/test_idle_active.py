@@ -14,6 +14,7 @@ class TestIdleActive(TestCase, IdleActiveTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestIdleActive, self).setUp()
+        self.wait_for_object("window.navigator.mozPower")
         self.marionette.execute_script("window.wrappedJSObject.rcvd_idle = false;")
         self.marionette.execute_script("window.wrappedJSObject.rcvd_active = false;")
         #get screen current brightness

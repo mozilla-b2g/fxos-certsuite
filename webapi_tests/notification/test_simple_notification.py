@@ -18,6 +18,7 @@ class TestSimpleNotification(TestCase, NotificationTestCommon):
 
     def setUp(self):
         super(TestSimpleNotification, self).setUp()
+        self.wait_for_object("Notification")
         result = self.request_permission()
         self.assertEqual(result, "granted", "User must grant permission on device for notifications")
 

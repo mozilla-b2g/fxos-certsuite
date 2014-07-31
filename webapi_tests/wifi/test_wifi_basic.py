@@ -22,6 +22,7 @@ class TestWifiBasic(TestCase, WifiTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestWifiBasic, self).setUp()
+        self.wait_for_object("window.navigator.mozWifiManager")
         # start with wifi disabled
         if self.is_wifi_enabled():
             self.set_wifi_enabled(False)

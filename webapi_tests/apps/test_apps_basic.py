@@ -7,6 +7,10 @@ from webapi_tests.apps import AppsTestCommon
 
 
 class TestAppsBasic(TestCase, AppsTestCommon):
+    def setUp(self):
+        super(TestAppsBasic, self).setUp()
+        self.wait_for_object("window.navigator.mozApps")
+
     def test_get_self(self):
         app = self.get_self()
         self.assertEqual(app["manifest"]["name"], "CertTest App", "Application name is different from CertTest App")

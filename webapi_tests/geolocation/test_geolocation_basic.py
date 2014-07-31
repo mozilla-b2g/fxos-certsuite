@@ -20,6 +20,7 @@ class TestGeolocationBasic(TestCase, GeolocationTestCommon):
 
     def setUp(self):
         super(TestGeolocationBasic, self).setUp()
+        self.wait_for_object("window.navigator.geolocation")
         # ensure geolocation is available and enabled in settings
         self.assertTrue(self.is_geolocation_available(), "Geolocation is not available on the device")
         if not self.is_geolocation_enabled():

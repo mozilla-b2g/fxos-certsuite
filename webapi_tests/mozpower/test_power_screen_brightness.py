@@ -15,6 +15,10 @@ class TestPowerManagement(TestCase):
     .. _`Power Management API`: https://developer.mozilla.org/en-US/docs/Web/API/Power_Management_API
     """
 
+    def setUp(self):
+        super(TestPowerManagement, self).setUp()
+        self.wait_for_object("window.navigator.mozPower")
+
     def test_brightness_decrease(self):
         #initialize the screen brightness
         self.marionette.execute_script("window.navigator.mozPower.screenBrightness = 1.0;")

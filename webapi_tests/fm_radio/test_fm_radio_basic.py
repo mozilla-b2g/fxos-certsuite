@@ -18,6 +18,10 @@ class TestFMRadioBasic(TestCase, FMRadioTestCommon):
     .. _`WebFM API`: https://developer.mozilla.org/en-US/docs/WebAPI/WebFM_API
     """
 
+    def setUp(self):
+        super(TestFMRadioBasic, self).setUp()
+        self.wait_for_object("window.navigator.mozFMRadio")
+
     def tearDown(self):
         # ensure fm radio is off and listeners removed
         if self.is_radio_enabled():
