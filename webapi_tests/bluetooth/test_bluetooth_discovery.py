@@ -24,6 +24,7 @@ class TestBluetoothDiscovery(TestCase, BluetoothTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestBluetoothDiscovery, self).setUp()
+        self.wait_for_obj("window.navigator.mozBluetooth")
         # start with bt disabled
         if self.is_bt_enabled():
             self.set_bt_enabled(False)
