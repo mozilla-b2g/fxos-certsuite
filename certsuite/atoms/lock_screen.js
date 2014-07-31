@@ -1,60 +1,73 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this file,
-* You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict';
+"use strict";
 
-var GaiaLockScreen = {
-
+var LockScreen = {
   unlock: function() {
-    let lockscreen = window.wrappedJSObject.lockScreen || window.wrappedJSObject.LockScreen;
-    let setlock = window.wrappedJSObject.SettingsListener.getSettingsLock();
-    let obj = {'screen.timeout': 0};
-    setlock.set(obj);
+    let xpc = window.wrappedJSObject;
+    let lwm = ("lockScreenWindowManager" in xpc) ?
+      xpc.lockScreenWindowManager : null;
+    let lockscreen = xpc.lockScreen || xpc.LockScreen;
+    let setlock = xpc.SettingsListener.getSettingsLock();
+    let system = ("System" in xpc) ? xpc.System : null;
+    let lockResp = lwm ? system : lockscreen;
 
-    window.wrappedJSObject.ScreenManager.turnScreenOn();
+    setlock.set({"screen.timeout": 0});
+    xpc.ScreenManager.turnScreenOn();
 
-    waitFor(
-      function() {
-        lockscreen.unlock(true);
-        waitFor(
-          function() {
-            finish(lockscreen.locked);
-          },
-          function() {
-            return !lockscreen.locked;
-          }
-        );
-      },
-      function() {
-        return !!lockscreen;
-      }
-    );
+    waitFor(function() {
+      lockscreen.unlock(true);
+      waitFor(function() {
+        finish(lockResp.locked);
+      }, function() {
+        return !lockResp.locked;
+      });
+    }, function() {
+      return !!lockscreen;
+    });
   },
 
   lock: function() {
-    let lockscreen = window.wrappedJSObject.lockScreen || window.wrappedJSObject.LockScreen;
-    let setlock = window.wrappedJSObject.SettingsListener.getSettingsLock();
-    let obj = {'screen.timeout': 0};
-    setlock.set(obj);
+    let xpc = window.wrappedJSObject;
+    let lwm = ("lockScreenWindowManager" in xpc) ?
+      xpc.lockScreenWindowManager : null;
+    let lockscreen = xpc.lockScreen || xpc.LockScreen;
+    let setlock = xpc.SettingsListener.getSettingsLock();
+    let system = ("System" in xpc) ? xpc.System : null;
 
-    window.wrappedJSObject.ScreenManager.turnScreenOn();
+    // gaia > 2.0 removed the locked property on lockscreen in
+    // favour of System.locked.
+    let lockResp = ("locked" in lockscreen) ? lockscreen : system;
 
-    waitFor(
-      function() {
+    let waitLock = function() {
+      waitFor(function() {
         lockscreen.lock(true);
-        waitFor(
-          function() {
-            finish(!lockscreen.locked);
-          },
-          function() {
-            return lockscreen.locked;
-          }
-        );
-      },
-      function() {
+        waitFor(function() {
+          finish(!lockResp.locked);
+        }, function() {
+          return lockResp.locked;
+        });
+      }, function() {
         return !!lockscreen;
-      }
-    );
+      });
+    };
+
+    setlock.set({"screen.timeout": 0});
+    xpc.ScreenManager.turnScreenOn();
+
+    // On gaia >= 2.0 we need to be explicit about opening the lock
+    // screen window because we call lockscreen.lock directly.
+    if (lwm) {
+      lwm.openApp();
+      waitFor(function() {
+        waitLock();
+      }, function() {
+        return lwm.states.instance.isActive();
+      });
+    } else {
+      waitLock();
+    }
   }
 };

@@ -45,13 +45,12 @@ class LockScreen(object):
 
     def lock(self):
         self.driver.switch_to_frame()
-        result = self.driver.execute_async_script("GaiaLockScreen.lock()")
+        result = self.driver.execute_async_script("LockScreen.lock()")
         assert result, "Unable to lock screen"
 
     def unlock(self):
         self.driver.switch_to_frame()
-        result = self.driver.execute_async_script(
-            "GaiaLockScreen.unlock()")
+        result = self.driver.execute_async_script("LockScreen.unlock()")
         assert result, "Unable to unlock screen"
 
 
