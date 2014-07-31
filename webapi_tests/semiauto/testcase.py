@@ -10,6 +10,7 @@ import unittest
 import mozdevice
 from marionette import Marionette
 from marionette.wait import Wait
+from marionette import errors
 
 from webapi_tests import certapp
 from webapi_tests.semiauto import environment
@@ -197,7 +198,7 @@ class TestCase(unittest.TestCase):
         wait = Wait(self.marionette, timeout=5, interval=0.5)
         try:
             wait.until(lambda m: m.execute_script("return !!%s;" % object))
-        except:
+        except errors.TimeoutException:
             self.fail("Object '%s' does not exist" % object)
 
 
