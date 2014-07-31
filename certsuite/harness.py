@@ -172,7 +172,7 @@ class Device(object):
         return self
 
     def __exit__(self, *args, **kwargs):
-        # Original settings are restarted by Device.restore
+        # Original settings are reinstated by Device.restore
         logger.info("Tearing down device after testing")
         with MarionetteSession(self.adb) as marionette:
             lock_screen = gaiautils.LockScreen(marionette)
