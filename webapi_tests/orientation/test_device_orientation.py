@@ -18,7 +18,7 @@ class TestDeviceOrientation(TestCase):
 
     def setUp(self):
         super(TestDeviceOrientation, self).setUp()
-        self.wait_for_object("window.wrappedJSObject.addEventListener")
+        self.wait_for_obj("window.wrappedJSObject.addEventListener")
 
     def tearDown(self):
         clear_script = """

@@ -27,7 +27,7 @@ class TestTelephonyIncomingRemoteHangup(TestCase, TelephonyTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestTelephonyIncomingRemoteHangup, self).setUp()
-        self.wait_for_object("window.navigator.mozTelephony")
+        self.wait_for_obj("window.navigator.mozTelephony")
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 

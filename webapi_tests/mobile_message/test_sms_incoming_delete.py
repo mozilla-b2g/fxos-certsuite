@@ -21,7 +21,7 @@ class TestSmsIncomingDelete(TestCase, MobileMessageTestCommon):
 
     def setUp(self):
         super(TestSmsIncomingDelete, self).setUp()
-        self.wait_for_object("window.navigator.mozMobileMessage")
+        self.wait_for_obj("window.navigator.mozMobileMessage")
 
     def tearDown(self):
         super(TestSmsIncomingDelete, self).tearDown()

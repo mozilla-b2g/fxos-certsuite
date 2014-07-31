@@ -19,7 +19,7 @@ class TestScreenOrientation(TestCase):
 
     def setUp(self):
         super(TestScreenOrientation, self).setUp()
-        self.wait_for_object("window.wrappedJSObject.screen.mozOrientation")
+        self.wait_for_obj("window.wrappedJSObject.screen.mozOrientation")
 
     def check_orientation(self, mode):
         orientation = self.marionette.execute_script("return window.wrappedJSObject.screen.mozOrientation;")

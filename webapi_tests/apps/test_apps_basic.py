@@ -9,7 +9,7 @@ from webapi_tests.apps import AppsTestCommon
 class TestAppsBasic(TestCase, AppsTestCommon):
     def setUp(self):
         super(TestAppsBasic, self).setUp()
-        self.wait_for_object("window.navigator.mozApps")
+        self.wait_for_obj("window.navigator.mozApps")
 
     def test_get_self(self):
         app = self.get_self()

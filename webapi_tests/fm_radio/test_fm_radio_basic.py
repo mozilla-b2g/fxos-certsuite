@@ -20,7 +20,7 @@ class TestFMRadioBasic(TestCase, FMRadioTestCommon):
 
     def setUp(self):
         super(TestFMRadioBasic, self).setUp()
-        self.wait_for_object("window.navigator.mozFMRadio")
+        self.wait_for_obj("window.navigator.mozFMRadio")
 
     def tearDown(self):
         # ensure fm radio is off and listeners removed

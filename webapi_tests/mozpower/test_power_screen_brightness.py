@@ -17,7 +17,7 @@ class TestPowerManagement(TestCase):
 
     def setUp(self):
         super(TestPowerManagement, self).setUp()
-        self.wait_for_object("window.navigator.mozPower")
+        self.wait_for_obj("window.navigator.mozPower")
 
     def test_brightness_decrease(self):
         #initialize the screen brightness

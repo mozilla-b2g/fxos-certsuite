@@ -20,7 +20,7 @@ class TestVibrateBasic(TestCase):
 
     def setUp(self):
         super(TestVibrateBasic, self).setUp()
-        self.wait_for_object("window.navigator.vibrate")
+        self.wait_for_obj("window.navigator.vibrate")
 
     def test_vibrate_basic(self):
         self.instruct("Ensure the phone is unlocked, then hold the phone.")

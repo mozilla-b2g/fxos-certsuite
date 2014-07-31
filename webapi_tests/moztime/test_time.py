@@ -16,7 +16,7 @@ class TestTime(TestCase):
 
     def setUp(self):
         super(TestTime, self).setUp()
-        self.wait_for_object("window.navigator.mozTime")
+        self.wait_for_obj("window.navigator.mozTime")
 
     def test_time_set(self):
         get_current_time = """

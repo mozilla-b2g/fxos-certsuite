@@ -123,7 +123,7 @@ class TestTcpSocketFormality(TestCase):
 
     def setUp(self):
         super(TestTcpSocketFormality, self).setUp()
-        self.wait_for_object("window.navigator.mozTCPSocket")
+        self.wait_for_obj("window.navigator.mozTCPSocket")
 
     def prop(self, pp, obj):
         return self.marionette.execute_script("return %s.%s" % (pp, obj))

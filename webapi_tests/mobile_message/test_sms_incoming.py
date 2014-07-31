@@ -19,7 +19,7 @@ class TestSmsIncoming(TestCase, MobileMessageTestCommon):
 
     def setUp(self):
         super(TestSmsIncoming, self).setUp()
-        self.wait_for_object("window.navigator.mozMobileMessage")
+        self.wait_for_obj("window.navigator.mozMobileMessage")
 
     def tearDown(self):
         super(TestSmsIncoming, self).tearDown()

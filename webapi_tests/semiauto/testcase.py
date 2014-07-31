@@ -194,7 +194,7 @@ class TestCase(unittest.TestCase):
         self.instruct("Could not launch %s automatically. Please launch by hand." % certapp.name)
         certapp.activate(self.marionette)
 
-    def wait_for_object(self, object):
+    def wait_for_obj(self, object):
         wait = Wait(self.marionette, timeout=5, interval=0.5)
         try:
             wait.until(lambda m: m.execute_script("return !!%s;" % object))

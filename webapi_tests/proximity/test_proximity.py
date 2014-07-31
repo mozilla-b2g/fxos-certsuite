@@ -18,7 +18,7 @@ class TestProximity(TestCase):
 
     def setUp(self):
         super(TestProximity, self).setUp()
-        self.wait_for_object("window.addEventListener")
+        self.wait_for_obj("window.addEventListener")
 
     def tearDown(self):
         self.marionette.execute_script("""
