@@ -92,7 +92,6 @@ var Keys = (function() {
   // Run callback function associated with the event's key.
   // Returns true if key binding was found and called, or false
   // if no binding could be found for the key.
-
   Keys.prototype.triggerEvent = function(ev) {
     return this.trigger(ev.key);
   };
@@ -100,7 +99,6 @@ var Keys = (function() {
   // Run callback function associated with key.  Returns true if
   // key binding was found and called, or false if no binding
   // could be found for the key.
-
   Keys.prototype.trigger = function(key) {
     for (var e of this) {
       if (e.hasOwnProperty(key)) {
@@ -152,6 +150,7 @@ TestListView.prototype = {
     switch (data.action) {
     case "test_start":
       el.className = "running";
+      el.scrollIntoView();
       break;
 
     case "test_end":
