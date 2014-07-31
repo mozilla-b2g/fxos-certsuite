@@ -44,6 +44,8 @@ installed = False
 webapi_results = None
 webapi_results_embed_app = None
 
+last_test_started = 'None'
+
 supported_versions = ["1.4", "1.3"]
 
 @wptserve.handlers.handler
@@ -61,7 +63,13 @@ def webapi_results_embed_apps_handler(request, response):
 
 @wptserve.handlers.handler
 def webapi_log_handler(request, response):
-    logger.debug(request.POST["log"])
+    global last_test_started
+
+    log_string = request.POST["log"]
+    index = log_string.find('test started:')
+    if index > -1:
+        last_test_started = log_string[index + len('test started:'):]
+    logger.debug(log_string)
 
 routes = [("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_results_embed_apps", webapi_results_embed_apps_handler),
@@ -491,7 +499,7 @@ def _run(args, logger):
             try:
                 wait.Wait(timeout=120).until(lambda: webapi_results is not None)
             except wait.TimeoutException:
-                logger.error('Timed out waiting for results')
+                logger.error('Timed out waiting for results for test: %s' % last_test_started)
                 errors = True
 
             logger.debug('uninstalling: %s' % appname)
