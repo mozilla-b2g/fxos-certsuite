@@ -440,7 +440,9 @@ def _run(args, logger):
     if 'omni-analyzer' in test_groups:
         omni_work_dir = pkg_resources.resource_filename(
                             __name__, 'omni.ja')
-        omni_analyzer = OmniAnalyzer('expected_omni_results/omni.ja.%s' % args.version, dir=omni_work_dir, logger=logger)
+        omni_ref_path = pkg_resources.resource_filename(
+                            __name__, os.path.join('expected_omni_results', 'omni.ja.%s' % args.version))
+        omni_analyzer = OmniAnalyzer(omni_ref_path, dir=omni_work_dir, logger=logger)
         diff = omni_analyzer.run()
         report["omni_result"] = diff
 
