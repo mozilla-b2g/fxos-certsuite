@@ -5,18 +5,12 @@ There are two methods for setting up and running the test suite:
 The “quick” method and the “virtualenv” way.  For either to work
 you must enable adb access to the device.
 
-Enabling ADB
-------------
+Enabling ADB and Disabling Screen Lock
+--------------------------------------
 
-**For Firefox OS version 1.3:** Launch *Settings*, and navigate to
+Launch *Settings*, and navigate to
 *Device Information* → *More Information* → *Developer*, then check
 *Remote Debugging*.
-
-**For version 1.4:** Launch *Settings*, and navigate to *Device
-Information* → *More Information*, then check *Developer Options*.
-Next, hold down the *Home* button, and close the *Settings* app
-(press the *X*).  Finally, launch *Settings* again, and navigate
-to *Developer*, then select *ADB only* in *Remote Debugging*.
 
 Once this is done, go to *Settings* → *Display* and set the *Screen
 Timeout* to “never”, and to *Settings* -> *Security* and set the screen
@@ -83,5 +77,6 @@ Known Issues
 * Bug 1026259 - web-platform tests sometimes lose wifi connection
 * Bug 1039042 - Semi-auto tests wait forever for browser to be closed, if it launched the browser initially
 * Bug 1039060 - "WebIDL2 is not defined" during web-platform-tests
+* Bug 1021756 - Tests fail on devices which require 'adb root'
 
 For a full list of known bugs, see:  https://bugzilla.mozilla.org/showdependencytree.cgi?id=970615&hide_resolved=1
