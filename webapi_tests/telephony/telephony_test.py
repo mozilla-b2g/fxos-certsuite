@@ -232,6 +232,7 @@ class TelephonyTestCommon(object):
     def disable_dialer(self):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app
+        self.dialer_disabled = False
         cur_frame = self.marionette.get_active_frame()
         self.marionette.switch_to_frame() # system app
         try:
@@ -240,12 +241,16 @@ class TelephonyTestCommon(object):
             window.wrappedJSObject.dialerAgent.stop();
             marionetteScriptFinished(1);
             """, special_powers=True)
+            self.dialer_disabled = True
         except:
             raise SkipTest("Unable to disable dialer agent; bug 997248")
         finally:
             self.marionette.switch_to_frame(cur_frame)
 
     def enable_dialer(self):
+        if not self.dialer_disabled:
+            return
+
         # enable system dialer agent to handle calls
         cur_frame = self.marionette.get_active_frame()
         self.marionette.switch_to_frame() # system app
