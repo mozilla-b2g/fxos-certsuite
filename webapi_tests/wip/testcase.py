@@ -98,7 +98,7 @@ class MinimalTestCase(MarionetteTestCase, CertAppMixin):
         self.instruct(
             "Unplug the phone.\n%s\nPlug the phone back in after you are "
             "done, and unlock the screen if necessary.\n" % message)
-        dm = mozdevice.DeviceManagerADB()
+        dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
         dm.forward("tcp:2828", "tcp:2828")
         self.marionette = Marionette()
         self.marionette.start_session()

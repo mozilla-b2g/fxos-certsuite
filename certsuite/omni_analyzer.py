@@ -71,7 +71,7 @@ class OmniAnalyzer:
         # Get the omni.ja from /system/b2g/omni.ja
         # Unzip it
         try:
-            dm = mozdevice.DeviceManagerADB()
+            dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
         except mozdevice.DMError, e:
             print "Error connecting to device via adb (error: %s). Please be " \
                 "sure device is connected and 'remote debugging' is enabled." % \

@@ -6,10 +6,6 @@
 
 import argparse
 import json
-from marionette_extension import install as marionette_install
-from marionette_extension import AlreadyInstalledException
-import mozdevice
-import mozprocess
 import os
 import pkg_resources
 import shutil
@@ -22,8 +18,14 @@ import zipfile
 
 from collections import OrderedDict
 from datetime import datetime
+
+import mozdevice
+import mozprocess
+
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters
+from marionette_extension import install as marionette_install
+from marionette_extension import AlreadyInstalledException
 
 import report
 
@@ -120,7 +122,7 @@ class LogManager(object):
 
 class DeviceBackup(object):
     def __init__(self):
-        self.device = mozdevice.DeviceManagerADB()
+        self.device = mozdevice.DeviceManagerADB(runAdbAsRoot=False)
         self.backup_dirs = ["/data/local",
                             "/data/b2g/mozilla"]
         self.backup_files = ["/system/etc/hosts"]
@@ -292,11 +294,16 @@ def log_result(results, result):
 def check_adb():
     try:
         logger.info("Testing ADB connection")
-        mozdevice.DeviceManagerADB()
+        dm = mozdevice.DeviceManagerADB(runAdbAsRoot=False)
+        assert dm.processOwner("adbd") == "root", \
+                "Your device should either be rooted or allow us to run adb as root."
     except mozdevice.DMError as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
                         e.msg)
+        logger.critical(traceback.format_exc())
+        sys.exit(1)
+    except AssertionError as e:
         logger.critical(traceback.format_exc())
         sys.exit(1)
 
@@ -319,7 +326,6 @@ def list_tests(args, config):
     print '''To run a set of tests, pass those test names on the commandline, like:
 runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
     return 0
-
 
 def run_tests(args, config):
     error = False
