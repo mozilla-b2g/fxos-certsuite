@@ -5,14 +5,10 @@ There are two methods for setting up and running the test suite:
 The “quick” method and the “virtualenv” way.  For either to work
 you must enable adb access to the device.
 
-Enabling ADB
-------------
+Enabling ADB and Disabling Screen Lock
+--------------------------------------
 
-**For Firefox OS version 1.3:** Launch *Settings*, and navigate to
-*Device Information* → *More Information* → *Developer*, then check
-*Remote Debugging*.
-
-**For version 1.4:** Launch *Settings*, and navigate to *Device
+Launch *Settings*, and navigate to *Device
 Information* → *More Information*, then check *Developer Options*.
 Next, hold down the *Home* button, and close the *Settings* app
 (press the *X*).  Finally, launch *Settings* again, and navigate
