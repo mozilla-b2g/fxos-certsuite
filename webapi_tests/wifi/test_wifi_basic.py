@@ -22,6 +22,7 @@ class TestWifiBasic(TestCase, WifiTestCommon):
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestWifiBasic, self).setUp()
+        self.wait_for_obj("window.navigator.mozWifiManager")
         # start with wifi disabled
         if self.is_wifi_enabled():
             self.set_wifi_enabled(False)
@@ -48,6 +49,6 @@ class TestWifiBasic(TestCase, WifiTestCommon):
         self.assertEqual(len(wifinetwork["bssid"]), 17, "Wifi network bssid address should be 17 chars in length")
 
     def clean_up(self):
-        # disable wifi
-        if self.is_wifi_enabled():
-            self.set_wifi_enabled(False)
+        # enable wifi
+        if not self.is_wifi_enabled():
+            self.set_wifi_enabled(True)

@@ -17,6 +17,10 @@ class TestScreenOrientation(TestCase):
     .. _`Screen Orientation API`: https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model/Managing_screen_orientation
     """
 
+    def setUp(self):
+        super(TestScreenOrientation, self).setUp()
+        self.wait_for_obj("window.wrappedJSObject.screen.mozOrientation")
+
     def check_orientation(self, mode):
         orientation = self.marionette.execute_script("return window.wrappedJSObject.screen.mozOrientation;")
         self.assertTrue(mode in orientation, "the screen.mozOrientation value is incorrect/not what was expected")

@@ -16,6 +16,10 @@ class TestDeviceOrientation(TestCase):
     .. _`Device Orientation API`: https://developer.mozilla.org/en-US/docs/Web/API/Detecting_device_orientation
     """
 
+    def setUp(self):
+        super(TestDeviceOrientation, self).setUp()
+        self.wait_for_obj("window.wrappedJSObject.addEventListener")
+
     def tearDown(self):
         clear_script = """
             window.removeEventListener("deviceorientation", window.wrappedJSObject.deviceListener);

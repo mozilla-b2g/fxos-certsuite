@@ -9,6 +9,8 @@ import unittest
 
 import mozdevice
 from marionette import Marionette
+from marionette.wait import Wait
+from marionette import errors
 
 from webapi_tests import certapp
 from webapi_tests.semiauto import environment
@@ -191,6 +193,13 @@ class TestCase(unittest.TestCase):
     def launch_app_manually(self):
         self.instruct("Could not launch %s automatically. Please launch by hand." % certapp.name)
         certapp.activate(self.marionette)
+
+    def wait_for_obj(self, object):
+        wait = Wait(self.marionette, timeout=5, interval=0.5)
+        try:
+            wait.until(lambda m: m.execute_script("return !!%s;" % object))
+        except errors.TimeoutException:
+            self.fail("Object '%s' does not exist" % object)
 
 
 def turn_screen_on(marionette):

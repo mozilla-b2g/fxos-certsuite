@@ -8,7 +8,7 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
+class TestTelephonyOutgoingRemoteHangup(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -16,7 +16,9 @@ class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
     - Ask the test user to specify a destination phone number for the test call
     - Setup mozTelephonyCall event listeners for the outgoing call
     - Use the API to initiate the outgoing call
-    - Hang up the call via the API after dialing but before call is connected
+    - Ask the test user to answer the call on the destination phone
+    - Keep the call active for 5 seconds
+    - Ask the user to hangup call from second device
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
@@ -25,20 +27,23 @@ class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyOutgoingHangupAlerting, self).setUp()
+        super(TestTelephonyOutgoingRemoteHangup, self).setUp()
         self.wait_for_obj("window.navigator.mozTelephony")
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_outgoing_hangup_alerting(self):
+    def test_telephony_outgoing_remote_hangup(self):
         # use the webapi to make an outgoing call to user-specified number
         self.user_guided_outgoing_call()
 
-        # keep call ringing for awhile
-        time.sleep(1)
+        # have user answer the call on target
+        self.answer_call(incoming=False)
 
-        # disconnect the outgoing call
-        self.hangup_call(call_type="Outgoing")
+        # keep call active for awhile
+        time.sleep(5)
+
+        # ask user to hangup call remotely, verify
+        self.hangup_call(remote_hangup=True)
 
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")

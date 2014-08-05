@@ -18,6 +18,10 @@ class TestVibrateBasic(TestCase):
     .. _`Vibration API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Vibration
     """
 
+    def setUp(self):
+        super(TestVibrateBasic, self).setUp()
+        self.wait_for_obj("window.navigator.vibrate")
+
     def test_vibrate_basic(self):
         self.instruct("Ensure the phone is unlocked, then hold the phone.")
         self.marionette.execute_script("window.navigator.vibrate(200);")
