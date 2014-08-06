@@ -86,11 +86,8 @@ class TelephonyTestCommon(object):
         except:
             self.fail("Failed to answer call")
 
-        # verify the active call
+        # append new call to the active call list
         self.active_call_list.append(self.marionette.execute_script("return window.wrappedJSObject.active_call"))
-
-        if incoming == False:
-            self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
 
     def user_guided_incoming_call(self):
         # ask user to call the device; answer and verify via webapi
@@ -105,12 +102,18 @@ class TelephonyTestCommon(object):
         var call_type = arguments[0];
         var remote_hangup = arguments[1];
         var active_call_selected = arguments[2];
+        window.wrappedJSObject.rcvd_error = false;
         if (call_type == "Incoming") {
           var call_to_hangup = window.wrappedJSObject.incoming_call;
         } else if (call_type == "Outgoing") {
           var call_to_hangup = window.wrappedJSObject.outgoing_call;
         } else {
-          var call_to_hangup = window.wrappedJSObject.calls[active_call_selected];
+          if (active_call_selected >=0 && active_call_selected < window.wrappedJSObject.calls.length) {
+            var call_to_hangup = window.wrappedJSObject.calls[active_call_selected];
+          } else {
+            window.wrappedJSObject.rcvd_error = true;
+            marionetteScriptFinished(0);
+          }
         };
 
         window.wrappedJSObject.disconnecting_call_ok = false;
@@ -137,6 +140,9 @@ class TelephonyTestCommon(object):
         """, script_args=[call_type, remote_hangup, active_call_selected], special_powers=True)
 
         if remote_hangup == False:
+            if self.marionette.execute_script("return window.wrappedJSObject.rcvd_error;"):
+                self.fail("Received invalid value for active_call_selected")
+
             # should have received both events associated with a active call hangup
             wait = Wait(self.marionette, timeout=90, interval=0.5)
             try:
@@ -159,6 +165,9 @@ class TelephonyTestCommon(object):
             disconnecting = self.marionette.execute_script("return window.wrappedJSObject.disconnecting_call_ok")
             self.assertFalse(disconnecting, "Telephony.ondisconnecting event found, but should not have been "
                             "since the call was terminated remotely")
+
+        # remove the call from list
+        del self.active_call_list[-1]
 
     def hold_active_call(self):
         self.marionette.execute_async_script("""

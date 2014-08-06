@@ -41,6 +41,9 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         # keep call active for awhile
         time.sleep(5)
 
+        # verify the active call
+        self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+
         # disconnect the active call
         self.hangup_call()
 

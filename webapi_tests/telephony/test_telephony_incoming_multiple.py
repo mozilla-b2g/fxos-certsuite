@@ -43,9 +43,7 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
 
         self.answer_call()
         self.assertTrue(self.active_call_list[0]['state'], "connected")
-
         self.assertEqual(self.active_call_list[0]['number'], self.incoming_call['number'])
-
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual((self.calls['0'])['state'], "connected", "Call state should be 'connected'")
@@ -60,27 +58,25 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['0'], self.active_call_list[0])
 
         self.answer_call()
-
         self.assertTrue(self.active_call_list[1]['state'], "connected")
         self.assertEqual(self.active_call_list[1]['number'], self.incoming_call['number'])
-
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 2, "There should be 2 active calls")
 
         # keep call active for a while
         time.sleep(5)
 
-        #verify call state change
+        # verify call state change
         self.assertEqual((self.calls['0'])['state'], "held", "Call state should be 'held'")
         self.assertEqual((self.calls['1'])['state'], "connected", "Call state should be 'connected'")
 
         # disconnect the two active calls
         self.hangup_call(active_call_selected=1)
 
-        #keep a delay to get the change in call state
+        # keep a delay to get the change in call state
         time.sleep(2)
 
-        # verify number of remaning calls and its state
+        # verify number of remaining calls and its state
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual((self.calls['0'])['state'], "connected", "Call state should be 'connected'")

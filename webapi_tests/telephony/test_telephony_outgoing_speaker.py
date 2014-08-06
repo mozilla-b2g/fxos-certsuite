@@ -44,6 +44,9 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
         # keep call active for awhile
         time.sleep(5)
 
+        # verify the active call
+        self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+
         # enable speaker
         self.set_speaker(enable=True)
         self.confirm("Is the call now on speaker mode?")
