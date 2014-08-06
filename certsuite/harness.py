@@ -151,8 +151,8 @@ class Device(object):
     backup_dirs = ["/data/local", "/data/b2g/mozilla"]
     backup_files = ["/system/etc/hosts"]
     test_settings = {"screen.automatic-brightness": False,
-                     "screen.brightness": 100,
-                     "screen.timeout": 0,
+                     "screen.brightness": 1.0,
+                     "screen.timeout": 0.0,
                      "lockscreen.enabled": False}
 
     def __init__(self, adb):
