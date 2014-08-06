@@ -13,6 +13,7 @@ import re
 import json
 import base64
 import subprocess
+import tempfile
 import traceback
 import zipfile
 import shutil
@@ -41,44 +42,52 @@ def unzip_omnifile(omnifile, path):
         if omnizip:
             omnizip.close()
 
-class OmniAnalyzer:
-    def __init__(self, reference_omni_ja, dir, logger=structuredlog.StructuredLogger("omni-analyzer")):
-        self.reference_omni_ja = reference_omni_ja
-        self.workdir = dir
-        self.logger = logger
+class CleanedTempFolder(object):
+    def __init__(self, root_folder=None):
+        self.root_folder = root_folder
 
-    def getomni(self):
+    def __enter__(self, *args, **kwargs):
+        self.folder = tempfile.mkdtemp(dir=self.root_folder)
+        return self.folder
+
+    def __exit__(self, type, value, traceback):
+        shutil.rmtree(self.folder)
+
+class OmniAnalyzer(object):
+    def __init__(self, reference_omni_ja, logger=None):
+        self.reference_omni_ja = reference_omni_ja
+        if logger is None:
+            self.logger = structuredlog.StructuredLogger("omni-analyzer")
+        else:
+            self.logger = logger
+
+    def getomni(self, workdir):
         # Get the omni.ja from /system/b2g/omni.ja
         # Unzip it
         try:
             dm = mozdevice.DeviceManagerADB()
-        except mozdevice.DMError, e:
-            print "Error connecting to device via adb (error: %s). Please be " \
-                "sure device is connected and 'remote debugging' is enabled." % \
-                e.msg
+        except mozdevice.DMError as e:
+            print ("Error connecting to device via adb (error: %s). Please be sure device is connected and 'remote debugging' is enabled." % e.msg)
             sys.exit(1)
-        omnifile = os.path.join(self.workdir, 'omni.ja')
+        omnifile = os.path.join(workdir, 'omni.ja')
         dm.getFile('/system/b2g/omni.ja', omnifile)
-
-        # Try to unzip it
-        unzip_omnifile(omnifile, self.workdir + '/device')
+        unzip_omnifile(omnifile, os.path.join(workdir, 'device'))
 
     def run(self):
-        if os.path.isdir(self.workdir):
-            shutil.rmtree(self.workdir)
+        diff = ''
+        with CleanedTempFolder() as workdir:
+            self.getomni(workdir)
+            unzip_omnifile(self.reference_omni_ja, os.path.join(workdir, 'reference'))
 
-        self.getomni()
-        unzip_omnifile(self.reference_omni_ja, self.workdir + '/reference')
-
-        cmd = ['diff', '--new-file', self.workdir + '/reference', self.workdir + '/device']
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        diff, err = proc.communicate()
-
-        if err:
-            logger.error('error running diff: %s', err)
-
-        if os.path.isdir(self.workdir):
-            shutil.rmtree(self.workdir)
+            cmd = ['diff', '--new-file', os.path.join(workdir, 'reference'),os.path.join(workdir, 'device')]
+            try:
+                diff = subprocess.check_output(cmd)
+            except subprocess.CalledProcessError as e:
+                if e.returncode == 1:
+                    # return code 1 simply indicates differences were found
+                    diff = e.output
+                else:
+                    self.logger.error('error running diff: %s' % e.returncode)
 
         return diff
 
@@ -87,11 +96,9 @@ def main(argv):
     parser.add_argument("--reference-omni-ja", help="Path to reference omni.ja file")
     parser.add_argument("--results-file", help="File in which to store the results",
         default=os.path.join(os.getcwd(), "results.diff"))
-    parser.add_argument("--working-dir", help="Directory to work in - will be removed",
-        default=os.path.join(os.getcwd(), "omni.ja"))
 
     args = parser.parse_args(argv[1:])
-    omni_analyzer = OmniAnalyzer(args.reference_omni_ja, args.working_dir)
+    omni_analyzer = OmniAnalyzer(args.reference_omni_ja)
     diff = omni_analyzer.run()
     with open(args.results_file, 'w') as f:
         f.write(diff)
