@@ -79,7 +79,7 @@ class OmniAnalyzer(object):
             self.getomni(workdir)
             unzip_omnifile(self.reference_omni_ja, os.path.join(workdir, 'reference'))
 
-            cmd = ['diff', '--new-file', os.path.join(workdir, 'reference'),os.path.join(workdir, 'device')]
+            cmd = ['diff', '--new-file', os.path.join(workdir, 'reference'), os.path.join(workdir, 'device')]
             try:
                 diff = subprocess.check_output(cmd)
             except subprocess.CalledProcessError as e:
