@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
 import os
 
 
@@ -23,7 +24,6 @@ class Settings(object):
             special_powers=True)
 
     def set(self, key, value):
-        import json
         value = json.dumps(value)
         self.driver.execute_script(
             "return GaiaDataLayer.setSetting('%s', %s)" %
