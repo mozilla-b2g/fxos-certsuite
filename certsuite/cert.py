@@ -438,17 +438,11 @@ def _run(args, logger):
     logger.suite_start(tests=[])
     # run the omni.ja analyzer
     if 'omni-analyzer' in test_groups:
-        omni_results_path = pkg_resources.resource_filename(
-                            __name__, 'omni.json')
-        omni_verify_file = pkg_resources.resource_filename(
-                            __name__, os.path.sep.join(['expected_omni_results', '%s.json' % args.version]))
-        omni_work_dir = pkg_resources.resource_filename(
-                            __name__, 'omnidir')
-        omni_analyzer = OmniAnalyzer(vfile=omni_verify_file, results=omni_results_path, dir=omni_work_dir, logger=logger)
-        omni_results = open(omni_results_path, 'r').read()
-        report["omni_result"] = json.loads(omni_results)
-        if not args.generate_reference:
-            os.remove(omni_results_path)
+        omni_ref_path = pkg_resources.resource_filename(
+                            __name__, os.path.join('expected_omni_results', 'omni.ja.%s' % args.version))
+        omni_analyzer = OmniAnalyzer(omni_ref_path, logger=logger)
+        diff = omni_analyzer.run()
+        report["omni_result"] = diff
 
     # start webserver
     if 'webapi' in test_groups or 'permissions' in test_groups:
