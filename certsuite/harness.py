@@ -159,10 +159,10 @@ class Device(object):
         self.adb = adb
 
     def __enter__(self):
+        self.backup()
         logger.info("Setting up device for testing")
         with MarionetteSession(self.adb) as marionette:
             gaiautils.Screen(marionette).on()
-            self.backup()
             settings = gaiautils.Settings(marionette)
             for k, v in self.test_settings.iteritems():
                 settings.set(k, v)
