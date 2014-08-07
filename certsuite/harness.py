@@ -188,13 +188,13 @@ class Device(object):
         logger.info("Backing up device state")
         self.backup_path = tempfile.mkdtemp()
 
-        for remote_path in Device.backup_dirs:
+        for remote_path in self.backup_dirs:
             local_path = self.local_dir(remote_path)
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
             self.adb.getDirectory(remote_path, local_path)
 
-        for remote_path in Device.backup_files:
+        for remote_path in self.backup_files:
             remote_dir, filename = remote_path.rsplit("/", 1)
             local_dir = self.local_dir(remote_dir)
             local_path = os.path.join(local_dir, filename)
@@ -206,13 +206,13 @@ class Device(object):
         logger.info("Restoring device state")
         self.adb.remount()
 
-        for remote_path in Device.backup_files:
+        for remote_path in self.backup_files:
             remote_dir, filename = remote_path.rsplit("/", 1)
             local_path = os.path.join(self.local_dir(remote_dir), filename)
             self.adb.removeFile(remote_path)
             self.adb.pushFile(local_path, remote_path)
 
-        for remote_path in Device.backup_dirs:
+        for remote_path in self.backup_dirs:
             local_path = self.local_dir(remote_path)
             self.adb.removeDir(remote_path)
             self.adb.pushDir(local_path, remote_path)
