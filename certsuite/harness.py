@@ -172,16 +172,9 @@ class Device(object):
         return self
 
     def __exit__(self, *args, **kwargs):
-        # Original settings are reinstated by Device.restore
         logger.info("Tearing down device after testing")
-        try:
-            with MarionetteSession(self.adb) as marionette:
-                lock_screen = gaiautils.LockScreen(marionette)
-                if not lock_screen.is_locked:
-                    lock_screen.lock()
-                gaiautils.Screen(marionette).off()
-        finally:
-            shutil.rmtree(self.backup_path)
+        # Original settings are reinstated by Device.restore
+        shutil.rmtree(self.backup_path)
 
     def local_dir(self, remote):
         return os.path.join(self.backup_path, remote.lstrip("/"))
