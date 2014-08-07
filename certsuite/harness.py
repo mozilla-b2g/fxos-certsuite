@@ -164,7 +164,7 @@ class Device(object):
             gaiautils.Screen(marionette).on()
             self.backup()
             settings = gaiautils.Settings(marionette)
-            for k, v in Device.test_settings.iteritems():
+            for k, v in self.test_settings.iteritems():
                 settings.set(k, v)
             lock_screen = gaiautils.LockScreen(marionette)
             if lock_screen.is_locked:
