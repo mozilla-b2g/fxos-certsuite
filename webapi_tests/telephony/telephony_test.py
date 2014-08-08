@@ -7,12 +7,9 @@ from marionette.wait import Wait
 
 
 class TelephonyTestCommon(object):
-    active_call_list = []
 
     def __init__(self):
-        self.calls = None
-        self.incoming_call = None
-        self.outgoing_call = None
+        self.active_call_list = []
 
     def setup_incoming_call(self):
         # listen for and answer incoming call

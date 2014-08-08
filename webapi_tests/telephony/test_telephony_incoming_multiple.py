@@ -28,6 +28,10 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
+    def __init__(self, *args, **kwargs):
+        TestCase.__init__(self, *args, **kwargs)
+        TelephonyTestCommon.__init__(self)
+
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestTelephonyIncomingMultiple, self).setUp()
