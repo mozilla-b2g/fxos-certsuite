@@ -294,7 +294,7 @@ def check_adb():
         logger.info("Testing ADB connection")
         dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
         if dm.processInfo("adbd")[2] != "root":
-            logger.critical("Your device should either be rooted or allow us to run adb as root.")
+            logger.critical("Your device should allow us to run adb as root.")
             sys.exit(1)
     except mozdevice.DMError as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
