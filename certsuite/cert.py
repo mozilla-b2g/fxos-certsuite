@@ -16,6 +16,7 @@ import time
 import traceback
 import wait
 
+from py.xml import html
 from zipfile import ZipFile
 
 import fxos_appgen
@@ -346,6 +347,33 @@ def set_permission(permission, value, app):
     app_url = 'app://' + app
     run_marionette_script(script % (permission, app_url, app_url, value), True)
 
+def make_html_report(path, report):
+    def tabelize(value):
+        try:
+            rows = []
+            for key in value.keys():
+                rows.append(html.tr(html.td(html.pre(key)), html.td(tabelize(value[key]))))
+            return html.table(rows)
+        except AttributeError:
+            if type(value) == type([]):
+                return html.table(map(tabelize, value))
+            else:
+                return html.pre(value)
+
+    body_els = []
+    keys = report.keys()
+    keys.sort()
+    links = []
+    for key in keys:
+        links.append(html.li(html.a(key, href="#" + key)))
+    body_els.append(html.ul(links))
+    for key in keys:
+        body_els.append(html.a(html.h1(key), id=key))
+        body_els.append(tabelize(report[key]))
+    with open(path, 'w') as f:
+        doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
+        f.write(str(doc))
+
 def _run(args, logger):
     # This function is to simply make the cli() function easier to handle
 
@@ -641,11 +669,13 @@ def _run(args, logger):
 
     logger.suite_end()
 
-    result_file = open(result_file_path, "w")
-    result_file.write(json.dumps(report, indent=2))
-    result_file.close()
-
+    with open(result_file_path, "w") as result_file:
+        result_file.write(json.dumps(report, indent=2))
     logger.debug('Results have been stored in: %s' % result_file_path)
+
+    if args.html_result_file is not None:
+        make_html_report(args.html_result_file, report)
+        logger.debug('HTML Results have been stored in: %s' % args.html_result_file)
 
 def cli():
     global logger
@@ -670,6 +700,9 @@ def cli():
     parser.add_argument("--result-file",
                         help="absolute file path to store the resulting json." \
                              "Defaults to results.json on your current path",
+                        action="store")
+    parser.add_argument("--html-result-file",
+                        help="absolute file path to store the resulting html.",
                         action="store")
     parser.add_argument("--generate-reference",
                         help="Generate expected result files",
