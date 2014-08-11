@@ -212,10 +212,10 @@ class Device(object):
         logger.info("Rebooting device")
         self.adb.reboot(wait=True)
         # Bug 1045671: Because the reboot function has a race condition and
-        # sometimes returns too soon, we are forced to rely on an arbitrary 20
+        # sometimes returns too soon, we are forced to rely on an arbitrary 30
         # second sleep to be sure we're issuing the next command to the right
         # device.
-        time.sleep(20)
+        time.sleep(30)
 
 
 class TestRunner(object):
