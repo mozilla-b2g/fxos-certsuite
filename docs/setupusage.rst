@@ -8,11 +8,11 @@ you must enable adb access to the device.
 Enabling ADB and Disabling Screen Lock
 --------------------------------------
 
-Launch *Settings*, and navigate to *Device
-Information* → *More Information*, then check *Developer Options*.
-Next, hold down the *Home* button, and close the *Settings* app
-(press the *X*).  Finally, launch *Settings* again, and navigate
-to *Developer*, then select *ADB only* in *Remote Debugging*.
+Launch *Settings*, and navigate to *Device information* → *More
+Information*, then check *Developer Menu*.  Next, hold down the
+*Home* button, and close the *Settings* app (press the *X*).  Finally,
+launch *Settings* again, and navigate to *Developer*, then select
+*ADB only* in *Remote Debugging*.
 
 Once this is done, go to *Settings* → *Display* and set the *Screen
 Timeout* to “never”.  You need this because adb will not work when
@@ -75,5 +75,4 @@ working directory. Please e-mail this file to fxos-cert@mozilla.com.
 Known Issues
 ------------
 
-* Bug 1030238 - Semi-auto WebAPI tests do not produce a log file
 * Bug 1026259 - web-platform tests sometimes lose wifi connection

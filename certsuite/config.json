@@ -1,9 +1,26 @@
-{"version": "1.4",
- "suites": [
-            ["webapi", {"cmd": "webapirunner"}],
-            ["cert", {"cmd": "cert",
-                      "run_args": ["--version=%(version)s",
-                                   "--result-file=%(temp_dir)s/results.json"],
-                      "extra_files": ["%(temp_dir)s/results.json"]}]
-           ]
+{
+    "version": "1.4",
+    "suites": [
+        [
+            "webapi",
+            {
+                "cmd": "webapirunner"
+            }
+        ],
+        [
+            "cert",
+            {
+                "cmd": "cert",
+                "run_args": [
+                    "--version=%(version)s",
+                    "--result-file=%(temp_dir)s/cert_results.json",
+                    "--html-result-file=%(temp_dir)s/cert_results.html"
+                ],
+                "extra_files": [
+                    "%(temp_dir)s/cert_results.json",
+                    "%(temp_dir)s/cert_results.html"
+                ]
+            }
+        ]
+    ]
 }

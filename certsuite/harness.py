@@ -6,10 +6,6 @@
 
 import argparse
 import json
-from marionette_extension import install as marionette_install
-from marionette_extension import AlreadyInstalledException
-import mozdevice
-import mozprocess
 import os
 import pkg_resources
 import shutil
@@ -22,10 +18,19 @@ import zipfile
 
 from collections import OrderedDict
 from datetime import datetime
+
+import marionette
+import mozdevice
+import mozprocess
+
+from marionette_extension import AlreadyInstalledException
+from marionette_extension import install as marionette_install
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters
 
+import gaiautils
 import report
+
 
 logger = None
 stdio_handler = handlers.StreamHandler(sys.stderr,
@@ -70,10 +75,12 @@ def get_metadata():
     dist = pkg_resources.get_distribution("fxos-certsuite")
     return {"version": dist.version}
 
+
 def log_metadata():
     metadata = get_metadata()
     for key in sorted(metadata.keys()):
         logger.info("fxos-certsuite %s: %s" % (key, metadata[key]))
+
 
 class LogManager(object):
     def __init__(self):
@@ -118,25 +125,65 @@ class LogManager(object):
             finally:
                 self.zip_file.__exit__(*args, **kwargs)
 
-class DeviceBackup(object):
-    def __init__(self):
-        self.device = mozdevice.DeviceManagerADB()
-        self.backup_dirs = ["/data/local",
-                            "/data/b2g/mozilla"]
-        self.backup_files = ["/system/etc/hosts"]
+
+# Consider upstreaming this to marionette-client:
+class MarionetteSession(object):
+    def __init__(self, adb):
+        self.dm = adb
+        self.marionette = marionette.Marionette()
+
+    def __enter__(self):
+        self.dm.forward("tcp:2828", "tcp:2828")
+        self.marionette.wait_for_port()
+        self.marionette.start_session()
+        return self.marionette
+
+    def __exit__(self, *args, **kwargs):
+        if self.marionette.session is not None:
+            self.marionette.delete_session()
+
+
+class Device(object):
+    """Represents a device under test.  This class provides encapsulation of
+    the things that the harness does when it takes and relinquishes ownership
+    of the device."""
+
+    backup_dirs = ["/data/local", "/data/b2g/mozilla"]
+    backup_files = ["/system/etc/hosts"]
+    test_settings = {"screen.automatic-brightness": False,
+                     "screen.brightness": 1.0,
+                     "screen.timeout": 0.0,
+                     "lockscreen.enabled": False}
+
+    def __init__(self, adb):
+        self.adb = adb
+
+    def __enter__(self):
+        self.backup()
+        logger.info("Setting up device for testing")
+        with MarionetteSession(self.adb) as marionette:
+            settings = gaiautils.Settings(marionette)
+            for k, v in self.test_settings.iteritems():
+                settings.set(k, v)
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        logger.info("Tearing down device after testing")
+        # Original settings are reinstated by Device.restore
+        shutil.rmtree(self.backup_path)
 
     def local_dir(self, remote):
         return os.path.join(self.backup_path, remote.lstrip("/"))
 
-    def __enter__(self):
-        logger.info("Saving device state")
+    def backup(self):
+        logger.info("Backing up device state")
         self.backup_path = tempfile.mkdtemp()
 
         for remote_path in self.backup_dirs:
             local_path = self.local_dir(remote_path)
             if not os.path.exists(local_path):
                 os.makedirs(local_path)
-            self.device.getDirectory(remote_path, local_path)
+            self.adb.getDirectory(remote_path, local_path)
 
         for remote_path in self.backup_files:
             remote_dir, filename = remote_path.rsplit("/", 1)
@@ -144,29 +191,31 @@ class DeviceBackup(object):
             local_path = os.path.join(local_dir, filename)
             if not os.path.exists(local_dir):
                 os.makedirs(local_dir)
-            self.device.getFile(remote_path, local_path)
-
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        shutil.rmtree(self.backup_path)
+            self.adb.getFile(remote_path, local_path)
 
     def restore(self):
         logger.info("Restoring device state")
-        self.device.remount()
+        self.adb.remount()
 
         for remote_path in self.backup_files:
             remote_dir, filename = remote_path.rsplit("/", 1)
             local_path = os.path.join(self.local_dir(remote_dir), filename)
-            self.device.removeFile(remote_path)
-            self.device.pushFile(local_path, remote_path)
+            self.adb.removeFile(remote_path)
+            self.adb.pushFile(local_path, remote_path)
 
         for remote_path in self.backup_dirs:
             local_path = self.local_dir(remote_path)
-            self.device.removeDir(remote_path)
-            self.device.pushDir(local_path, remote_path)
+            self.adb.removeDir(remote_path)
+            self.adb.pushDir(local_path, remote_path)
 
-        self.device.reboot(wait=True)
+    def reboot(self):
+        logger.info("Rebooting device")
+        self.adb.reboot(wait=True)
+        # Bug 1045671: Because the reboot function has a race condition and
+        # sometimes returns too soon, we are forced to rely on an arbitrary 30
+        # second sleep to be sure we're issuing the next command to the right
+        # device.
+        time.sleep(30)
 
 
 class TestRunner(object):
@@ -282,26 +331,28 @@ class TestRunner(object):
 
         return cmd, output_files, log_name
 
-def log_result(results, result):
-    results[result.test_name] = {
-        'status': 'PASS' if result.passed else 'FAIL',
-        'failures': result.failures,
-        'errors': result.errors,
-        }
 
-def check_adb():
+def log_result(results, result):
+    results[result.test_name] = {'status': 'PASS' if result.passed else 'FAIL',
+                                 'failures': result.failures,
+                                 'errors': result.errors}
+
+
+def create_adb():
     try:
         logger.info("Testing ADB connection")
         dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
         if dm.processInfo("adbd")[2] != "root":
-            logger.critical("Your device should either be rooted or allow us to run adb as root.")
+            logger.critical("Your device should allow us to run adb as root.")
             sys.exit(1)
+        return mozdevice.DeviceManagerADB()
     except mozdevice.DMError as e:
-        logger.critical('Error connecting to device via adb (error: %s). Please be ' \
-                        'sure device is connected and "remote debugging" is enabled.' % \
+        logger.critical('Error connecting to device via adb (error: %s). Please be '
+                        'sure device is connected and "remote debugging" is enabled.' %
                         e.msg)
         logger.critical(traceback.format_exc())
-        sys.exit(1)
+        raise
+
 
 def install_marionette(version):
     try:
@@ -310,18 +361,16 @@ def install_marionette(version):
             marionette_install(version)
         except AlreadyInstalledException:
             logger.info("Marionette is already installed")
-    except subprocess.CalledProcessError as e:
-        logger.critical('Error installing marionette extension: %s' % e)
-        logger.critical(traceback.format_exc())
-        sys.exit(1)
+    except subprocess.CalledProcessError:
+        logger.critical(
+            "Error installing marionette extension:\n%s" % traceback.format_exc())
+        raise
+
 
 def list_tests(args, config):
-    print 'Tests available:'
     for test, group in iter_test_lists(config["suites"]):
         print "%s:%s" % (test, group)
-    print '''To run a set of tests, pass those test names on the commandline, like:
-runcertsuite suite1:test1 suite1:test2 suite2:test1 [...]'''
-    return 0
+    return True
 
 
 def run_tests(args, config):
@@ -334,45 +383,35 @@ def run_tests(args, config):
             setup_logging(log_manager)
 
             log_metadata()
-            check_adb()
+            adb = create_adb()
             install_marionette(config['version'])
 
-            with DeviceBackup() as device:
+            with Device(adb) as device:
                 runner = TestRunner(args, config)
-
                 for suite, groups in runner.iter_suites():
                     try:
                         runner.run_suite(suite, groups, log_manager)
                     except:
-                        logger.error("Encountered error:\n%s" % traceback.format_exc())
+                        logger.error("Encountered error:\n%s" %
+                                     traceback.format_exc())
                         error = True
                     finally:
                         device.restore()
+                        device.reboot()
 
             if error:
                 logger.critical("Encountered errors during run")
-
     except (SystemExit, KeyboardInterrupt):
-        raise
+        logger.info("Testrun interrupted")
     except:
         error = True
         print "Encountered error at top level:\n%s" % traceback.format_exc()
+    finally:
+        if output_zipfile:
+            print >> sys.stderr, "Results saved to %s" % output_zipfile
 
-    if output_zipfile:
-        sys.stderr.write('Results saved in %s\n' % output_zipfile)
+    return error
 
-    return int(error)
-
-def main():
-    parser = get_parser()
-    args = parser.parse_args()
-
-    config = load_config(args.config)
-
-    if args.list_tests:
-        return list_tests(args, config)
-    else:
-        return run_tests(args, config)
 
 def get_parser():
     parser = argparse.ArgumentParser()
@@ -385,9 +424,21 @@ def get_parser():
                         action='store_true')
     parser.add_argument('tests',
                         metavar='TEST',
-                        help='test to run (use --list-tests to see available tests)',
+                        help='tests to run',
                         nargs='*')
     return parser
 
+
+def main():
+    parser = get_parser()
+    args = parser.parse_args()
+    config = load_config(args.config)
+
+    if args.list_tests:
+        return list_tests(args, config)
+    else:
+        return run_tests(args, config)
+
+
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(not main())
