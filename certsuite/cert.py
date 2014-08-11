@@ -368,7 +368,7 @@ def make_html_report(path, report):
         links.append(html.li(html.a(key, href="#" + key)))
     body_els.append(html.ul(links))
     for key in keys:
-        body_els.append(html.a(html.h1(key), name=key))
+        body_els.append(html.a(html.h1(key), id=key))
         body_els.append(tabelize(report[key]))
     with open(path, 'w') as f:
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
@@ -702,7 +702,7 @@ def cli():
                              "Defaults to results.json on your current path",
                         action="store")
     parser.add_argument("--html-result-file",
-                        help="absolute file path to store the resulting html.", 
+                        help="absolute file path to store the resulting html.",
                         action="store")
     parser.add_argument("--generate-reference",
                         help="Generate expected result files",
