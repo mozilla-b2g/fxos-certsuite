@@ -165,9 +165,6 @@ class Device(object):
             settings = gaiautils.Settings(marionette)
             for k, v in self.test_settings.iteritems():
                 settings.set(k, v)
-            lock_screen = gaiautils.LockScreen(marionette)
-            if lock_screen.is_locked:
-                lock_screen.unlock()
         return self
 
     def __exit__(self, *args, **kwargs):

@@ -27,39 +27,3 @@ class Settings(object):
             "return GaiaDataLayer.setSetting('%s', %s)" %
             (key.replace("'", '"'), value),
             special_powers=True)
-
-
-class LockScreen(object):
-    atom = os.path.join(atoms_dir, "lock_screen.js")
-
-    def __init__(self, driver):
-        self.driver = driver
-        self.driver.import_script(LockScreen.atom)
-
-    @property
-    def is_locked(self):
-        return self.driver.execute_script(
-            "return window.wrappedJSObject.lockScreen.locked")
-
-    def lock(self):
-        self.driver.switch_to_frame()
-        result = self.driver.execute_async_script("LockScreen.lock()")
-        assert result, "Unable to lock screen"
-
-    def unlock(self):
-        self.driver.switch_to_frame()
-        result = self.driver.execute_async_script("LockScreen.unlock()")
-        assert result, "Unable to unlock screen"
-
-
-class Screen(object):
-    def __init__(self, driver):
-        self.driver = driver
-
-    def on(self):
-        self.driver.execute_script(
-            "window.wrappedJSObject.ScreenManager.turnScreenOn()")
-
-    def off(self):
-        self.driver.execute_script(
-            "window.wrappedJSObject.ScreenManager.turnScreenOff()")
