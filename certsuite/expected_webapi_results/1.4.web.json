@@ -6056,7 +6056,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://web-webapi-verifier/testharness.js:651:20\nmake_message@app://web-webapi-verifier/testharness.js:2073:17\nassert@app://web-webapi-verifier/testharness.js:2060:1\nassert_equals@app://web-webapi-verifier/testharness.js:700:1\nIdlInterface.prototype.test_self/<@app://web-webapi-verifier/idlharness.js:1259:1\nTest.prototype.step@app://web-webapi-verifier/testharness.js:1159:13\ntest@app://web-webapi-verifier/testharness.js:442:9\nIdlInterface.prototype.test_self@app://web-webapi-verifier/idlharness.js:1281:1\nIdlExceptionOrInterface.prototype.test@app://web-webapi-verifier/idlharness.js:706:9\nIdlArray.prototype.test@app://web-webapi-verifier/idlharness.js:435:9\nrunTest@app://web-webapi-verifier/main.js:95:3\n)", 
+      "message": "'toString' called on an object that does not implement interface DOMTokenList.(stack: format_value@app://web-webapi-verifier/testharness.js:289:20\nmake_message@app://web-webapi-verifier/testharness.js:1797:17\nassert@app://web-webapi-verifier/testharness.js:1779:1\nassert_equals@app://web-webapi-verifier/testharness.js:338:1\nIdlInterface.prototype.test_self/<@app://web-webapi-verifier/idlharness.js:1135:1\nTest.prototype.step@app://web-webapi-verifier/testharness.js:799:13\ntest@app://web-webapi-verifier/testharness.js:74:9\nIdlInterface.prototype.test_self@app://web-webapi-verifier/idlharness.js:1157:1\nIdlExceptionOrInterface.prototype.test@app://web-webapi-verifier/idlharness.js:582:9\nIdlArray.prototype.test@app://web-webapi-verifier/idlharness.js:311:9\nrunTest@app://web-webapi-verifier/main.js:111:5\n)", 
       "name": "DOMSettableTokenList interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
@@ -16831,32 +16831,32 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"MozClirModeEvent\" expected property \"MozClirModeEvent\" missing", 
+      "message": "assert_equals: prototype of window's property \"MozClirModeEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
       "name": "MozClirModeEvent interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"MozClirModeEvent\" expected property \"MozClirModeEvent\" missing", 
+      "message": "assert_equals: wrong value for MozClirModeEvent.length expected 0 but got 1", 
       "name": "MozClirModeEvent interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"MozClirModeEvent\" expected property \"MozClirModeEvent\" missing", 
+      "message": "assert_equals: prototype of MozClirModeEvent.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventPrototype]\"", 
       "name": "MozClirModeEvent interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"MozClirModeEvent\" expected property \"MozClirModeEvent\" missing", 
+      "message": null, 
       "name": "MozClirModeEvent interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"MozClirModeEvent\" expected property \"MozClirModeEvent\" missing", 
+      "message": null, 
       "name": "MozClirModeEvent interface: attribute mode", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"MozClirModeEvent\" expected property \"MozClirModeEvent\" missing", 
+      "message": "assert_true: The prototype object must have a property \"isTrusted\" expected true got false", 
       "name": "MozClirModeEvent interface: attribute isTrusted", 
       "result": "FAIL"
     }, 
@@ -37497,6 +37497,7 @@
     }, 
     "KeyEvent": true, 
     "KeyboardEvent": true, 
+    "LOG_URI": true, 
     "LocalMediaStream": true, 
     "Location": true, 
     "LockedFile": {
@@ -37650,6 +37651,7 @@
     }, 
     "MozCellBroadcast": true, 
     "MozCellBroadcastEvent": true, 
+    "MozClirModeEvent": true, 
     "MozContactChangeEvent": true, 
     "MozEmergencyCbModeEvent": true, 
     "MozIcc": true, 
@@ -38402,6 +38404,7 @@
     "add_completion_callback": true, 
     "add_result_callback": true, 
     "add_start_callback": true, 
+    "add_test_started_callback": true, 
     "alert": true, 
     "applicationCache": {
       "@@iterator": true, 
@@ -38628,6 +38631,7 @@
       "visible": true, 
       "watch": true
     }, 
+    "log": true, 
     "matchMedia": true, 
     "menubar": true, 
     "metadata_generator": true, 
@@ -39032,7 +39036,7 @@
     "ondurationchange": null, 
     "onemptied": null, 
     "onended": null, 
-    "onerror": true, 
+    "onerror": null, 
     "onfocus": null, 
     "ongotpointercapture": null, 
     "onhashchange": null, 
