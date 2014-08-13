@@ -15,6 +15,7 @@ clean:
 	-rm -rf dist
 	-rm -rf build
 	-rm -rf firefox-os-certification_*.zip
+	-rm -rf app.zip
 
 docs: documentation.pdf
 	@true
