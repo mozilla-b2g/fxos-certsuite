@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
+from marionette.wait import Wait
 
 from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony.telephony_test import TelephonyTestCommon
@@ -21,7 +22,9 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
     - Verify that the mozTelephony incoming call event is triggered
     - Answer the second incoming call via the API
     - Verify that the first call state should be on held while second call becomes active
-    - Hangup both calls via the API
+    - Hang up the connected call via the API
+    - Verify the held call is now resumed and the only active call
+    - Hang up the remaining active call via the API
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
@@ -61,11 +64,25 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['1'], self.incoming_call)
         self.assertEqual(self.calls['0'], self.active_call_list[0])
 
+        # setup the 'onheld' event handler
+        self.hold_active_call(user_initiate_hold=False)
+
         self.answer_call()
         self.assertTrue(self.active_call_list[1]['state'], "connected")
         self.assertEqual(self.active_call_list[1]['number'], self.incoming_call['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 2, "There should be 2 active calls")
+
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+        except:
+            # failed to hold
+            self.fail("Failed to put first active call on hold while second call becomes active")
+
+        onholding = self.marionette.execute_script("return window.wrappedJSObject.onholding_call_ok")
+        self.assertFalse(onholding, "Telephony.onholding event found, but should not have been "
+                            "since the phone user did not initiate holding the call")
 
         # keep call active for a while
         time.sleep(5)

@@ -163,11 +163,12 @@ class TelephonyTestCommon(object):
                             "since the call was terminated remotely")
 
         # remove the call from list
-        del self.active_call_list[-1]
+        self.active_call_list.pop(active_call_selected)
 
-    def hold_active_call(self):
+    def hold_active_call(self, user_initiate_hold=True):
         self.marionette.execute_async_script("""
         let active = window.wrappedJSObject.active_call;
+        var user_initiate_hold = arguments[0];
 
         window.wrappedJSObject.onholding_call_ok = false;
         active.onholding = function ondisconnecting(event) {
@@ -184,24 +185,21 @@ class TelephonyTestCommon(object):
             window.wrappedJSObject.onheld_call_ok = true;
           };
         };
-
-        active.hold();
+        if (user_initiate_hold) {
+          active.hold();
+        }
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """, script_args=[user_initiate_hold], special_powers=True)
 
-        # should have received both events associated with a call on hold
-        wait = Wait(self.marionette, timeout=90, interval=0.5)
-        try:
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onholding_call_ok"))
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
-        except:
-            # failed to hold
-            self.fail("Failed to hold call")
-
-        # verify the held call
-        self.active_call = self.marionette.execute_script("return window.wrappedJSObject.active_call")
-        self.assertEqual(self.active_call['state'], "held", "Call state should he 'held'")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
+        if user_initiate_hold == True:
+            # should have received both events associated with a call on hold
+            wait = Wait(self.marionette, timeout=90, interval=0.5)
+            try:
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onholding_call_ok"))
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+            except:
+                # failed to hold
+                self.fail("Failed to put call on hold initiated by user")
 
     def initiate_outgoing_call(self, destination):
         # use the webapi to initiate a call to the specified number
