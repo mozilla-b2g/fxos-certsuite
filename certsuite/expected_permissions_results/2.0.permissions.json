@@ -1,0 +1,187 @@
+{
+  "alarms": [
+    "window.navigator.mozAlarms"
+  ], 
+  "attention": [], 
+  "audio-capture": [], 
+  "audio-channel-alarm": [
+    "audio-channel-alarm"
+  ], 
+  "audio-channel-content": [
+    "audio-channel-content"
+  ], 
+  "audio-channel-normal": [], 
+  "audio-channel-notification": [
+    "audio-channel-notification"
+  ], 
+  "audio-channel-publicnotification": [
+    "audio-channel-publicnotification"
+  ], 
+  "audio-channel-ringer": [
+    "audio-channel-ringer"
+  ], 
+  "audio-channel-telephony": [
+    "audio-channel-telephony"
+  ], 
+  "background-sensors": [], 
+  "backgroundservice": [], 
+  "bluetooth": [
+    "window.BluetoothDeviceEvent", 
+    "window.BluetoothDevice", 
+    "window.BluetoothDiscoveryStateChangedEvent", 
+    "window.BluetoothAdapter", 
+    "window.BluetoothManager", 
+    "window.BluetoothStatusChangedEvent", 
+    "window.navigator.mozBluetooth"
+  ], 
+  "browser": [
+    "browser", 
+    "window.0", 
+    "window.1", 
+    "window.document.body.lastElementChild.getCanGoBack", 
+    "window.document.body.lastElementChild.getCanGoForward", 
+    "window.document.body.lastElementChild.sendTouchEvent", 
+    "window.document.body.lastElementChild.goForward", 
+    "window.document.body.lastElementChild.goBack", 
+    "window.document.body.lastElementChild.purgeHistory", 
+    "window.document.body.lastElementChild.stop", 
+    "window.document.body.lastElementChild.getVisible", 
+    "window.document.body.lastElementChild.reload", 
+    "window.document.body.lastElementChild.removeNextPaintListener", 
+    "window.document.body.lastElementChild.getScreenshot", 
+    "window.document.body.lastElementChild.download", 
+    "window.document.body.lastElementChild.addNextPaintListener", 
+    "window.document.body.lastElementChild.sendMouseEvent", 
+    "window.document.body.lastElementChild.setVisible", 
+    "window.document.body.lastElementChild.contentDocument", 
+    "window.document.body.lastElementChild.contentWindow"
+  ], 
+  "camera": [
+    "window.CameraDetectedFace", 
+    "window.CameraManager", 
+    "window.CameraControl", 
+    "window.CameraCapabilities", 
+    "window.navigator.mozCameras"
+  ], 
+  "cellbroadcast": [
+    "window.navigator.mozCellBroadcast"
+  ], 
+  "contacts": [], 
+  "deprecated-hwvideo": [], 
+  "desktop-notification": [], 
+  "device-storage:apps": [], 
+  "device-storage:crashes": [], 
+  "device-storage:music": [], 
+  "device-storage:pictures": [], 
+  "device-storage:sdcard": [], 
+  "device-storage:videos": [], 
+  "downloads": [
+    "window.DownloadEvent", 
+    "window.DOMDownload", 
+    "window.navigator.mozDownloadManager"
+  ], 
+  "embed-apps": [], 
+  "feature-detection": [
+    "window.navigator.getFeature"
+  ], 
+  "firefox-accounts": [
+    "window.navigator.getMobileIdAssertion"
+  ], 
+  "fmradio": [
+    "window.navigator.mozFMRadio"
+  ], 
+  "geolocation": [], 
+  "idle": [
+    "window.navigator.addIdleObserver", 
+    "window.navigator.removeIdleObserver"
+  ], 
+  "input": [
+    "window.MozInputMethod", 
+    "window.navigator.mozInputMethod"
+  ], 
+  "input-manage": [
+    "window.MozInputMethod", 
+    "window.navigator.mozInputMethod"
+  ], 
+  "mobileconnection": "timed out", 
+  "mobileid": [
+    "window.navigator.getMobileIdAssertion"
+  ], 
+  "mobilenetwork": "timed out", 
+  "moz-attention": [], 
+  "moz-audio-channel-ringer": [], 
+  "moz-audio-channel-telephony": [], 
+  "moz-firefox-accounts": [
+    "window.navigator.getMobileIdAssertion"
+  ], 
+  "network-events": [], 
+  "networkstats-manage": [
+    "window.MozNetworkStatsInterface", 
+    "window.navigator.mozNetworkStats"
+  ], 
+  "nfc": [], 
+  "nfc-manager": [], 
+  "open-remote-window": {
+    "open-remote-window-allow": true, 
+    "open-remote-window-deny": false
+  }, 
+  "permissions": [
+    "window.PermissionSettings", 
+    "window.navigator.mozPermissionSettings"
+  ], 
+  "phonenumberservice": [
+    "window.PhoneNumberService", 
+    "window.navigator.mozPhoneNumberService"
+  ], 
+  "power": [
+    "window.navigator.mozPower"
+  ], 
+  "push": [
+    "window.navigator.push"
+  ], 
+  "settings": [], 
+  "sms": [
+    "window.navigator.mozMobileMessage", 
+    "window.MozMobileMessageManager"
+  ], 
+  "speaker-control": [
+    "speaker-control"
+  ], 
+  "storage": [], 
+  "systemXHR": [
+    "systemXHR"
+  ], 
+  "tcp-socket": [], 
+  "telephony": [
+    "window.navigator.mozTelephony", 
+    "window.document.body.itemType"
+  ], 
+  "test-permission": [
+    "window.navigator.getMobileIdAssertion"
+  ], 
+  "time": [
+    "window.navigator.mozTime"
+  ], 
+  "video-capture": [], 
+  "voicemail": [
+    "window.navigator.mozVoicemail"
+  ], 
+  "wappush": [], 
+  "webapps-manage": [
+    "device-storage:apps", 
+    "window.1", 
+    "window.navigator.mozApps.mgmt", 
+    "window.document.body.lastElementChild.contentDocument", 
+    "window.document.body.lastElementChild.contentWindow"
+  ], 
+  "wifi-manage": [
+    "window.MozWifiP2pGroupOwner", 
+    "window.MozWifiP2pStatusChangeEvent", 
+    "window.MozWifiP2pManager", 
+    "window.MozWifiCapabilities", 
+    "window.MozWifiManager", 
+    "window.MozWifiNetwork", 
+    "window.navigator.mozWifiManager", 
+    "window.navigator.mozWifiP2pManager"
+  ]
+}

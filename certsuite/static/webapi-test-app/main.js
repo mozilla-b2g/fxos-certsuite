@@ -24,6 +24,12 @@ function getTheNames(obj, visited)
 
   while (obj) {
     for (var name of Object.getOwnPropertyNames(obj)) {
+
+      // work around crash - see Bug 1053246
+      if (name === 'voice' || name === 'data') {
+        continue;
+      }
+
       try {
         var value = orig_obj[name];
         var value_visited = visited[value];
@@ -115,7 +121,7 @@ function runTest()
   done();
 
   //Recursively get property names on window object
-  log('Running "getTheNames" on window');
+  log('test started: "getTheNames" on window');
   var winResults = {}
   try {
     winResults = getTheNames(window, {});
