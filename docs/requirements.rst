@@ -1,10 +1,10 @@
 Requirements
 ============
 
-The test suite is designed to run on unprivileged devices and does not
-rely on high level instrumentation.  Instead human interaction is
-needed throughout the test suite to perform various instructions in
-order to assert that conditions are met on the device.
+The test suite is designed to run on devices with adb root access
+and does not rely on high level instrumentation.  Instead human
+interaction is needed throughout the test suite to perform various
+instructions in order to assert that conditions are met on the device.
 
 The certification test suite is intended to run on a host computer
 attached to the device via USB cable.  Currently the host requires the
