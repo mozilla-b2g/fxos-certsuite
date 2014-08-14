@@ -47,7 +47,7 @@ webapi_results_embed_app = None
 
 last_test_started = 'None'
 
-supported_versions = ["1.4", "1.3"]
+supported_versions = ["2.0", "1.4", "1.3"]
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
@@ -167,21 +167,14 @@ def test_open_remote_window(logger, version, addr):
         try:
             wait.Wait(timeout=30).until(lambda: webapi_results is not None)
         except wait.TimeoutException:
-            # This does not necessarily indicate a problem, if the other window
-            # launched remotely, our original test app may stop before it POSTs
-            pass
+            results[value] = 'timed out'
 
         if webapi_results is not None:
             result = webapi_results['open-remote-window']
 
-        running_apps = get_runningapps()
-        for app in running_apps:
-            if app == 'window:Remote Window,source:app://' + installed_appname:
-                result = True
-                kill(app)
-
-        # We uninstall rather than using kill() as kill seems unhappy when
-        # the popup is open.
+        # launching here will force the remote window (if any) to be hidden
+        # but will not retrigger the test.
+        fxos_appgen.launch_app(appname)
         logger.debug('uninstalling: %s' % appname)
         fxos_appgen.uninstall_app(appname)
 
@@ -312,21 +305,6 @@ def get_permissions():
     """
     return run_marionette_script(script, True)
 
-def get_runningapps():
-    """Return names of running apps"""
-
-    script = """
-      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
-      let runningApps = manager.getRunningApps();
-
-      result = []
-      for (key in runningApps) {
-        result.push(key);
-      }
-      return result;
-    """
-    return run_marionette_script(script)
-
 def set_permission(permission, value, app):
     """Set a permission for the specified app
        Value should be 'deny' or 'allow'
@@ -423,7 +401,7 @@ def _run(args, logger):
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
               (args.version, supported_versions)
-        raise
+        raise Exception("%s is not a valid version" % args.version)
 
     result_file_path = args.result_file
     if not result_file_path:
