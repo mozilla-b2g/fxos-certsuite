@@ -193,11 +193,9 @@ def diff_results(a, b):
     for key in same_keys:
         if type(a[key]) is dict:
             if type(b[key]) is not dict:
-                result.append(key)
+                result.append(key + ' (expected object)')
             else:
                 result.extend([key + '.' + item for item in diff_results(a[key], b[key])])
-        elif a[key] != b[key]:
-            result.append(key)
 
     return result
 
@@ -220,10 +218,10 @@ def parse_webapi_results(expected_results_path, results, prefix, logger, report)
     expected_window = expected_results["windowList"]
     window = results["windowList"]
 
-    missing_window = diff_results(expected_window, window)
+    missing_window = diff_results(window, expected_window)
     log_results(missing_window, logger, report, 'webapi', prefix + 'missing-window-functions')
 
-    added_window = diff_results(window, expected_window)
+    added_window = diff_results(expected_window, window)
     log_results(added_window, logger, report, 'webapi', prefix + 'added-window-functions')
 
     # compute differences in WebIDL results
