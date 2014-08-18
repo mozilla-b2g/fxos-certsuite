@@ -8,7 +8,7 @@ from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
+class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -17,7 +17,10 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
     - Setup mozTelephonyCall event listeners for the outgoing call
     - Use the API to initiate the outgoing call
     - Ask the test user to answer the call on the destination phone
-    - Keep the call active for 5 seconds, then hang up the call via the API
+    - Keep the call active for 5 seconds
+    - Turn on speaker using the API and ask the test user to verify
+    - Turn off speaker using the API and ask the test user to verify
+    - Hangup the call via the API
     - Verify that the corresponding mozTelephonyCall events were triggered
     - Re-enable the default gaia dialer
 
@@ -30,13 +33,13 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyOutgoing, self).setUp()
+        super(TestTelephonyOutgoingSpeaker, self).setUp()
         self.wait_for_obj("window.navigator.mozTelephony")
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_outgoing(self):
-        # use the webapi to make an outgoing call to user-specified number
+    def test_telephony_outgoing_speaker(self):
+        # use the webapi to make an outgoing call to user-specified number; user answer
         self.user_guided_outgoing_call()
 
         # have user answer the call on target
@@ -48,8 +51,21 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         # verify the active call
         self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
 
+        # enable speaker
+        self.set_speaker(enable=True)
+        self.confirm("Is the call now on speaker mode?")
+
+        # keep a delay for speaker turn off confirmation
+        time.sleep(2)
+        # disable speaker
+        self.set_speaker(enable=False)
+        self.confirm("Is the call 'not' on speaker mode now?")
+
         # disconnect the active call
         self.hangup_call()
+
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager
