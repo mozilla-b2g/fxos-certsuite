@@ -25,6 +25,10 @@ class TestTelephonyOutgoingRemoteHangup(TestCase, TelephonyTestCommon):
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
+    def __init__(self, *args, **kwargs):
+        TestCase.__init__(self, *args, **kwargs)
+        TelephonyTestCommon.__init__(self)
+
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestTelephonyOutgoingRemoteHangup, self).setUp()
@@ -42,12 +46,15 @@ class TestTelephonyOutgoingRemoteHangup(TestCase, TelephonyTestCommon):
         # keep call active for awhile
         time.sleep(5)
 
+        # verify the active call
+        self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+
         # ask user to hangup call remotely, verify
         self.hangup_call(remote_hangup=True)
-
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager
         self.enable_dialer()
+        self.active_call_list = []

@@ -25,6 +25,10 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
     .. _`WebTelephony API`: https://developer.mozilla.org/en-US/docs/Web/Guide/API/Telephony
     """
 
+    def __init__(self, *args, **kwargs):
+        TestCase.__init__(self, *args, **kwargs)
+        TelephonyTestCommon.__init__(self)
+
     def setUp(self):
         self.addCleanup(self.clean_up)
         super(TestTelephonyIncomingHoldHangup, self).setUp()
@@ -35,7 +39,15 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
     def test_telephony_incoming_hold_hangup(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['0'], self.incoming_call)
+
         self.answer_call()
+        self.assertTrue(self.active_call_list[0]['state'], "connected")
+        self.assertEqual(self.active_call_list[0]['number'], self.incoming_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
+        self.assertEqual((self.calls['0'])['state'], "connected", "Call state should be 'connected'")
 
         # keep call active for a while
         time.sleep(5)
@@ -43,12 +55,12 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
         self.hold_active_call()
         self.confirm("Is the call now on hold?")
 
-        #hangup the hold call
+        # hangup the hold call
         self.hangup_call()
-
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager
         self.enable_dialer()
+        self.active_call_list = []

@@ -50,6 +50,8 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
 
         # disconnect the active call
         self.hangup_call()
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
         # re-enable the default dialer manager

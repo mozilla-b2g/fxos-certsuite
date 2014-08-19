@@ -163,7 +163,8 @@ class TelephonyTestCommon(object):
                             "since the call was terminated remotely")
 
         # remove the call from list
-        self.active_call_list.pop(active_call_selected)
+        if call_type == "Active":
+            self.active_call_list.pop(active_call_selected)
 
     def hold_active_call(self, user_initiate_hold=True):
         self.marionette.execute_async_script("""

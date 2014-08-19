@@ -39,7 +39,6 @@ class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
 
         # disconnect the outgoing call
         self.hangup_call(call_type="Outgoing")
-
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
