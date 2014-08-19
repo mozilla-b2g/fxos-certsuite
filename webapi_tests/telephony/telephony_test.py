@@ -257,12 +257,9 @@ class TelephonyTestCommon(object):
             self.assertFalse(busy, "Received busy signal; ensure target phone is available and try again")
             self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
-        # verify one outgoing call
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
+        # verify outgoing call state to be 'alerting'
         self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
         self.assertEqual(self.outgoing_call['state'], "alerting", "Call state should be 'alerting'")
-        self.assertEqual(self.calls['0'], self.outgoing_call)
 
     def user_guided_outgoing_call(self):
         # ask user to input destination phone number

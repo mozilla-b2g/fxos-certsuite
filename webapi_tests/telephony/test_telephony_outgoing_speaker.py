@@ -41,6 +41,10 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
     def test_telephony_outgoing_speaker(self):
         # use the webapi to make an outgoing call to user-specified number; user answer
         self.user_guided_outgoing_call()
+        # verify one outgoing call
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
+        self.assertEqual(self.calls['0'], self.outgoing_call)
 
         # have user answer the call on target
         self.answer_call(incoming=False)
@@ -50,6 +54,9 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
 
         # verify the active call
         self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
+        self.assertEqual(self.active_call_list[0]['state'], "connected", "Call state should be 'connected'")
 
         # enable speaker
         self.set_speaker(enable=True)

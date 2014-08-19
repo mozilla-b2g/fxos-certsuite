@@ -49,11 +49,10 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['0'], self.incoming_call)
 
         self.answer_call()
-        self.assertTrue(self.active_call_list[0]['state'], "connected")
+        self.assertEqual(self.active_call_list[0]['state'], "connected", "Call state should be 'connected'")
         self.assertEqual(self.active_call_list[0]['number'], self.incoming_call['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
-        self.assertEqual((self.calls['0'])['state'], "connected", "Call state should be 'connected'")
 
         # keep call active for a while
         time.sleep(5)
@@ -68,7 +67,7 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.hold_active_call(user_initiate_hold=False)
 
         self.answer_call()
-        self.assertTrue(self.active_call_list[1]['state'], "connected")
+        self.assertEqual(self.active_call_list[1]['state'], "connected", "Call state should be 'connected'")
         self.assertEqual(self.active_call_list[1]['number'], self.incoming_call['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 2, "There should be 2 active calls")
