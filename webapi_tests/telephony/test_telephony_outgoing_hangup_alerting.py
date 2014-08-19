@@ -33,13 +33,16 @@ class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
     def test_telephony_outgoing_hangup_alerting(self):
         # use the webapi to make an outgoing call to user-specified number
         self.user_guided_outgoing_call()
+        # verify one outgoing call
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
+        self.assertEqual(self.calls['0'], self.outgoing_call)
 
         # keep call ringing for awhile
         time.sleep(1)
 
         # disconnect the outgoing call
         self.hangup_call(call_type="Outgoing")
-
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
