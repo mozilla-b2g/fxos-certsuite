@@ -78,7 +78,7 @@ class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['length'], 2, "There should be 2 calls")
         self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
         self.assertEqual(self.calls['1'], self.outgoing_call)
-        self.assertEqual((self.calls['0'])['state'], "held", "Call state should be 'held'")
+        self.assertEqual(self.calls['0']['state'], "held", "Call state should be 'held'")
 
         # have user answer the call on target
         self.answer_call(incoming=False)
@@ -91,8 +91,8 @@ class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['length'], 2, "There should be 2 active call")
 
         # verify call state change
-        self.assertEqual((self.calls['0'])['state'], "held", "Call state should be 'held'")
-        self.assertEqual((self.calls['1'])['state'], "connected", "Call state should be 'connected'")
+        self.assertEqual(self.calls['0']['state'], "held", "Call state should be 'held'")
+        self.assertEqual(self.calls['1']['state'], "connected", "Call state should be 'connected'")
 
         # disconnect the two active calls
         self.hangup_call(active_call_selected=1)
@@ -102,7 +102,7 @@ class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
         # verify number of remaining calls and its state
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
-        self.assertEqual((self.calls['0'])['state'], "connected", "Call state should be 'connected'")
+        self.assertEqual(self.calls['0']['state'], "connected", "Call state should be 'connected'")
 
         # disconnect the active call
         self.hangup_call(active_call_selected=0)

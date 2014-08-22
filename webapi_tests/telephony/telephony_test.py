@@ -157,7 +157,7 @@ class TelephonyTestCommon(object):
                 # failed to hangup
                 self.fail("Failed to hangup call")
 
-            #verify that the call disconnected from phone which is not the device under test
+            # verify that the call disconnected from phone which is not the device under test
             disconnecting = self.marionette.execute_script("return window.wrappedJSObject.disconnecting_call_ok")
             self.assertFalse(disconnecting, "Telephony.ondisconnecting event found, but should not have been "
                             "since the call was terminated remotely")
