@@ -157,13 +157,14 @@ class TelephonyTestCommon(object):
                 # failed to hangup
                 self.fail("Failed to hangup call")
 
-            #verify that the call disconnected from phone which is not the device under test
+            # verify that the call disconnected from phone which is not the device under test
             disconnecting = self.marionette.execute_script("return window.wrappedJSObject.disconnecting_call_ok")
             self.assertFalse(disconnecting, "Telephony.ondisconnecting event found, but should not have been "
                             "since the call was terminated remotely")
 
         # remove the call from list
-        self.active_call_list.pop(active_call_selected)
+        if call_type == "Active":
+            self.active_call_list.pop(active_call_selected)
 
     def hold_active_call(self, user_initiate_hold=True):
         self.marionette.execute_async_script("""
@@ -256,12 +257,9 @@ class TelephonyTestCommon(object):
             self.assertFalse(busy, "Received busy signal; ensure target phone is available and try again")
             self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
-        # verify one outgoing call
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 call")
+        # verify outgoing call state to be 'alerting'
         self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
         self.assertEqual(self.outgoing_call['state'], "alerting", "Call state should be 'alerting'")
-        self.assertEqual(self.calls['0'], self.outgoing_call)
 
     def user_guided_outgoing_call(self):
         # ask user to input destination phone number

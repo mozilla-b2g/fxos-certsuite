@@ -6,10 +6,10 @@ import time
 from marionette.wait import Wait
 
 from webapi_tests.semiauto import TestCase
-from webapi_tests.telephony.telephony_test import TelephonyTestCommon
+from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
+class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -18,10 +18,10 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
     - Ask the test user to phone the Firefox OS device from a second phone
     - Verify that the mozTelephony incoming call event is triggered
     - Answer the incoming call via the API, keep the call active for 5 seconds
-    - While first call is active, ask the test user to phone the Firefox OS device from third phone
-    - Verify that the mozTelephony incoming call event is triggered
-    - Answer the second incoming call via the API
-    - Verify that the first call state should be on held while second call becomes active
+    - Use the API to initiate the outgoing call from the Firefox OS device to third phone
+    - Verify the first call state should be held and corresponding events were triggered
+    - Ask the test user to answer the call on the third phone
+    - Verify that the first call state still should be on held while second call becomes active
     - Hang up the connected call via the API
     - Verify the held call is now resumed and the only active call
     - Hang up the remaining active call via the API
@@ -37,13 +37,13 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyIncomingMultiple, self).setUp()
+        super(TestTelephonyIncomingHoldOutgoing, self).setUp()
         self.wait_for_obj("window.navigator.mozTelephony")
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
-    def test_telephony_incoming_multiple(self):
-        # ask user to make first call to the device; answer and verify via webapi
+    def test_telephony_incoming_hold_outgoing(self):
+        # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['0'], self.incoming_call)
@@ -54,25 +54,15 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
 
-        # keep call active for a while
+        # keep call active for awhile
         time.sleep(5)
 
-        # ask user to again call to the test device; answer and verify via webapi
-        self.user_guided_incoming_call()
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['1'], self.incoming_call)
-        self.assertEqual(self.calls['0'], self.active_call_list[0])
+        self.hold_active_call(user_initiate_hold=False)
+        # use the webapi to make an outgoing call to user-specified number
+        self.user_guided_outgoing_call()
 
         # setup the 'onheld' event handler
-        self.hold_active_call(user_initiate_hold=False)
-
-        self.answer_call()
-        self.assertEqual(self.active_call_list[1]['state'], "connected", "Call state should be 'connected'")
-        self.assertEqual(self.active_call_list[1]['number'], self.incoming_call['number'])
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 2, "There should be 2 active calls")
-
-        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        wait = Wait(self.marionette, timeout=30, interval=0.5)
         try:
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
         except:
@@ -83,8 +73,22 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.assertFalse(onholding, "Telephony.onholding event found, but should not have been "
                             "since the phone user did not initiate holding the call")
 
+        # verify that there are two calls of which first incoming call is held while second is outgoing call
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 2, "There should be 2 calls")
+        self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
+        self.assertEqual(self.calls['1'], self.outgoing_call)
+        self.assertEqual(self.calls['0']['state'], "held", "Call state should be 'held'")
+
+        # have user answer the call on target
+        self.answer_call(incoming=False)
         # keep call active for a while
         time.sleep(5)
+        # verify the active call
+        self.assertEqual(self.active_call_list[1]['state'], "connected", "Call state should be 'connected'")
+        self.assertEqual(self.active_call_list[1]['number'], self.outgoing_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.calls['length'], 2, "There should be 2 active call")
 
         # verify call state change
         self.assertEqual(self.calls['0']['state'], "held", "Call state should be 'held'")
@@ -95,12 +99,12 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
 
         # keep a delay to get the change in call state
         time.sleep(2)
-
         # verify number of remaining calls and its state
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual(self.calls['0']['state'], "connected", "Call state should be 'connected'")
 
+        # disconnect the active call
         self.hangup_call(active_call_selected=0)
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
