@@ -45,9 +45,6 @@ class TestSmsIncoming(TestCase, MobileMessageTestCommon):
         # cannot guarantee end-user didn't read message; test that specifically in a different test
         self.assertTrue(self.in_msg['read'] is False or self.in_msg['read'] is True,
                         "Received SMS MozSmsMessage.read field should be False or True")
-        # for privacy, don't print/check actual receiver (Firefox OS) phone number; just ensure not empty
-        self.assertGreater(len(self.in_msg['receiver']), 0,
-                           "Received SMS MozSmsMessage.receiver field should not be empty")
         # for privacy, don't print/check the actual sender's number; just ensure it is not empty
         self.assertGreater(len(self.in_msg['sender']), 0,
                            "Received SMS MozSmsMessage.sender field should not be empty")

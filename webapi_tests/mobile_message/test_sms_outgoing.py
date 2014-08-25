@@ -43,8 +43,6 @@ class TestSmsOutgoing(TestCase, MobileMessageTestCommon):
         # can check receiver number as the user provided it above
         self.assertTrue(self.out_destination in self.out_msg['receiver'],
                         "Sent SMS MozSmsMessage.receiver field should be %s" % self.out_destination)
-        # for privacy, don't print/check the actual sender's number; just ensure it is not empty
-        self.assertGreater(len(self.out_msg['sender']), 0, "Sent SMS MozSmsMessage.sender field should not be empty")
         # timezones and different SMSC's, don't check timestamp value; just ensure non-zero
         self.assertGreater(self.out_msg['timestamp'], 0, "Sent SMS MozSmsMessage.timestamp should not be 0")
         self.assertTrue(self.out_msg['messageClass'] in ["class-0", "class-1", "class-2", "class-3", "normal"],
