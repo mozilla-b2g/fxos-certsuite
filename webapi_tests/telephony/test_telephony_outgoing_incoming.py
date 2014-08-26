@@ -74,7 +74,6 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
 
         # answer the incoming call
         self.answer_call()
-        time.sleep(5)
         self.assertEqual(self.active_call_list[1]['state'], "connected", "Call state should be 'connected'")
         self.assertEqual(self.active_call_list[1]['number'], self.incoming_call['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
@@ -101,13 +100,13 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
         # disconnect the two active calls
         self.hangup_call(active_call_selected=1)
 
-        # keep a delay to get the change in call state
-        time.sleep(2)
-
         # verify number of remaining calls and its state
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
-        self.assertEqual(self.calls['0']['state'], "connected", "Call state should be 'connected'")
+        wait = Wait(self.marionette, timeout=10, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return (window.wrappedJSObject.calls.length == 1)"))
+            wait.until(lambda x: x.execute_script("return (window.wrappedJSObject.calls[0].state == \"connected\")"))
+        except:
+            self.fail("Failed to hangup the second call or change the state of first call")
 
         self.hangup_call(active_call_selected=0)
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")

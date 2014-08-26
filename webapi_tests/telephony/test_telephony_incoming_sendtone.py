@@ -56,7 +56,7 @@ class TestTelephonyIncomingSendtone(TestCase, TelephonyTestCommon):
         # send a DTMF tone for character '0'
         self.marionette.execute_script("window.navigator.mozTelephony.startTone(0);")
         time.sleep(2)
-        self.confirm("Did you hear the DTMF tone?")
+        self.confirm("Did you hear the DTMF tone on other (not the Firefox OS) phone?")
         self.marionette.execute_script("window.navigator.mozTelephony.stopTone();")
 
         # disconnect the active call
