@@ -66,9 +66,6 @@ class TestCase(unittest.TestCase):
         self.assert_browser_connected()
         self.marionette = TestCase.create_marionette()
 
-        turn_screen_on(self.marionette)
-        unlock_screen(self.marionette)
-
         if not certapp.is_installed():
             certapp.install(self.marionette)
 
@@ -200,20 +197,6 @@ class TestCase(unittest.TestCase):
             wait.until(lambda m: m.execute_script("return !!%s;" % object))
         except errors.TimeoutException:
             self.fail("Object '%s' does not exist" % object)
-
-
-def turn_screen_on(marionette):
-    marionette.execute_script("""
-        var screenManager = window.wrappedJSObject.ScreenManager;
-        screenManager.turnScreenOn();
-    """)
-
-
-def unlock_screen(marionette):
-    marionette.execute_script("""
-        var lockScreen = window.wrappedJSObject.lockScreen || window.wrappedJSObject.LockScreen;
-        lockScreen.unlock();
-    """)
 
 
 def wait_for_homescreen(marionette):
