@@ -82,6 +82,7 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
         except:
             # failed to hold
             self.fail("Failed to put first active call on hold while second call becomes active")

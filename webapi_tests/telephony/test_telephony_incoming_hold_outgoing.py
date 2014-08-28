@@ -54,7 +54,7 @@ class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
 
-        # keep call active for awhile
+        # keep call active for a while
         time.sleep(5)
 
         self.hold_active_call(user_initiate_hold=False)
@@ -65,6 +65,7 @@ class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
         wait = Wait(self.marionette, timeout=30, interval=0.5)
         try:
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
         except:
             # failed to hold
             self.fail("Failed to put first active call on hold while second call becomes active")
@@ -97,12 +98,13 @@ class TestTelephonyIncomingHoldOutgoing(TestCase, TelephonyTestCommon):
         # disconnect the two active calls
         self.hangup_call(active_call_selected=1)
 
-        # keep a delay to get the change in call state
-        time.sleep(2)
         # verify number of remaining calls and its state
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
-        self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
-        self.assertEqual(self.calls['0']['state'], "connected", "Call state should be 'connected'")
+        wait = Wait(self.marionette, timeout=10, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return (window.wrappedJSObject.calls.length == 1)"))
+            wait.until(lambda x: x.execute_script("return (window.wrappedJSObject.calls[0].state == \"connected\")"))
+        except:
+            self.fail("Failed to hangup the second call or change the state of first call")
 
         # disconnect the active call
         self.hangup_call(active_call_selected=0)

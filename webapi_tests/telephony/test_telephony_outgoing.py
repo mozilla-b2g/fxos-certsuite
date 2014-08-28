@@ -46,7 +46,7 @@ class TestTelephonyOutgoing(TestCase, TelephonyTestCommon):
         # have user answer the call on target
         self.answer_call(incoming=False)
 
-        # keep call active for awhile
+        # keep call active for a while
         time.sleep(5)
 
         # verify the active call

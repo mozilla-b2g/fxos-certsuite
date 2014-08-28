@@ -21,8 +21,22 @@ class TelephonyTestCommon(object):
           window.wrappedJSObject.incoming_call = event.call;
           window.wrappedJSObject.calls = telephony.calls;
         };
+
+        window.wrappedJSObject.received_callschanged = false;
+        telephony.oncallschanged = function oncallschanged(event) {
+          log("Received Telephony 'oncallschanged' event.");
+          window.wrappedJSObject.received_callschanged = true;
+        };
+
         marionetteScriptFinished(1);
         """, special_powers=True)
+
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_callschanged"))
+        except:
+            self.fail("Telephony.oncallschanged event not found, but should have been "
+                      "since initiated incoming call to firefox OS device")
 
     def verify_incoming_call(self):
         try:
@@ -49,6 +63,14 @@ class TelephonyTestCommon(object):
           log("Received 'onconnecting' call event.");
           if (event.call.state == "connecting") {
             window.wrappedJSObject.connecting_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.received_statechange = false;
+        call_to_answer.onstatechange = function onstatechange(event) {
+        log("Received TelephonyCall 'onstatechange' event.");
+          if (event.call.state == "connected") {
+            window.wrappedJSObject.received_statechange = true;
           };
         };
 
@@ -79,6 +101,7 @@ class TelephonyTestCommon(object):
             if incoming:  # only receive 'onconnecting' for incoming call
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connecting_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connected_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
         except:
             self.fail("Failed to answer call")
 
@@ -117,6 +140,14 @@ class TelephonyTestCommon(object):
           log("Received 'ondisconnecting' call event.");
           if (event.call.state == "disconnecting") {
             window.wrappedJSObject.disconnecting_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.received_statechange = false;
+        call_to_hangup.onstatechange = function onstatechange(event) {
+        log("Received TelephonyCall 'onstatechange' event.");
+          if (event.call.state == "disconnected") {
+            window.wrappedJSObject.received_statechange = true;
           };
         };
 
@@ -162,6 +193,14 @@ class TelephonyTestCommon(object):
             self.assertFalse(disconnecting, "Telephony.ondisconnecting event found, but should not have been "
                             "since the call was terminated remotely")
 
+        # should have received events associated with a state and calls change for with or without remote hangup
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_callschanged"))
+        except:
+            self.fail("Failed to receive either statechange or callschanged events")
+
         # remove the call from list
         if call_type == "Active":
             self.active_call_list.pop(active_call_selected)
@@ -176,6 +215,14 @@ class TelephonyTestCommon(object):
           log("Received 'onholding' call event.");
           if (event.call.state == "holding") {
             window.wrappedJSObject.onholding_call_ok = true;
+          };
+        };
+
+        window.wrappedJSObject.received_statechange = false;
+        active.onstatechange = function onstatechange(event) {
+        log("Received TelephonyCall 'onstatechange' event.");
+          if (event.call.state == "held") {
+            window.wrappedJSObject.received_statechange = true;
           };
         };
 
@@ -198,9 +245,43 @@ class TelephonyTestCommon(object):
             try:
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onholding_call_ok"))
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
+                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
             except:
                 # failed to hold
                 self.fail("Failed to put call on hold initiated by user")
+
+    def resume_held_call(self):
+        self.marionette.execute_async_script("""
+        let active = window.wrappedJSObject.active_call;
+
+        window.wrappedJSObject.received_statechange = false;
+        active.onstatechange = function onstatechange(event) {
+        log("Received TelephonyCall 'onstatechange' event.");
+          if (event.call.state == "resuming") {
+            window.wrappedJSObject.received_statechange = true;
+          };
+        };
+
+        window.wrappedJSObject.onresuming_call_ok = false;
+        active.onresuming = function onresuming(event) {
+          log("Received 'onresuming' call event.");
+          if (event.call.state == "resuming") {
+            window.wrappedJSObject.onresuming_call_ok = true;
+          };
+        };
+
+        active.resume();
+        marionetteScriptFinished(1);
+        """, special_powers=True)
+
+        # should have received event associated with a resumed call
+        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        try:
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onresuming_call_ok"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
+        except:
+            # failed to resume
+            self.fail("Failed to resume the held call")
 
     def initiate_outgoing_call(self, destination):
         # use the webapi to initiate a call to the specified number
@@ -233,6 +314,12 @@ class TelephonyTestCommon(object):
               };
             };
 
+            window.wrappedJSObject.received_callschanged = false;
+            telephony.oncallschanged = function oncallschanged(event) {
+              log("Received Telephony 'oncallschanged' event.");
+              window.wrappedJSObject.received_callschanged = true;
+            };
+
             window.wrappedJSObject.received_busy = false;
             out_call.onbusy = function onbusy(event) {
               log("Received TelephonyCall 'onbusy' event.");
@@ -251,6 +338,7 @@ class TelephonyTestCommon(object):
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_dialing"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_alerting"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_callschanged"))
         except:
             # failed to initiate call; check if the destination phone's line was busy
             busy = self.marionette.execute_script("return window.wrappedJSObject.received_busy")
