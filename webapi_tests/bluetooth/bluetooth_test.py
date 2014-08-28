@@ -17,6 +17,7 @@ class BluetoothTestCommon(object):
         window.wrappedJSObject.rcvd_enabled_event = false;
         window.wrappedJSObject.rcvd_disabled_event = false;
         window.wrappedJSObject.rcvd_error = false;
+        window.wrappedJSObject.rcvd_adapter_added_event = false;
         var mozBT = window.navigator.mozBluetooth;
 
         mozBT.onenabled = function() {
@@ -27,6 +28,11 @@ class BluetoothTestCommon(object):
         mozBT.ondisabled = function() {
            console.log("Received mozBluetooth.ondisabled event");
            window.wrappedJSObject.rcvd_disabled_event = true;
+        };
+
+        mozBT.onadapteradded = function() {
+           console.log("Recieved mozBluetooth.onadapteradded event");
+           window.wrappedJSObject.rcvd_adapter_added_event = true;
         };
 
         if (enable) {
@@ -56,6 +62,7 @@ class BluetoothTestCommon(object):
         try:
             if enable:
                 wait.until(lambda m: m.execute_script("return window.wrappedJSObject.rcvd_enabled_event;"))
+                wait.until(lambda m: m.execute_script("return window.wrappedJSObject.rcvd_adapter_added_event;"))
             else:
                 wait.until(lambda m: m.execute_script("return window.wrappedJSObject.rcvd_disabled_event;"))
         except:
