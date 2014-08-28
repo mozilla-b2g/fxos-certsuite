@@ -53,7 +53,7 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
         time.sleep(5)
 
         # verify the active call
-        self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+        self.assertEqual(self.active_call_list[0]['id']['number'], self.outgoing_call['id']['number'])
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual(self.active_call_list[0]['state'], "connected", "Call state should be 'connected'")
