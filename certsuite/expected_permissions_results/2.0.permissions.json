@@ -1,28 +1,14 @@
 {
-  "alarms": [
-    "window.navigator.mozAlarms"
-  ], 
+  "alarms": [], 
   "attention": [], 
   "audio-capture": [], 
-  "audio-channel-alarm": [
-    "audio-channel-alarm"
-  ], 
-  "audio-channel-content": [
-    "audio-channel-content"
-  ], 
+  "audio-channel-alarm": [], 
+  "audio-channel-content": [], 
   "audio-channel-normal": [], 
-  "audio-channel-notification": [
-    "audio-channel-notification"
-  ], 
-  "audio-channel-publicnotification": [
-    "audio-channel-publicnotification"
-  ], 
-  "audio-channel-ringer": [
-    "audio-channel-ringer"
-  ], 
-  "audio-channel-telephony": [
-    "audio-channel-telephony"
-  ], 
+  "audio-channel-notification": [], 
+  "audio-channel-publicnotification": [], 
+  "audio-channel-ringer": [], 
+  "audio-channel-telephony": [], 
   "background-sensors": [], 
   "backgroundservice": [], 
   "bluetooth": [
@@ -36,8 +22,6 @@
   ], 
   "browser": [
     "browser", 
-    "window.0", 
-    "window.1", 
     "window.document.body.lastElementChild.getCanGoBack", 
     "window.document.body.lastElementChild.getCanGoForward", 
     "window.document.body.lastElementChild.sendTouchEvent", 
@@ -52,9 +36,7 @@
     "window.document.body.lastElementChild.download", 
     "window.document.body.lastElementChild.addNextPaintListener", 
     "window.document.body.lastElementChild.sendMouseEvent", 
-    "window.document.body.lastElementChild.setVisible", 
-    "window.document.body.lastElementChild.contentDocument", 
-    "window.document.body.lastElementChild.contentWindow"
+    "window.document.body.lastElementChild.setVisible"
   ], 
   "camera": [
     "window.CameraDetectedFace", 
@@ -77,8 +59,7 @@
   "device-storage:videos": [], 
   "downloads": [
     "window.DownloadEvent", 
-    "window.DOMDownload", 
-    "window.navigator.mozDownloadManager"
+    "window.DOMDownload"
   ], 
   "embed-apps": [], 
   "feature-detection": [
@@ -103,11 +84,16 @@
     "window.MozInputMethod", 
     "window.navigator.mozInputMethod"
   ], 
-  "mobileconnection": "timed out", 
+  "mobileconnection": [
+    "window.navigator.mozIccManager", 
+    "window.navigator.mozMobileConnections"
+  ], 
   "mobileid": [
     "window.navigator.getMobileIdAssertion"
   ], 
-  "mobilenetwork": "timed out", 
+  "mobilenetwork": [
+    "window.navigator.mozMobileConnections"
+  ], 
   "moz-attention": [], 
   "moz-audio-channel-ringer": [], 
   "moz-audio-channel-telephony": [], 
@@ -116,8 +102,7 @@
   ], 
   "network-events": [], 
   "networkstats-manage": [
-    "window.MozNetworkStatsInterface", 
-    "window.navigator.mozNetworkStats"
+    "window.MozNetworkStatsInterface"
   ], 
   "nfc": [], 
   "nfc-manager": [], 
@@ -142,7 +127,7 @@
   "settings": [], 
   "sms": [
     "window.navigator.mozMobileMessage", 
-    "window.MozMobileMessageManager"
+    "window.MozMobileMessageManager (expected object)"
   ], 
   "speaker-control": [
     "speaker-control"
@@ -154,7 +139,7 @@
   "tcp-socket": [], 
   "telephony": [
     "window.navigator.mozTelephony", 
-    "window.document.body.itemType"
+    "window.document.body.itemType (expected object)"
   ], 
   "test-permission": [
     "window.navigator.getMobileIdAssertion"
@@ -168,11 +153,7 @@
   ], 
   "wappush": [], 
   "webapps-manage": [
-    "device-storage:apps", 
-    "window.1", 
-    "window.navigator.mozApps.mgmt", 
-    "window.document.body.lastElementChild.contentDocument", 
-    "window.document.body.lastElementChild.contentWindow"
+    "device-storage:apps"
   ], 
   "wifi-manage": [
     "window.MozWifiP2pGroupOwner", 

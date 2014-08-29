@@ -5546,7 +5546,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 2 but got 1", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"registerElement\" missing", 
       "name": "Document interface: operation registerElement(String,ElementRegistrationOptions (Wrapper))", 
       "result": "FAIL"
     }, 
@@ -7666,19 +7666,19 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"createShadowRoot\" missing", 
       "name": "Element interface: operation createShadowRoot()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getDestinationInsertionPoints\" missing", 
       "name": "Element interface: operation getDestinationInsertionPoints()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"shadowRoot\" expected true got false", 
       "name": "Element interface: attribute shadowRoot", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -12956,9 +12956,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"import\" expected true got false", 
       "name": "HTMLLinkElement interface: attribute import", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -18821,154 +18821,154 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"lastKnownNetwork\" expected true got false", 
       "name": "MozMobileConnection interface: attribute lastKnownNetwork", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"lastKnownHomeNetwork\" expected true got false", 
       "name": "MozMobileConnection interface: attribute lastKnownHomeNetwork", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"voice\" expected true got false", 
       "name": "MozMobileConnection interface: attribute voice", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"data\" expected true got false", 
       "name": "MozMobileConnection interface: attribute data", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"iccId\" expected true got false", 
       "name": "MozMobileConnection interface: attribute iccId", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"networkSelectionMode\" expected true got false", 
       "name": "MozMobileConnection interface: attribute networkSelectionMode", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"radioState\" expected true got false", 
       "name": "MozMobileConnection interface: attribute radioState", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"supportedNetworkTypes\" expected true got false", 
       "name": "MozMobileConnection interface: attribute supportedNetworkTypes", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getNetworks\" missing", 
       "name": "MozMobileConnection interface: operation getNetworks()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"selectNetwork\" missing", 
       "name": "MozMobileConnection interface: operation selectNetwork(MozMobileNetworkInfo (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"selectNetworkAutomatically\" missing", 
       "name": "MozMobileConnection interface: operation selectNetworkAutomatically()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setPreferredNetworkType\" missing", 
       "name": "MozMobileConnection interface: operation setPreferredNetworkType(MobilePreferredNetworkType (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getPreferredNetworkType\" missing", 
       "name": "MozMobileConnection interface: operation getPreferredNetworkType()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setRoamingPreference\" missing", 
       "name": "MozMobileConnection interface: operation setRoamingPreference(MobileRoamingMode (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getRoamingPreference\" missing", 
       "name": "MozMobileConnection interface: operation getRoamingPreference()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setVoicePrivacyMode\" missing", 
       "name": "MozMobileConnection interface: operation setVoicePrivacyMode(boolean)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getVoicePrivacyMode\" missing", 
       "name": "MozMobileConnection interface: operation getVoicePrivacyMode()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"sendMMI\" missing", 
       "name": "MozMobileConnection interface: operation sendMMI(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"cancelMMI\" missing", 
       "name": "MozMobileConnection interface: operation cancelMMI()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setCallForwardingOption\" missing", 
       "name": "MozMobileConnection interface: operation setCallForwardingOption(MozCallForwardingOptions (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getCallForwardingOption\" missing", 
       "name": "MozMobileConnection interface: operation getCallForwardingOption(UnsignedShort)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setCallBarringOption\" missing", 
       "name": "MozMobileConnection interface: operation setCallBarringOption(MozCallBarringOptions (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getCallBarringOption\" missing", 
       "name": "MozMobileConnection interface: operation getCallBarringOption(MozCallBarringOptions (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"changeCallBarringPassword\" missing", 
       "name": "MozMobileConnection interface: operation changeCallBarringPassword(MozCallBarringOptions (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setCallWaitingOption\" missing", 
       "name": "MozMobileConnection interface: operation setCallWaitingOption(boolean)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getCallWaitingOption\" missing", 
       "name": "MozMobileConnection interface: operation getCallWaitingOption()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setCallingLineIdRestriction\" missing", 
       "name": "MozMobileConnection interface: operation setCallingLineIdRestriction(UnsignedShort)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getCallingLineIdRestriction\" missing", 
       "name": "MozMobileConnection interface: operation getCallingLineIdRestriction()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"exitEmergencyCbMode\" missing", 
       "name": "MozMobileConnection interface: operation exitEmergencyCbMode()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setRadioEnabled\" missing", 
       "name": "MozMobileConnection interface: operation setRadioEnabled(boolean)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -24271,59 +24271,59 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"ShadowRoot\" is not Function.prototype expected function \"function () {\n}\" but got function \"function DocumentFragment() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface object length", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of ShadowRoot.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object DocumentFragmentPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: operation getElementById(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: operation getElementsByTagName(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: operation getElementsByTagNameNS(StringOrNull,String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: operation getElementsByClassName(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: attribute innerHTML", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: attribute applyAuthorStyles", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"ShadowRoot\" expected property \"ShadowRoot\" missing", 
       "name": "ShadowRoot interface: attribute styleSheets", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_own_property: window does not have own property \"SharedWorkerGlobalScope\" expected property \"SharedWorkerGlobalScope\" missing", 
@@ -41599,7 +41599,6 @@
     "Set": true, 
     "SettingsLock": true, 
     "SettingsManager": true, 
-    "ShadowRoot": true, 
     "SharedWorker": true, 
     "SimpleGestureEvent": true, 
     "SmartCardEvent": true, 
@@ -42003,7 +42002,6 @@
         "contains": true, 
         "contentEditable": true, 
         "contextMenu": null, 
-        "createShadowRoot": true, 
         "dataset": {
           "__defineGetter__": true, 
           "__defineSetter__": true, 
@@ -42071,7 +42069,6 @@
           "contains": true, 
           "contentEditable": true, 
           "contextMenu": null, 
-          "createShadowRoot": true, 
           "dataset": true, 
           "dir": true, 
           "dispatchEvent": true, 
@@ -42085,7 +42082,6 @@
           "getAttributeNodeNS": true, 
           "getBoundingClientRect": true, 
           "getClientRects": true, 
-          "getDestinationInsertionPoints": true, 
           "getElementsByClassName": true, 
           "getElementsByTagName": true, 
           "getElementsByTagNameNS": true, 
@@ -42167,7 +42163,6 @@
             "contains": true, 
             "contentEditable": true, 
             "contextMenu": null, 
-            "createShadowRoot": true, 
             "crossOrigin": true, 
             "dataset": true, 
             "defer": true, 
@@ -42184,7 +42179,6 @@
             "getAttributeNodeNS": true, 
             "getBoundingClientRect": true, 
             "getClientRects": true, 
-            "getDestinationInsertionPoints": true, 
             "getElementsByClassName": true, 
             "getElementsByTagName": true, 
             "getElementsByTagNameNS": true, 
@@ -42328,7 +42322,6 @@
             "setAttributeNode": true, 
             "setAttributeNodeNS": true, 
             "setCapture": true, 
-            "shadowRoot": null, 
             "spellcheck": true, 
             "src": true, 
             "style": true, 
@@ -42453,7 +42446,6 @@
           "setAttributeNode": true, 
           "setAttributeNodeNS": true, 
           "setCapture": true, 
-          "shadowRoot": null, 
           "spellcheck": true, 
           "style": true, 
           "tabIndex": true, 
@@ -42474,7 +42466,6 @@
         "getAttributeNodeNS": true, 
         "getBoundingClientRect": true, 
         "getClientRects": true, 
-        "getDestinationInsertionPoints": true, 
         "getElementsByClassName": true, 
         "getElementsByTagName": true, 
         "getElementsByTagNameNS": true, 
@@ -42708,7 +42699,6 @@
               "content": true, 
               "contentEditable": true, 
               "contextMenu": null, 
-              "createShadowRoot": true, 
               "dataset": true, 
               "dir": true, 
               "dispatchEvent": true, 
@@ -42722,7 +42712,6 @@
               "getAttributeNodeNS": true, 
               "getBoundingClientRect": true, 
               "getClientRects": true, 
-              "getDestinationInsertionPoints": true, 
               "getElementsByClassName": true, 
               "getElementsByTagName": true, 
               "getElementsByTagNameNS": true, 
@@ -42804,7 +42793,6 @@
                 "contains": true, 
                 "contentEditable": true, 
                 "contextMenu": null, 
-                "createShadowRoot": true, 
                 "dataset": true, 
                 "dir": true, 
                 "dispatchEvent": true, 
@@ -42818,7 +42806,6 @@
                 "getAttributeNodeNS": true, 
                 "getBoundingClientRect": true, 
                 "getClientRects": true, 
-                "getDestinationInsertionPoints": true, 
                 "getElementsByClassName": true, 
                 "getElementsByTagName": true, 
                 "getElementsByTagNameNS": true, 
@@ -42917,7 +42904,6 @@
                   "contains": true, 
                   "contentEditable": true, 
                   "contextMenu": null, 
-                  "createShadowRoot": true, 
                   "crossOrigin": true, 
                   "dataset": true, 
                   "dir": true, 
@@ -42933,7 +42919,6 @@
                   "getAttributeNodeNS": true, 
                   "getBoundingClientRect": true, 
                   "getClientRects": true, 
-                  "getDestinationInsertionPoints": true, 
                   "getElementsByClassName": true, 
                   "getElementsByTagName": true, 
                   "getElementsByTagNameNS": true, 
@@ -42946,7 +42931,6 @@
                   "href": true, 
                   "hreflang": true, 
                   "id": true, 
-                  "import": null, 
                   "innerHTML": true, 
                   "insertAdjacentHTML": true, 
                   "insertBefore": true, 
@@ -43183,7 +43167,6 @@
                   "setAttributeNode": true, 
                   "setAttributeNodeNS": true, 
                   "setCapture": true, 
-                  "shadowRoot": null, 
                   "sheet": {
                     "__defineGetter__": true, 
                     "__defineSetter__": true, 
@@ -43335,7 +43318,6 @@
                 "setAttributeNode": true, 
                 "setAttributeNodeNS": true, 
                 "setCapture": true, 
-                "shadowRoot": null, 
                 "spellcheck": true, 
                 "style": true, 
                 "tabIndex": true, 
@@ -43459,7 +43441,6 @@
               "setAttributeNode": true, 
               "setAttributeNodeNS": true, 
               "setCapture": true, 
-              "shadowRoot": null, 
               "spellcheck": true, 
               "style": true, 
               "tabIndex": true, 
@@ -43507,7 +43488,6 @@
           "contains": true, 
           "contentEditable": true, 
           "contextMenu": null, 
-          "createShadowRoot": true, 
           "dataset": true, 
           "dir": true, 
           "dispatchEvent": true, 
@@ -43521,7 +43501,6 @@
           "getAttributeNodeNS": true, 
           "getBoundingClientRect": true, 
           "getClientRects": true, 
-          "getDestinationInsertionPoints": true, 
           "getElementsByClassName": true, 
           "getElementsByTagName": true, 
           "getElementsByTagNameNS": true, 
@@ -43682,7 +43661,6 @@
             "contains": true, 
             "contentEditable": true, 
             "contextMenu": null, 
-            "createShadowRoot": true, 
             "dataset": true, 
             "dir": true, 
             "dispatchEvent": true, 
@@ -43771,7 +43749,6 @@
             "getAttributeNodeNS": true, 
             "getBoundingClientRect": true, 
             "getClientRects": true, 
-            "getDestinationInsertionPoints": true, 
             "getElementsByClassName": true, 
             "getElementsByTagName": true, 
             "getElementsByTagNameNS": true, 
@@ -43985,7 +43962,6 @@
             "setAttributeNode": true, 
             "setAttributeNodeNS": true, 
             "setCapture": true, 
-            "shadowRoot": null, 
             "spellcheck": true, 
             "style": true, 
             "tabIndex": true, 
@@ -44027,7 +44003,6 @@
           "setAttributeNode": true, 
           "setAttributeNodeNS": true, 
           "setCapture": true, 
-          "shadowRoot": null, 
           "spellcheck": true, 
           "style": true, 
           "tabIndex": true, 
@@ -44105,7 +44080,6 @@
         "setAttributeNode": true, 
         "setAttributeNodeNS": true, 
         "setCapture": true, 
-        "shadowRoot": null, 
         "spellcheck": true, 
         "style": {
           "@@iterator": true, 
@@ -44671,7 +44645,6 @@
       "querySelectorAll": true, 
       "readyState": true, 
       "referrer": true, 
-      "registerElement": true, 
       "releaseCapture": true, 
       "releaseEvents": true, 
       "removeChild": true, 
