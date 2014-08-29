@@ -49,7 +49,7 @@ class TestTelephonyIncomingMute(TestCase, TelephonyTestCommon):
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
 
-        # keep call active for awhile
+        # keep call active for a while
         time.sleep(3)
 
         # turn on mute
