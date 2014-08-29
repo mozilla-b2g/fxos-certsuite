@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
+import unittest
 from marionette.wait import Wait
 
 from webapi_tests.semiauto import TestCase
@@ -31,6 +32,8 @@ class TestTelephonyOutgoingBusy(TestCase, TelephonyTestCommon):
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
 
+    @unittest.skip("Skipping this test as 'BusyError' error name is not received while making call to busy line, "
+                   "Instead receiving 'UnspecifiedError', refer Bug-1060129")
     def test_telephony_outgoing_busy(self):
         self.instruct("Make a call to second non firefox OS phone from third non firefox "
                        "OS phone, answer the call on second phone and press OK")

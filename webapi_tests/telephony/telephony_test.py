@@ -321,9 +321,9 @@ class TelephonyTestCommon(object):
             };
 
             window.wrappedJSObject.received_busy = false;
-            out_call.onbusy = function onbusy(event) {
-              log("Received TelephonyCall 'onbusy' event.");
-              if (event.call.state == "busy") {
+            out_call.onerror = function onerror(event) {
+              log("Received TelephonyCall 'onerror' event.");
+              if (event.call.error.name == "BusyError") {
                 window.wrappedJSObject.received_busy = true;
               };
             };

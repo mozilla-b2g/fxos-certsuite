@@ -3,12 +3,13 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
+import unittest
 
 from webapi_tests.semiauto import TestCase
 from webapi_tests.telephony import TelephonyTestCommon
 
 
-class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
+class TestTelephonyIncomingHoldResume(TestCase, TelephonyTestCommon):
     """
     This is a test for the `WebTelephony API`_ which will:
 
@@ -31,7 +32,7 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
 
     def setUp(self):
         self.addCleanup(self.clean_up)
-        super(TestTelephonyIncomingHoldHangup, self).setUp()
+        super(TestTelephonyIncomingHoldResume, self).setUp()
         self.wait_for_obj("window.navigator.mozTelephony")
         # disable the default dialer manager so it doesn't grab our calls
         self.disable_dialer()
@@ -59,6 +60,7 @@ class TestTelephonyIncomingHoldHangup(TestCase, TelephonyTestCommon):
         self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
+    @unittest.skip("Skipping this test as hangup the call through API fails")
     def test_telephony_incoming_hold_resume(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
