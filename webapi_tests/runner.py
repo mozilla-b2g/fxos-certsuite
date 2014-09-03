@@ -78,6 +78,8 @@ def main():
                         "groups by repeating flag")
     parser.add_argument("-n", "--no-browser", action="store_true",
                         help="Don't start a browser but wait for manual connection")
+    parser.add_argument("--version", action="store", dest="version",
+                        help="B2G version")
     parser.add_argument(
         "-v", dest="verbose", action="store_true", help="Verbose output")
     commandline.add_logging_group(parser)
@@ -102,7 +104,7 @@ def main():
                 print("%s.%s" % (group, test))
         return 0
 
-    test_loader = semiauto.TestLoader()
+    test_loader = semiauto.TestLoader(version=args.version)
     tests = test_loader.loadTestsFromNames(
         map(lambda t: "webapi_tests.%s" % t, args.include or [g for g, _ in testgen]), None)
     results = semiauto.run(tests,
