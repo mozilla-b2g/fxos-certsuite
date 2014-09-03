@@ -62,7 +62,7 @@ To get a list of command-line arguments, use::
 For example it is possible to list logical test groups and to run
 filtered test runs of only a subset of the tests::
 
-    runcertsuite --list-test-groups
+    runcertsuite --list-tests
 
 Submitting Results
 ------------------
