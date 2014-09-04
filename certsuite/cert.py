@@ -357,7 +357,8 @@ def _run(args, logger):
         'omni-analyzer',
         'permissions',
         'webapi',
-        'user-agent'
+        'user-agent',
+        'crash-reporter',
         ]
     if args.list_test_groups:
         for t in test_groups:
@@ -642,6 +643,19 @@ def _run(args, logger):
             logger.test_end('user-agent', 'OK')
         else:
             logger.test_end('user-agent', 'ERROR')
+
+    if 'crash-reporter' in test_groups:
+        logger.test_start('crash-reporter')
+        logger.debug('start checking test reporter')
+
+        crash_report_toggle = (report.get('application_ini', {})
+                                     .get('Crash Reporter', {})
+                                     .get('enabled'))
+
+        if crash_report_toggle == '1':
+            logger.test_end('crash-reporter', 'OK')
+        else:
+            logger.test_end('crash-reporter', 'ERROR')
 
     logger.suite_end()
 
