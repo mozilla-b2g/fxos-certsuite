@@ -26,6 +26,7 @@ class TestCase(unittest.TestCase):
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):
+        self.version = kwargs.pop('version')
         super(TestCase, self).__init__(*args, **kwargs)
         self.stored.handler = None
         self.stored.marionette = None
@@ -67,7 +68,7 @@ class TestCase(unittest.TestCase):
         self.marionette = TestCase.create_marionette()
 
         if not certapp.is_installed():
-            certapp.install(self.marionette)
+            certapp.install(marionette=self.marionette, version=self.version)
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.

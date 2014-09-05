@@ -44,7 +44,7 @@ class DeviceStorageTestCommon(object):
         };
         request.onerror = function () {
             console.log("Unable to write the file: " + this.error.name);
-            marionetteScriptFinished(this.error.name);
+            marionetteScriptFinished("Unable to write the file: " + this.error.name);
         };
         """, script_args=[file_name, file_contents])
         return ret_namedfile_sdcard
@@ -74,7 +74,7 @@ class DeviceStorageTestCommon(object):
         }
         request.onerror = function (error) {
             console.log('Unable to remove the file: ' + this.error.name);
-            marionetteScriptFinished(false);
+            marionetteScriptFinished('Unable to remove the file: ' + this.error.name);
         }
         """, script_args=[file_name])
         return ret_file_delete_sdcard
