@@ -13,7 +13,6 @@ class TestSmsIncomingReadStatus(TestCase, MobileMessageTestCommon):
 
     - Verify that an SMS can be received (sent by the test user)
     - Confirm that the associated mozMobileMessage received event is triggered
-    - Verify the mozSmsMessage attributes
     - Mark the received message status as unread using API and verify read attribute
     - Mark the received message status as read using API and verify read attribute
 
@@ -29,7 +28,7 @@ class TestSmsIncomingReadStatus(TestCase, MobileMessageTestCommon):
 
     def test_sms_incoming_read_status(self):
         # have user send sms to the Firefox OS device
-        self.msg_type= "SMS"
+        self.msg_type = "SMS"
         self.user_guided_incoming_msg()
 
         # verify message contents
@@ -41,19 +40,8 @@ class TestSmsIncomingReadStatus(TestCase, MobileMessageTestCommon):
                          "Received SMS MozSmsMessage.type should be 'sms'")
         self.assertGreater(self.in_msg['id'], 0,
                            "Received SMS MozSmsMessage.id should be > 0")
-        self.assertGreater(self.in_msg['threadId'], 0,
-                           "Received SMS MozSmsMessage.threadId should be > 0")
         self.assertEqual(self.in_msg['delivery'], 'received',
                          "Received SMS MozSmsMessage.delivery should be 'received'")
-
-        # for privacy, don't print/check the actual sender's number; just ensure it is not empty
-        self.assertGreater(len(self.in_msg['sender']), 0,
-                           "Received SMS MozSmsMessage.sender field should not be empty")
-        # timezones and different SMSC's, don't check timestamp value; just ensure non-zero
-        self.assertGreater(self.in_msg['timestamp'], 0,
-                           "Received SMS MozSmsMessage.timestamp should not be 0")
-        self.assertTrue(self.in_msg['messageClass'] in ["class-0", "class-1", "class-2", "class-3", "normal"],
-                        "Received SMS MozSmsMessage.messageClass must be a valid class")
 
         # mark received message status as unread and verify
         self.mark_message_status(self.in_msg['id'], is_read=False)

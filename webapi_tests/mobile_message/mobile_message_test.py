@@ -183,13 +183,11 @@ class MobileMessageTestCommon(object):
                 window.wrappedJSObject.rcvd_req_success = true;
             } else {
                 log("request returned false for manager.send");
-                cleanUp();
             }
         };
 
         requestRet.onerror = function() {
             log("Failed to send message, received error: %s" % requestRet.error.name);
-            cleanUp();
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_type, destination, body], special_powers=True)
@@ -289,12 +287,11 @@ class MobileMessageTestCommon(object):
 
         requestRet.onerror = function() {
             log("Failed to mark message read status, received error: %s" % requestRet.error.name);
-            cleanUp();
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_id, is_read], special_powers=True)
 
-        wait = Wait(self.marionette, timeout=90, interval=0.5)
+        wait = Wait(self.marionette, timeout=15, interval=0.5)
         try:
             if is_read is True:
                 wait.until(lambda m: self.marionette.execute_script("return window.wrappedJSObject.rcvd_req_success_read"))
