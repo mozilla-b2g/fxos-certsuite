@@ -11,7 +11,7 @@ const SERVER_ADDR = window.location.host;
 function $(selector) {
   var els = document.querySelectorAll(String(selector));
   return els.length > 1 ? els : els[0];
-};
+}
 
 // Extension of HTMLElement's prototype to allow adding a single CSS
 // class to its @class attribute.
@@ -110,7 +110,7 @@ var Keys = (function() {
   };
 
   var instance = new Keys();
-  window.onkeypress = function(ev) { instance.triggerEvent(ev); }
+  window.onkeypress = function(ev) { instance.triggerEvent(ev) };
   return instance;
 })();
 
