@@ -316,6 +316,7 @@ def check_root(device):
     processes = device.get_process_list()
     for pid, name, user in processes:
         if name == "/sbin/adbd":
+            have_adbd = True
             have_root = user == "root"
             if not have_root:
                 logger.critical("adbd running as non-root user %s" % user)
