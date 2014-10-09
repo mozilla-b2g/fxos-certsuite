@@ -359,8 +359,7 @@ def check_network(device):
 def ensure_settings(device):
     test_settings = {"screen.automatic-brightness": False,
                      "screen.brightness": 1.0,
-                     "screen.timeout": 0.0,
-                     "lockscreen.enabled": False}
+                     "screen.timeout": 0.0}
     logger.info("Setting up device for testing")
     with MarionetteSession(device) as marionette:
         settings = gaiautils.Settings(marionette)

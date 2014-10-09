@@ -195,7 +195,13 @@ class ADBB2G(adb.ADBDevice):
 
     def stop(self, timeout=None):
         self._logger.info("Stopping b2g process")
+        if timeout is None:
+            timeout = self._timeout
         self.shell_bool("stop b2g")
+        def b2g_stopped():
+            processes = set(item[1].split("/")[-1] for item in self.get_process_list())
+            return "b2g" not in processes
+        poll_wait(b2g_stopped, timeout=timeout)
 
     def start(self, wait=True, timeout=None, wait_polling_interval=None):
         """Start b2g, waiting for the adb connection to become stable.
@@ -265,7 +271,7 @@ class ADBB2G(adb.ADBDevice):
                 if "name" in items and "path" in items:
                     path = items["path"]
                     if "isrelative" in items and int(items["isrelative"]):
-                        path = os.path.normpath("%s/%s"% (profile_base, path))
+                        path = os.path.normpath("%s/%s" % (profile_base, path))
                     rv[items["name"]] = path
         finally:
             proc.stdout_file.close()
