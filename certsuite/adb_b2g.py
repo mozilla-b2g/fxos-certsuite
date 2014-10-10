@@ -148,7 +148,7 @@ class ADBB2G(adb.ADBDevice):
         assert len(profiles) == 1
 
         profile_dir = profiles.itervalues().next()
-        prefs_file = os.path.normpath(profile_dir + "/prefs.js")
+        prefs_file = posixpath.normpath(profile_dir + "/prefs.js")
 
         current_date = int(self.shell_output('date +\"%s\"'))
         set_date = current_date - (365 * 24 * 3600 + 24 * 3600 + 3600 + 60 + 1)
@@ -271,7 +271,7 @@ class ADBB2G(adb.ADBDevice):
                 if "name" in items and "path" in items:
                     path = items["path"]
                     if "isrelative" in items and int(items["isrelative"]):
-                        path = os.path.normpath("%s/%s" % (profile_base, path))
+                        path = posixpath.normpath("%s/%s" % (profile_base, path))
                     rv[items["name"]] = path
         finally:
             proc.stdout_file.close()
