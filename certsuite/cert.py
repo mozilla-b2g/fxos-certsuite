@@ -143,7 +143,7 @@ def test_user_agent(user_agent, logger):
     if valid:
         logger.test_status('user-agent', 'user-agent-string', 'PASS')
     else:
-        logger.test_status('user-agent', 'user-agent-string', 'FAIL', 'Invalid user-agent string: %s: %s' % (user_agent, message))
+        logger.test_status('user-agent', 'user-agent-string', 'FAIL', message='Invalid user-agent string: %s: %s' % (user_agent, message))
 
     return valid
 
@@ -359,6 +359,7 @@ def _run(args, logger):
         'webapi',
         'user-agent',
         'crash-reporter',
+        'search-id',
         ]
     if args.list_test_groups:
         for t in test_groups:
@@ -656,6 +657,34 @@ def _run(args, logger):
             logger.test_end('crash-reporter', 'OK')
         else:
             logger.test_end('crash-reporter', 'ERROR')
+
+    if 'search-id' in test_groups:
+        logger.test_start('search-id')
+        fxos_appgen.launch_app('browser')
+
+        script = """
+          result = window.wrappedJSObject.Browser.getUrlFromInput('hello world');
+          return result;
+        """
+
+        m = marionette.Marionette('localhost', 2828)
+        m.start_session()
+        browser = m.find_element('css selector', 'iframe[src="app://browser.gaiamobile.org/index.html"]')
+        m.switch_to_frame(browser)
+        url = m.execute_script(script)
+        m.delete_session()
+
+        report['search-oemid'] = url
+
+        oemid_rexp = re.compile('client=mobile-firefoxos&channel=fm:org.mozilla:([A-Z0-9.]+):official&')
+
+        match = oemid_rexp.match(url)
+        if match:
+            logger.test_status('search-id', 'oemid', 'PASS', message='oemid: %s' % match.groups()[0])
+        else:
+            logger.test_status('search-id', 'oemid', 'FAIL', message='no oemid found in url: %s' % url)
+
+        logger.test_end('search-id', 'OK')
 
     logger.suite_end()
 
