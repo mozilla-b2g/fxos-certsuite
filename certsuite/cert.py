@@ -662,8 +662,6 @@ def _run(args, logger):
         logger.test_start('search-id')
         fxos_appgen.launch_app('browser')
 
-        time.sleep(5)
-
         script = """
           result = window.wrappedJSObject.Browser.getUrlFromInput('hello world');
           return result;
