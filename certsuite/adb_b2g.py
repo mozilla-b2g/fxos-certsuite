@@ -1,4 +1,5 @@
 import ConfigParser
+import datetime
 import os
 import posixpath
 import re
@@ -153,7 +154,15 @@ class ADBB2G(adb.ADBDevice):
         current_date = int(self.shell_output('date +\"%s\"'))
         set_date = current_date - (365 * 24 * 3600 + 24 * 3600 + 3600 + 60 + 1)
 
-        self.shell_output("touch -t %i %s" % (set_date, prefs_file))
+        try:
+            self.shell_output("touch -t %i %s" % (set_date, prefs_file))
+        except adb.ADBError:
+            # See Bug 1092383, the format for the touch command
+            # has changed for flame-kk builds.
+            set_date = datetime.datetime.fromtimestamp(set_date)
+            self.shell_output("touch -t %s %s" %
+                              (set_date.strftime('%Y%m%d.%H%M%S'),
+                              prefs_file))
 
         def prefs_modified():
             times = [None, None]
