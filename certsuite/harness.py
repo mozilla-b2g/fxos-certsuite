@@ -385,7 +385,11 @@ def check_server(device):
 
     device.forward("tcp:2828", "tcp:2828")
 
-    logger.debug(str(device.list_forwards()))
+    try:
+        logger.debug(str(device.list_forwards()))
+    except mozdevice.ADBError:
+        # not supported on flame-kk builds
+        pass
 
     m = marionette.Marionette()
     m.wait_for_port()
