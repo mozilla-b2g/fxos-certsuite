@@ -383,30 +383,6 @@ def check_server(device):
     logger.info("Checking access to host machine")
     routes = [("GET", "/", test_handler)]
 
-    device.forward("tcp:2828", "tcp:2828")
-
-    try:
-        logger.debug(str(device.list_forwards()))
-    except mozdevice.ADBError:
-        # not supported on flame-kk builds
-        pass
-
-    m = marionette.Marionette()
-    m.wait_for_port()
-    logger.debug("Got marionette port")
-    try:
-        m.start_session()
-    except:
-        logger.critical("Failed to start marionette session")
-        return False
-    logger.debug("Started marionette session")
-
-    try:
-        wait_for_homescreen(m, 60)
-    except IOError:
-        logger.critical("Error when waiting for homescreen")
-        return False
-
     host_ip = moznetwork.get_ip()
 
     for port in [8000, 8001]:
@@ -419,9 +395,12 @@ def check_server(device):
             return False
 
         try:
-            m.navigate("http://%s:%i" % (host_ip, port))
-            m.go_back()
-        except:
+            device.shell_output("curl http://%s:%i" % (host_ip, port))
+        except mozdevice.ADBError as e:
+            if 'curl: not found' in e.message:
+                logger.warning("Could not check access to host machine: curl not present.")
+                logger.warning("If timeouts occur, check your network configuration.")
+                break
             logger.critical("Failed to connect to server running on host machine ip %s port %i. Check network configuration." % (host_ip, port))
             return False
         finally:
