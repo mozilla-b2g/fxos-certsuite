@@ -60,6 +60,9 @@ bluetooth
   Bluetooth API provides low-level access to the device's Bluetooth
   hardware.
 
+devicelight
+  Lets you detect changes to ambient light using the device's light sensor.
+
 fm_radio
   Provides support for a device's FM radio functionality.
 
@@ -83,10 +86,6 @@ notification
 
 orientation
   Provides notifications when the device's orientation changes.
-
-proximity
-  Lets you detect proximity of the device to a nearby object, such
-  as the user's face.
 
 tcp_socket
   Provides low-level sockets and SSL support.
