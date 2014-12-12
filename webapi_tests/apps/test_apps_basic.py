@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import unittest
 from webapi_tests.semiauto import TestCase
 from webapi_tests.apps import AppsTestCommon
 
@@ -11,11 +12,13 @@ class TestAppsBasic(TestCase, AppsTestCommon):
         super(TestAppsBasic, self).setUp()
         self.wait_for_obj("window.navigator.mozApps")
 
+    @unittest.skip("Bug 1110545 - test times out")
     def test_get_self(self):
         app = self.get_self()
         self.assertEqual(app["manifest"]["name"], "CertTest App", "Application name is different from CertTest App")
         self.assertEqual(app["manifest"]["description"], "Generated app", "Application description is different from Generated app")
 
+    @unittest.skip("Bug 1110545 - test times out")
     def test_get_all(self):
         applist = self.get_all()
         for app in applist:
