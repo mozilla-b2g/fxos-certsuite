@@ -41,10 +41,10 @@ class TestGeolocationBasic(TestCase, GeolocationTestCommon):
         self.assertIsNotNone(position['coords']['altitude'], "position.coords.altitude must have a value")
         self.assertIsNotNone(position['coords']['latitude'], "position.coords.latitude must have a value")
         self.assertIsNotNone(position['coords']['longitude'], "position.coorts.longitude must have a value")
+        self.assertIsNotNone(position['coords']['altitudeAccuracy'], "position.altitudeAccuracy must have a value")
         # disable checking speed and heading because bug 1090047
         # self.assertIsNone(position['coords']['speed'], "Expected position.speed to be 'None'")
         # self.assertIsNone(position['coords']['heading'], "Expected position.heading to be 'None'")
-        self.assertIsNotNone(position['coords']['altitudeAccuracy'], "position.altitudeAccuracy must have a value")
         self.assertIsNotNone(position['coords']['accuracy'], "position.accuracy must have a value")
         # ask user to verify lat/long using the web
         lat = position['coords']['latitude']
