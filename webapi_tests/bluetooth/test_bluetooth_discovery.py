@@ -88,7 +88,9 @@ class TestBluetoothDiscovery(TestCase, BluetoothTestCommon):
         # enter discovery mode for awhile
         self.start_bt_discovery()
         time.sleep(30)
-        self.stop_bt_discovery()
+        # ensure are not discovering
+        if self.get_bt_discovering():
+            self.stop_bt_discovering()
         # verify at least one device was found
         self.assertTrue(self.get_num_bt_devices_found() > 0, "Failed to discover any bluetooth devices. Ensure at least one " \
                         "other non-Firefox OS device is in discoverable mode and please try again.")
