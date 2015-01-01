@@ -662,13 +662,13 @@ def _run(args, logger):
         fxos_appgen.launch_app('browser')
 
         script = """
-          result = window.wrappedJSObject.Browser.getUrlFromInput('hello world');
+          result = window.wrappedJSObject.UrlHelper.getUrlFromInput('hello world');
           return result;
         """
 
         m = marionette.Marionette('localhost', 2828)
         m.start_session()
-        browser = m.find_element('css selector', 'iframe[src="app://browser.gaiamobile.org/index.html"]')
+        browser = m.find_element('css selector', 'iframe[src="app://search.gaiamobile.org/newtab.html"]')
         m.switch_to_frame(browser)
         url = m.execute_script(script)
         m.delete_session()
