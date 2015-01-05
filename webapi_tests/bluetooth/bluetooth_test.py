@@ -21,24 +21,24 @@ class BluetoothTestCommon(object):
         var mozBT = window.navigator.mozBluetooth;
 
         mozBT.onenabled = function() {
-           console.log("Recieved mozBluetooth.onenabled event");
+           log("Recieved mozBluetooth.onenabled event");
            window.wrappedJSObject.rcvd_enabled_event = true;
         };
 
         mozBT.ondisabled = function() {
-           console.log("Received mozBluetooth.ondisabled event");
+           log("Received mozBluetooth.ondisabled event");
            window.wrappedJSObject.rcvd_disabled_event = true;
         };
 
         mozBT.onadapteradded = function() {
-           console.log("Recieved mozBluetooth.onadapteradded event");
+           log("Recieved mozBluetooth.onadapteradded event");
            window.wrappedJSObject.rcvd_adapter_added_event = true;
         };
 
         if (enable) {
-            console.log("Turning on bluetooth via settings");
+            log("Turning on bluetooth via settings");
         } else {
-            console.log("Turning off bluetooth via settings");
+            log("Turning off bluetooth via settings");
         }
         var lock = window.navigator.mozSettings.createLock();
 
@@ -48,9 +48,9 @@ class BluetoothTestCommon(object):
 
         result.onerror = function() {
             if (enable) {
-                console.log("Failed to changed Bluetooth setting to ON");
+                log("Failed to changed Bluetooth setting to ON");
             } else {
-                console.log("Failed to changed Bluetooth setting to OFF");
+                log("Failed to changed Bluetooth setting to OFF");
             }
             window.wrappedJSObject.rcvd_error = true;
         };
@@ -81,17 +81,22 @@ class BluetoothTestCommon(object):
         window.wrappedJSObject.bt_adapter = null;
         var mozBt = window.navigator.mozBluetooth;
 
-        console.log("Getting default bluetooth adaptor");
+        log("Getting default bluetooth adaptor");
         var request = mozBt.getDefaultAdapter();
 
         request.onsuccess = function() {
-            console.log("mozBluetooth.getDefaultAdapter request success");
+            log("mozBluetooth.getDefaultAdapter request success");
             window.wrappedJSObject.rcvd_success = true;
             window.wrappedJSObject.bt_adapter = request.result;
+            for (var prop in window.wrappedJSObject.bt_adapter) {
+                log("property " + prop + ", " + typeof(window.wrappedJSObject.bt_adapter[prop]));
+                log("... " + JSON.stringify(window.wrappedJSObject.bt_adapter[prop]));
+                log("... " + window.wrappedJSObject.bt_adapter[prop]);
+            }
         };
 
         request.onerror = function() {
-            console.log("mozBluetooth.getDefaultAdapter request returned error");
+            log("mozBluetooth.getDefaultAdapter request returned error");
             window.wrappedJSObject.rcvd_error = true;
         };
         marionetteScriptFinished(1);
