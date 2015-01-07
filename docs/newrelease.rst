@@ -6,7 +6,7 @@ This page describes how to create a new release of the certification suite.
 github branching
 ----------------
 
-If you are creating a release for the first time for a new version of Firefox OS, you should create a new branch in github for it, e.g.,:
+If you are creating a release for the first time for a new version of Firefox OS, you should create a new branch in github for it, e.g.,::
 
     git branch v2.1
     git checkout v2.1
@@ -24,13 +24,13 @@ The package version in *setup.py* should be bumped with each release.  For a rel
 archive generation
 ------------------
 
-The contents of the *fxos-certsuite* directory are copied to another directory with a name in the format *fxos-MCTS-2.1.0*, and the hidden *.git* directory is removed.  The *documentation.pdf* file in the root directory is updated using command
+The contents of the *fxos-certsuite* directory are copied to another directory with a name in the format *fxos-MCTS-2.1.0*, and the hidden *.git* directory is removed.  The *documentation.pdf* file in the root directory is updated using command::
 
-    *make latexpdf*
+    make latexpdf
 
 in the *docs* folder.  The resulting PDF file is moved from *_build/latex/FirefoxOSCertificationTestsuite.pdf* to *documentation.pdf* in the root folder, and the *docs/_build* folder is removed.
 
-Finally, the directory is archived using the command:
+Finally, the directory is archived using the command::
 
     zip -r fxos-MCTS-2.1.0.zip fxos-MCTS-2.1.0/
 
