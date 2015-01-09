@@ -72,6 +72,7 @@
     "window.navigator.mozFMRadio"
   ], 
   "geolocation": [], 
+  "geolocation-noprompt": [], 
   "idle": [
     "window.navigator.addIdleObserver", 
     "window.navigator.removeIdleObserver"
