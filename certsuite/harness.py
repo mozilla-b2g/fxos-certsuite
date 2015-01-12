@@ -36,7 +36,7 @@ from marionette_extension import install as marionette_install
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters, set_default_logger
 
-import adb_b2g
+#import adb_b2g
 import gaiautils
 import report
 
@@ -304,8 +304,8 @@ class NoADB(mozdevice.ADBDevice):
 def check_adb():
     try:
         logger.info("Testing ADB connection")
-        #return NoADB()
-        return adb_b2g.ADBB2G()
+        return NoADB()
+        #return adb_b2g.ADBB2G()
     except (mozdevice.ADBError, mozdevice.ADBTimeoutError) as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
                         'sure device is connected and "remote debugging" is enabled.' % \
