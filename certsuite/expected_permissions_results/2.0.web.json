@@ -30,6 +30,7 @@
   "firefox-accounts": "unknown", 
   "fmradio": "deny", 
   "geolocation": "prompt", 
+  "geolocation-noprompt": "unknown", 
   "idle": "deny", 
   "input": "deny", 
   "input-manage": "deny", 

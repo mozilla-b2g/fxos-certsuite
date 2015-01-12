@@ -359,7 +359,7 @@ def _run(args, logger):
         'webapi',
         'user-agent',
         'crash-reporter',
-        'search-id',
+        'search-id'
         ]
     if args.list_test_groups:
         for t in test_groups:
@@ -381,9 +381,7 @@ def _run(args, logger):
 
     # wait here to make sure marionette is running
     logger.debug('Attempting to set up port forwarding for marionette')
-    if dm.forward("tcp:2828", "tcp:2828") != 0:
-        raise Exception("Can't use localhost:2828 for port forwarding." \
-                        "Is something else using port 2828?")
+    dm.forward("tcp:2828", "tcp:2828")
     retries = 0
     while retries < 5:
         try:
