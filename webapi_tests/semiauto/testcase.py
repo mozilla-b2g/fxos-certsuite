@@ -67,8 +67,10 @@ class TestCase(unittest.TestCase):
         self.assert_browser_connected()
         self.marionette = TestCase.create_marionette()
 
-        if not certapp.is_installed():
-            certapp.install(marionette=self.marionette, version=self.version)
+        #if not certapp.is_installed():
+        #    certapp.install(marionette=self.marionette, version=self.version)
+        # TODO: check and install certapp use WebIDE way,
+        #       or modify certapp check and install method
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.

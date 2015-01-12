@@ -282,8 +282,8 @@ def check_preconditions(config):
     if not device:
         sys.exit(1)
 
-    for precondition in [check_root,
-                         check_marionette_installed,
+    for precondition in [#check_root,
+                         #check_marionette_installed,
                          ensure_settings,
                          check_network,
                          check_server]:
@@ -298,10 +298,13 @@ def check_preconditions(config):
 
     logger.info("Passed precondition checks")
 
+class NoADB(mozdevice.ADBDevice):
+    pass
 
 def check_adb():
     try:
         logger.info("Testing ADB connection")
+        #return NoADB()
         return adb_b2g.ADBB2G()
     except (mozdevice.ADBError, mozdevice.ADBTimeoutError) as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
@@ -395,7 +398,8 @@ def check_server(device):
             return False
 
         try:
-            device.shell_output("curl http://%s:%i" % (host_ip, port))
+            #device.shell_output("curl http://%s:%i" % (host_ip, port))
+            # TODO: check device and host network connection
         except mozdevice.ADBError as e:
             if 'curl: not found' in e.message:
                 logger.warning("Could not check access to host machine: curl not present.")
@@ -429,9 +433,11 @@ def run_tests(args, config):
 
             check_preconditions(config)
 
-            with adb_b2g.DeviceBackup() as backup:
-                device = backup.device
-                runner = TestRunner(args, config)
+            
+            #with adb_b2g.DeviceBackup() as backup:
+            #    device = backup.device
+            #    runner = TestRunner(args, config)
+            with TestRunner(args, config) as runner:
                 for suite, groups in runner.iter_suites():
                     try:
                         runner.run_suite(suite, groups, log_manager)
@@ -439,9 +445,9 @@ def run_tests(args, config):
                         logger.error("Encountered error:\n%s" %
                                      traceback.format_exc())
                         error = True
-                    finally:
-                        backup.restore()
-                        device.reboot()
+                    #finally:
+                    #    backup.restore()
+                    #    device.reboot()
 
             if error:
                 logger.critical("Encountered errors during run")
