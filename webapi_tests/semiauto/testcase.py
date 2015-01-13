@@ -104,7 +104,7 @@ class TestCase(unittest.TestCase):
 
         m = TestCase.stored.marionette
         if m is None:
-            m = Marionette(host=_host,port=_port)
+            m = Marionette(host=_host,port=int(_port))
             m.wait_for_port()
             m.start_session()
             TestCase.stored.marionette = m
