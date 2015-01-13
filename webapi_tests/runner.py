@@ -13,7 +13,7 @@ import sys
 from fnmatch import fnmatch
 
 # from mozdevice import DeviceManagerADB
-# from mozlog.structured import commandline
+from mozlog.structured import commandline
 
 from webapi_tests import semiauto
 
@@ -80,16 +80,16 @@ def main():
                         help="Don't start a browser but wait for manual connection")
     parser.add_argument("--version", action="store", dest="version",
                         help="B2G version")
-    parser.add_arguement("--ip", action="store", default="localhost",
+    parser.add_argument("--ip", action="store", default="localhost",
                         help="IP address for target device")
-    parser.add_arguement("--port", action="store", default="2828",
+    parser.add_argument("--port", action="store", default="2828",
                         help="Port for target device")
     parser.add_argument(
         "-v", dest="verbose", action="store_true", help="Verbose output")
-    # commandline.add_logging_group(parser)
+    commandline.add_logging_group(parser)
     args = parser.parse_args(sys.argv[1:])
-    # logger = commandline.setup_logging(
-        # "webapi", vars(args), {"raw": sys.stdout})
+    logger = commandline.setup_logging(
+        "webapi", vars(args), {"raw": sys.stdout})
 
     if args.list_test_groups and len(args.include) > 0:
         print >> sys.stderr("%s: error: cannot list and include test "
