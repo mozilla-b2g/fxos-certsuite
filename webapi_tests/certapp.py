@@ -41,7 +41,7 @@ def install(marionette=None, version='1.3'):
 
     # fxos_appgen will create a new Marionette instance if unspecified
     fxos_appgen.generate_app(name,
-                             install=True,
+                             install=False,
                              version=version,
                              all_perm=True,
                              marionette=marionette)
@@ -123,3 +123,10 @@ def kill(marionette, app=None):
         raise CloseError("Unable to close app: %s" % e)
     except Exception as e:
         raise CloseError("Unexpected exception: %s" % e)
+
+if __name__ == '__main__':
+    fxos_appgen.generate_app(name,
+                             install=False,
+                             version="2.0",
+                             all_perm=True,
+                             marionette=None)
