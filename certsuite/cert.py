@@ -328,27 +328,36 @@ def make_html_report(path, report):
         try:
             rows = []
             for key in value.keys():
-                rows.append(html.tr(html.td(html.pre(key)), html.td(tabelize(value[key]))))
+                encoded_key = key
+                encoded_value = value[key]
+                if isinstance(key, basestring):
+                    encoded_key = encoded_key.encode('ascii', 'ignore')
+                if isinstance(encoded_value, basestring):
+                    encoded_value = encoded_value.encode('ascii', 'ignore')
+                rows.append(html.tr(html.td(html.pre(encoded_key)),
+                                    html.td(tabelize(encoded_value))))
             return html.table(rows)
         except AttributeError:
             if type(value) == type([]):
                 return html.table(map(tabelize, value))
             else:
-                return html.pre(value)
+                return html.pre(value.encode('ascii', 'ignore'))
 
     body_els = []
     keys = report.keys()
     keys.sort()
     links = []
     for key in keys:
-        links.append(html.li(html.a(key, href="#" + key)))
+        links.append(html.li(html.a(key.encode('ascii', 'ignore'),
+                                    href="#" + key.encode('ascii', 'ignore'))))
     body_els.append(html.ul(links))
     for key in keys:
-        body_els.append(html.a(html.h1(key), id=key))
+        body_els.append(html.a(html.h1(key.encode('ascii', 'ignore')),
+                               id=key.encode('ascii', 'ignore')))
         body_els.append(tabelize(report[key]))
     with open(path, 'w') as f:
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
-        f.write(str(doc))
+        f.write(str(doc).encode('ascii', 'ignore'))
 
 def _run(args, logger):
     # This function is to simply make the cli() function easier to handle
