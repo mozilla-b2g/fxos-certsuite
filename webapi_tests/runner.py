@@ -117,9 +117,7 @@ def main():
     results = semiauto.run(tests,
                            logger=logger,
                            spawn_browser=not args.no_browser,
-                           verbosity=2 if args.verbose else 1,
-                           host=args.host,
-                           port=args.port)
+                           verbosity=2 if args.verbose else 1)
     return 0 if results.wasSuccessful() else 1
 
 
