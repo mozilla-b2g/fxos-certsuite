@@ -80,6 +80,10 @@ def main():
                         help="Don't start a browser but wait for manual connection")
     parser.add_argument("--version", action="store", dest="version",
                         help="B2G version")
+    parser.add_arguement("--ip", action="store", default="localhost",
+                        help="IP address for target device")
+    parser.add_arguement("--port", action="store", default="2828",
+                        help="Port for target device")
     parser.add_argument(
         "-v", dest="verbose", action="store_true", help="Verbose output")
     # commandline.add_logging_group(parser)
