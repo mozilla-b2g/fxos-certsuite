@@ -33,8 +33,8 @@ class TestCase(unittest.TestCase):
 
         self.marionette, self.server, self.handler, self.app = None, None, None, None
 
-        device = mozdevice.DeviceManagerADB()
-        device.forward("tcp:2828", "tcp:2828")
+        #device = mozdevice.DeviceManagerADB()
+        #device.forward("tcp:2828", "tcp:2828")
 
         # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.cleanup)
@@ -185,8 +185,8 @@ class TestCase(unittest.TestCase):
             "Please close the app manually by holding down the Home button "
             "and pressing the X above the %s card." % (certapp.name, certapp.name))
         if not success:
-            device = mozdevice.DeviceManagerADB()
-            device.reboot(wait=True)
+            #device = mozdevice.DeviceManagerADB()
+            #device.reboot(wait=True)
             self.instruct("Please unlock the lockscreen (if present) after device reboots")
             self.fail("Failed attempts at closing certapp")
 

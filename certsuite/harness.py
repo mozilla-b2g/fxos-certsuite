@@ -400,6 +400,7 @@ def check_server(device):
         try:
             #device.shell_output("curl http://%s:%i" % (host_ip, port))
             # TODO: check device and host network connection
+            pass
         except mozdevice.ADBError as e:
             if 'curl: not found' in e.message:
                 logger.warning("Could not check access to host machine: curl not present.")
