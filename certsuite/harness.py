@@ -40,6 +40,9 @@ from mozlog.structured import structuredlog, handlers, formatters, set_default_l
 import gaiautils
 import report
 
+_host = 'localhost'
+_port = 2828
+
 logger = None
 stdio_handler = handlers.StreamHandler(sys.stderr,
                                        formatters.MachFormatter())
@@ -142,7 +145,9 @@ class LogManager(object):
 class MarionetteSession(object):
     def __init__(self, device):
         self.device = device
-        self.marionette = marionette.Marionette()
+        global _host
+        global _port
+        self.marionette = marionette.Marionette(host=_host,port=_port)
 
     def __enter__(self):
         self.device.forward("tcp:2828", "tcp:2828")
@@ -262,9 +267,12 @@ class TestRunner(object):
 
         cmd.extend(item % subn for item in suite_opts.get("run_args", []))
         cmd.extend(item % subn for item in suite_opts.get("common_args", []))
-
+        
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
+
+        cmd.extend([u'--host=%s' % _host])
+        cmd.extend([u'--port=%s' % _port])
 
         return cmd, output_files, log_name
 
@@ -298,7 +306,15 @@ def check_preconditions(config):
 
     logger.info("Passed precondition checks")
 
-class NoADB(mozdevice.ADBDevice):
+class NoADB():
+    def reboot(self):
+        pass
+    def wait_for_net(self):
+        pass
+    def shell_output(self, *args):
+        pass
+    def forward(self, *args):
+        pass
     pass
 
 def check_adb():
@@ -437,18 +453,17 @@ def run_tests(args, config):
             
             #with adb_b2g.DeviceBackup() as backup:
             #    device = backup.device
-            #    runner = TestRunner(args, config)
-            with TestRunner(args, config) as runner:
-                for suite, groups in runner.iter_suites():
-                    try:
-                        runner.run_suite(suite, groups, log_manager)
-                    except:
-                        logger.error("Encountered error:\n%s" %
-                                     traceback.format_exc())
-                        error = True
-                    #finally:
-                    #    backup.restore()
-                    #    device.reboot()
+            runner = TestRunner(args, config)
+            for suite, groups in runner.iter_suites():
+                try:
+                    runner.run_suite(suite, groups, log_manager)
+                except:
+                    logger.error("Encountered error:\n%s" %
+                                 traceback.format_exc())
+                    error = True
+                #finally:
+                #    backup.restore()
+                #    device.reboot()
 
             if error:
                 logger.critical("Encountered errors during run")
@@ -471,6 +486,10 @@ def get_parser():
     parser.add_argument('--list-tests',
                         help='list all tests available to run',
                         action='store_true')
+    parser.add_argument("--host", action="store", default="localhost",
+                        help="hostname or ip for target device")
+    parser.add_argument("--port", action="store", default="2828",
+                        help="Port for target device")
     parser.add_argument('tests',
                         metavar='TEST',
                         help='tests to run',
@@ -482,6 +501,11 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     config = load_config(args.config)
+
+    global _host
+    global _port
+    _host = args.host
+    _port = int(args.port)
 
     if args.list_tests:
         return list_tests(args, config)
