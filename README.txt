@@ -21,4 +21,6 @@ Instructions to run MCTS in FreeBSD
 4. source stingray2.0/bin/activate
 5. git checkout stingray
 6. python setup.py install
-7. runcertsuite webapi:bluetooth webapi:bluetooth webapi:device_storage webapi:idle webapi:moztime webapi:tcp_socket webapi:wifi webapi:apps cert:
+7. runcertsuite webapi:bluetooth webapi:device_storage webapi:idle webapi:moztime webapi:tcp_socket webapi:wifi webapi:apps --host 10.247.30.195
+
+Note:Please change the IP address to IP of TV
