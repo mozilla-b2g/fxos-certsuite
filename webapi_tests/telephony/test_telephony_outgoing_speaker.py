@@ -42,7 +42,7 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
         # use the webapi to make an outgoing call to user-specified number; user answer
         self.user_guided_outgoing_call()
         # verify one outgoing call
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
         self.assertEqual(self.calls['0'], self.outgoing_call)
 
@@ -53,8 +53,8 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
         time.sleep(5)
 
         # verify the active call
-        self.assertEqual(self.active_call_list[0]['id']['number'], self.outgoing_call['id']['number'])
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual(self.active_call_list[0]['state'], "connected", "Call state should be 'connected'")
 
@@ -70,7 +70,7 @@ class TestTelephonyOutgoingSpeaker(TestCase, TelephonyTestCommon):
 
         # disconnect the active call
         self.hangup_call()
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):

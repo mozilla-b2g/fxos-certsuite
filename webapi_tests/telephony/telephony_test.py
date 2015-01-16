@@ -7,10 +7,27 @@ from marionette.wait import Wait
 
 class TelephonyTestCommon(object):
 
+    returnable_calls = """
+        window.wrappedJSObject.get_returnable_calls = function() {
+          let calls = {};
+          for (let i in window.navigator.mozTelephony.calls) {
+            let call = {
+              number: window.navigator.mozTelephony.calls[i].number,
+              state: window.navigator.mozTelephony.calls[i].state
+            }
+            calls[i] = call;
+          }
+          calls['length'] = window.navigator.mozTelephony.calls['length'];
+          return calls;
+        }
+    """
+
     def __init__(self):
         self.active_call_list = []
 
     def setup_incoming_call(self):
+        self.marionette.execute_script(self.returnable_calls)
+
         # listen for and answer incoming call
         self.marionette.execute_async_script("""
         var telephony = window.navigator.mozTelephony;
@@ -19,6 +36,10 @@ class TelephonyTestCommon(object):
           log("Received 'incoming' call event.");
           window.wrappedJSObject.received_incoming = true;
           window.wrappedJSObject.incoming_call = event.call;
+          window.wrappedJSObject.returnable_incoming_call = {
+            number: event.call.number,
+            state: event.call.state
+          };
           window.wrappedJSObject.calls = telephony.calls;
         };
 
@@ -42,7 +63,7 @@ class TelephonyTestCommon(object):
         try:
             received = self.marionette.execute_script("return window.wrappedJSObject.received_incoming")
             self.assertTrue(received, "Incoming call not received (Telephony.onincoming event not found)")
-            self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.incoming_call")
+            self.incoming_call = self.marionette.execute_script("return window.wrappedJSObject.returnable_incoming_call")
             self.assertEqual(self.incoming_call['state'], "incoming", "Call state should be 'incoming'")
         finally:
             self.marionette.execute_script("window.navigator.mozTelephony.onincoming = null;")
@@ -79,6 +100,10 @@ class TelephonyTestCommon(object):
           log("Received 'onconnected' call event.");
           if (event.call.state == "connected") {
             window.wrappedJSObject.active_call = window.navigator.mozTelephony.active;
+            window.wrappedJSObject.returnable_active_call = {
+                state: window.navigator.mozTelephony.active.state,
+                number: window.navigator.mozTelephony.active.number
+            };
             window.wrappedJSObject.connected_call_ok = true;
           };
         };
@@ -106,7 +131,7 @@ class TelephonyTestCommon(object):
             self.fail("Failed to answer call")
 
         # append new call to the active call list
-        self.active_call_list.append(self.marionette.execute_script("return window.wrappedJSObject.active_call"))
+        self.active_call_list.append(self.marionette.execute_script("return window.wrappedJSObject.returnable_active_call"))
 
     def user_guided_incoming_call(self):
         # ask user to call the device; answer and verify via webapi
@@ -284,6 +309,8 @@ class TelephonyTestCommon(object):
             self.fail("Failed to resume the held call")
 
     def initiate_outgoing_call(self, destination):
+        self.marionette.execute_script(self.returnable_calls)
+
         # use the webapi to initiate a call to the specified number
         self.marionette.execute_async_script("""
         var telephony = window.navigator.mozTelephony;
@@ -310,6 +337,10 @@ class TelephonyTestCommon(object):
               if (event.call.state == "alerting") {
                 window.wrappedJSObject.received_alerting = true;
                 window.wrappedJSObject.outgoing_call = out_call;
+                window.wrappedJSObject.returnable_outgoing_call = {
+                    number: out_call.number,
+                    state: out_call.state
+                };
                 window.wrappedJSObject.calls = telephony.calls;
               };
             };
@@ -346,7 +377,7 @@ class TelephonyTestCommon(object):
             self.fail("Failed to initiate call; mozTelephony.dial is broken -or- there is no network signal. Try again")
 
         # verify outgoing call state to be 'alerting'
-        self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.outgoing_call")
+        self.outgoing_call = self.marionette.execute_script("return window.wrappedJSObject.returnable_outgoing_call")
         self.assertEqual(self.outgoing_call['state'], "alerting", "Call state should be 'alerting'")
 
     def user_guided_outgoing_call(self):

@@ -47,7 +47,7 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
         # use the webapi to make an outgoing call to user-specified number
         self.user_guided_outgoing_call()
         # verify one outgoing call
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
         self.assertEqual(self.calls['0'], self.outgoing_call)
 
@@ -58,14 +58,14 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
         time.sleep(5)
 
         # verify the active call
-        self.assertEqual(self.active_call_list[0]['id']['number'], self.outgoing_call['id']['number'])
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.active_call_list[0]['number'], self.outgoing_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
         self.assertEqual(self.active_call_list[0]['state'], "connected", "Call state should be 'connected'")
 
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['1'], self.incoming_call)
         self.assertEqual(self.calls['0'], self.active_call_list[0])
 
@@ -75,8 +75,8 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
         # answer the incoming call
         self.answer_call()
         self.assertEqual(self.active_call_list[1]['state'], "connected", "Call state should be 'connected'")
-        self.assertEqual(self.active_call_list[1]['id']['number'], self.incoming_call['id']['number'])
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.active_call_list[1]['number'], self.incoming_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 2, "There should be 2 active calls")
 
         wait = Wait(self.marionette, timeout=90, interval=0.5)
@@ -110,7 +110,7 @@ class TestTelephonyOutgoingIncoming(TestCase, TelephonyTestCommon):
             self.fail("Failed to hangup the second call or change the state of first call")
 
         self.hangup_call(active_call_selected=0)
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):

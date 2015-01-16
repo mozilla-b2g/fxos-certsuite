@@ -40,13 +40,13 @@ class TestTelephonyIncomingMute(TestCase, TelephonyTestCommon):
     def test_incoming_mute(self):
         # ask user to call the device; answer and verify via webapi
         self.user_guided_incoming_call()
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['0'], self.incoming_call)
 
         self.answer_call()
         self.assertEqual(self.active_call_list[0]['state'], "connected", "Call state should be 'connected'")
-        self.assertEqual(self.active_call_list[0]['id']['number'], self.incoming_call['id']['number'])
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.assertEqual(self.active_call_list[0]['number'], self.incoming_call['number'])
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 1, "There should be 1 active call")
 
         # keep call active for a while
@@ -64,7 +64,7 @@ class TestTelephonyIncomingMute(TestCase, TelephonyTestCommon):
 
         # disconnect the active call
         self.hangup_call()
-        self.calls = self.marionette.execute_script("return window.wrappedJSObject.calls")
+        self.calls = self.marionette.execute_script("return window.wrappedJSObject.get_returnable_calls()")
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
