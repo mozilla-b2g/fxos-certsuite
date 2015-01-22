@@ -57,10 +57,16 @@ def webapi_results_handler(request, response):
     global webapi_results
     webapi_results = json.loads(request.POST["results"])
 
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.content = "ok"
+
 @wptserve.handlers.handler
 def webapi_results_embed_apps_handler(request, response):
     global webapi_results_embed_app
     webapi_results_embed_app = json.loads(request.POST["results"])
+
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.content = "ok"
 
 @wptserve.handlers.handler
 def webapi_log_handler(request, response):
@@ -71,6 +77,10 @@ def webapi_log_handler(request, response):
     if index > -1:
         last_test_started = log_string[index + len('test started:'):]
     logger.debug(log_string)
+
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.content = "ok"
+
 
 routes = [("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_results_embed_apps", webapi_results_embed_apps_handler),

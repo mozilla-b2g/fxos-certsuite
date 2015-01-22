@@ -9,7 +9,7 @@ setup({explicit_done:true, timeout_multiplier:10});
 function log(msg)
 {
     var xmlHttp = null;
-    xmlHttp = new XMLHttpRequest();
+    xmlHttp = new XMLHttpRequest({'mozSystem': true});
     xmlHttp.open( "POST", LOG_URI, true );
     xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
     xmlHttp.send("log=" + msg);
@@ -134,7 +134,7 @@ function runTest()
   results.webIDLResults = webIDLResults;
 
   var xmlHttp = null;
-  xmlHttp = new XMLHttpRequest();
+  xmlHttp = new XMLHttpRequest({'mozSystem': true});
   xmlHttp.open( "POST", RESULTS_URI, true );
   xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
   xmlHttp.send("results=" + JSON.stringify(results));
