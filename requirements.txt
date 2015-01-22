@@ -12,5 +12,5 @@ moztest >= 0.6
 py == 1.4.20
 sphinx
 tornado >= 3.2
-wptrunner >= 1.4
+wptrunner == 1.4
 wptserve >= 1.0.1
