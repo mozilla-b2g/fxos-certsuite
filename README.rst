@@ -1,4 +1,3 @@
-===================================
 Firefox OS Certification Testsuite for Stingray
 ===================================
 
@@ -9,14 +8,16 @@ Before running the tests, make sure you read the full documentation
 at http://fxos-certsuite.readthedocs.org/ or in documentation.pdf
 found in this directory.
 
-### Prerequest:
+Prerequest
+--------------
 1. git
 2. python
 3. pip (sudo easy_install pip)
 4. virtualenv (sudo pip install virtualenv)
 5. Install CertTest App using WebIDE
 
-### Instructions to run MCTS (suggest run in Ubuntu linux)
+Instructions to run MCTS (suggest run in Ubuntu linux)
+-----------------------------------------------------------------------
 1. git clone https://github.com/Mozilla-TWQA/fxos-certsuite
 2. cd fxos-certsuite
 3. virtualenv stingray2.0
@@ -27,24 +28,25 @@ found in this directory.
 
 Note:Please change the IP address to IP of TV
 
-### Example:
-- List Test
+Example
+-----------
+List Tests
   ::
 
-  | 	$ runcertsuite --list-tests
+   	$ runcertsuite --list-tests
 
 - Run webapi Tests
   ::
 
-  | 	$ runcertsuite webapi
+   	$ runcertsuite webapi
 
 - Run webapi:apps Test
   ::
 
-  | 	$ runcertsuite webapi:apps
+   	$ runcertsuite webapi:apps
 
 - Run multiple Tests
   ::
 
-  | 	$ runcertsuite webapi:apps webapi:tcp_socket
+   	$ runcertsuite webapi:apps webapi:tcp_socket
 
