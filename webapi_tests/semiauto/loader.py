@@ -15,8 +15,10 @@ class TestLoader(unittest.loader.TestLoader):
     """
 
     def __init__(self, **kwargs):
+        version = kwargs.pop('version')
         super(TestLoader, self).__init__()
         self.opts = kwargs
+        self.opts.update({'version': version})
 
     def loadTestsFromTestCase(self, klass):
         """Return a suite of all tests cases contained in ``klass``.

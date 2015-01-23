@@ -12,7 +12,7 @@ import sys
 
 from fnmatch import fnmatch
 
-from mozdevice import DeviceManagerADB
+# from mozdevice import DeviceManagerADB
 from mozlog.structured import commandline
 
 from webapi_tests import semiauto
@@ -78,6 +78,12 @@ def main():
                         "groups by repeating flag")
     parser.add_argument("-n", "--no-browser", action="store_true",
                         help="Don't start a browser but wait for manual connection")
+    parser.add_argument("--version", action="store", dest="version",
+                        help="B2G version")
+    parser.add_argument("--host", action="store", default="localhost",
+                        help="hostname or ip for target device")
+    parser.add_argument("--port", action="store", default="2828",
+                        help="Port for target device")
     parser.add_argument(
         "-v", dest="verbose", action="store_true", help="Verbose output")
     commandline.add_logging_group(parser)
@@ -102,7 +108,10 @@ def main():
                 print("%s.%s" % (group, test))
         return 0
 
-    test_loader = semiauto.TestLoader()
+    semiauto.testcase._host = args.host
+    semiauto.testcase._port = args.port
+
+    test_loader = semiauto.TestLoader(version=args.version)
     tests = test_loader.loadTestsFromNames(
         map(lambda t: "webapi_tests.%s" % t, args.include or [g for g, _ in testgen]), None)
     results = semiauto.run(tests,

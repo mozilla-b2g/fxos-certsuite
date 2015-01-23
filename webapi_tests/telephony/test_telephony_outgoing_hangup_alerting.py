@@ -38,7 +38,7 @@ class TestTelephonyOutgoingHangupAlerting(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['length'], 1, "There should be 1 call")
         self.assertEqual(self.calls['0'], self.outgoing_call)
 
-        # keep call ringing for awhile
+        # keep call ringing for a while
         time.sleep(1)
 
         # disconnect the outgoing call
