@@ -21,19 +21,23 @@ from webapi_tests.semiauto.environment import InProcessTestEnvironment
 instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
+# local variable for marionette
+_host = 'localhost'
+_port = 2828
 
 class TestCase(unittest.TestCase):
     stored = threading.local()
 
     def __init__(self, *args, **kwargs):
+        self.version = kwargs.pop('version')
         super(TestCase, self).__init__(*args, **kwargs)
         self.stored.handler = None
         self.stored.marionette = None
 
         self.marionette, self.server, self.handler, self.app = None, None, None, None
 
-        device = mozdevice.DeviceManagerADB()
-        device.forward("tcp:2828", "tcp:2828")
+        #device = mozdevice.DeviceManagerADB()
+        #device.forward("tcp:2828", "tcp:2828")
 
         # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.cleanup)
@@ -66,8 +70,10 @@ class TestCase(unittest.TestCase):
         self.assert_browser_connected()
         self.marionette = TestCase.create_marionette()
 
-        if not certapp.is_installed():
-            certapp.install(self.marionette)
+        #if not certapp.is_installed():
+        #    certapp.install(marionette=self.marionette, version=self.version)
+        # TODO: check and install certapp use WebIDE way,
+        #       or modify certapp check and install method
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
@@ -98,7 +104,7 @@ class TestCase(unittest.TestCase):
 
         m = TestCase.stored.marionette
         if m is None:
-            m = Marionette()
+            m = Marionette(host=_host,port=int(_port))
             m.wait_for_port()
             m.start_session()
             TestCase.stored.marionette = m
@@ -182,8 +188,8 @@ class TestCase(unittest.TestCase):
             "Please close the app manually by holding down the Home button "
             "and pressing the X above the %s card." % (certapp.name, certapp.name))
         if not success:
-            device = mozdevice.DeviceManagerADB()
-            device.reboot(wait=True)
+            #device = mozdevice.DeviceManagerADB()
+            #device.reboot(wait=True)
             self.instruct("Please unlock the lockscreen (if present) after device reboots")
             self.fail("Failed attempts at closing certapp")
 

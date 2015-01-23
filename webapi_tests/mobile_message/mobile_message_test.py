@@ -183,13 +183,11 @@ class MobileMessageTestCommon(object):
                 window.wrappedJSObject.rcvd_req_success = true;
             } else {
                 log("request returned false for manager.send");
-                cleanUp();
             }
         };
 
         requestRet.onerror = function() {
             log("Failed to send message, received error: %s" % requestRet.error.name);
-            cleanUp();
         };
         marionetteScriptFinished(1);
         """, script_args=[msg_type, destination, body], special_powers=True)
@@ -263,3 +261,42 @@ class MobileMessageTestCommon(object):
             self.confirm('Sent %s with text "%s" does this text match what was received on the target phone?' % (msg_type, self.out_msg['body']))
         finally:
             self.remove_sending_listeners()
+
+    def mark_message_status(self, msg_id, is_read=False):
+        self.marionette.execute_async_script("""
+        var msg_id = arguments[0];
+        var is_read = arguments[1];
+        var requestRet = null;
+
+        var mm = window.navigator.mozMobileMessage;
+        // Bug 952875
+        mm.getThreads();
+
+        requestRet = mm.markMessageRead(msg_id, is_read);
+        window.wrappedJSObject.rcvd_req_success_read = false;
+        window.wrappedJSObject.rcvd_req_success_unread = false;
+        requestRet.onsuccess = function(event) {
+            log("Received 'onsuccess' event.");
+            if (event.target.result) {
+                window.wrappedJSObject.rcvd_req_success_read = true;
+            } else {
+                window.wrappedJSObject.rcvd_req_success_unread = true;
+                log("request returned false for manager.markMessageRead");
+            }
+        }
+
+        requestRet.onerror = function() {
+            log("Failed to mark message read status, received error: %s" % requestRet.error.name);
+        };
+        marionetteScriptFinished(1);
+        """, script_args=[msg_id, is_read], special_powers=True)
+
+        wait = Wait(self.marionette, timeout=15, interval=0.5)
+        try:
+            if is_read is True:
+                wait.until(lambda m: self.marionette.execute_script("return window.wrappedJSObject.rcvd_req_success_read"))
+            else:
+                wait.until(lambda m: self.marionette.execute_script("return window.wrappedJSObject.rcvd_req_success_unread"))
+        except errors.TimeoutException:
+            # msg read status wasn't marked
+            self.fail("Failed to update the read status of message.")

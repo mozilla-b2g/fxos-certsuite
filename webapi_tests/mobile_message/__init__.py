@@ -9,3 +9,4 @@ from webapi_tests.mobile_message.test_sms_incoming_get_message import TestSmsInc
 from webapi_tests.mobile_message.test_sms_outgoing import TestSmsOutgoing
 from webapi_tests.mobile_message.test_mms_incoming import TestMmsIncoming
 from webapi_tests.mobile_message.test_mms_incoming_delete import TestMmsIncomingDelete
+from webapi_tests.mobile_message.test_sms_incoming_read_status import TestSmsIncomingReadStatus
