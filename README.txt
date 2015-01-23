@@ -13,6 +13,7 @@ Prerequest:
 2. python
 3. pip (sudo easy_install pip)
 4. virtualenv (sudo pip install virtualenv)
+5. Install CertTest App using WebIDE
 
 Instructions to run MCTS in FreeBSD 
 1. git clone https://github.com/Mozilla-TWQA/fxos-certsuite
