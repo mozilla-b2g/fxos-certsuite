@@ -30,7 +30,7 @@ Note:Please change the IP address to IP of TV
 
 Example
 -----------
-List Tests
+- List Tests
   ::
 
    	$ runcertsuite --list-tests
