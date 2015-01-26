@@ -33,20 +33,20 @@ Example
 - List Tests
   ::
 
-   	$ runcertsuite --list-tests
+   	$ runcertsuite --host 10.247.30.195 --list-tests
 
 - Run webapi Tests
   ::
 
-   	$ runcertsuite webapi
+   	$ runcertsuite  --host 10.247.30.195 webapi
 
 - Run webapi:apps Test
   ::
 
-   	$ runcertsuite webapi:apps
+   	$ runcertsuite --host 10.247.30.195  webapi:apps
 
 - Run multiple Tests
   ::
 
-   	$ runcertsuite webapi:apps webapi:tcp_socket
+   	$ runcertsuite --host 10.247.30.195  webapi:apps webapi:tcp_socket
 
