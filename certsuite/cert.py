@@ -47,7 +47,7 @@ webapi_results_embed_app = None
 
 last_test_started = 'None'
 
-supported_versions = ["2.0", "1.4", "1.3"]
+supported_versions = ["2.1", "2.0", "1.4", "1.3"]
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
@@ -391,6 +391,7 @@ def _run(args, logger):
     # wait here to make sure marionette is running
     logger.debug('Attempting to set up port forwarding for marionette')
     dm.forward("tcp:2828", "tcp:2828")
+
     retries = 0
     while retries < 5:
         try:
@@ -403,7 +404,7 @@ def _run(args, logger):
             retries += 1
     else:
         raise Exception("Couldn't connect to marionette after %d attempts. " \
-        "Is the marionette extension installed?" % retries)
+          "Is the marionette extension installed?" % retries)
 
     if args.version not in supported_versions:
         print "%s is not a valid version. Please enter one of %s" % \
@@ -670,13 +671,13 @@ def _run(args, logger):
         fxos_appgen.launch_app('browser')
 
         script = """
-          result = window.wrappedJSObject.Browser.getUrlFromInput('hello world');
+          result = window.wrappedJSObject.UrlHelper.getUrlFromInput('hello world');
           return result;
         """
 
         m = marionette.Marionette('localhost', 2828)
         m.start_session()
-        browser = m.find_element('css selector', 'iframe[src="app://browser.gaiamobile.org/index.html"]')
+        browser = m.find_element('css selector', 'iframe[src="app://search.gaiamobile.org/newtab.html"]')
         m.switch_to_frame(browser)
         url = m.execute_script(script)
         m.delete_session()
@@ -711,7 +712,7 @@ def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--version",
                         help="version of FxOS under test",
-                        default="1.3",
+                        default="2.1",
                         action="store")
     parser.add_argument("--debug",
                         help="enable debug logging",

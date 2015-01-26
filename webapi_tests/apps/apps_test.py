@@ -8,9 +8,14 @@ class AppsTestCommon(object):
         app = self.marionette.execute_async_script("""
         let request = navigator.mozApps.getSelf();
         request.onsuccess = function() {
-            marionetteScriptFinished(request.result);
+            let result = {};
+            result['manifest'] = request.result['manifest'];
+            result['origin'] = request.result['origin'];
+            marionetteScriptFinished(result);
         };
-        request.onerror = function() { throw req.error.name };
+        request.onerror = function() {
+            throw request.error.name;
+        };
         """)
         self.assertIsNotNone(app, "mozApps.getSelf returned none")
         return app
@@ -19,9 +24,16 @@ class AppsTestCommon(object):
         applist = self.marionette.execute_async_script("""
         let request = navigator.mozApps.mgmt.getAll();
         request.onsuccess = function() {
-            marionetteScriptFinished(request.result);
+            let resultlist = [];
+            for (let i in request.result) {
+                let result = {};
+                result['manifest'] = request.result[i]['manifest'];
+                result['origin'] = request.result[i]['origin'];
+                resultlist.push(result);
+            }
+            marionetteScriptFinished(resultlist);
         };
-        request.onerror = function() { throw req.error.name };
+        request.onerror = function() { throw request.error.name };
         """)
         self.assertIsNotNone(applist, "mozApps.mgmt.getAll returned none")
         return applist

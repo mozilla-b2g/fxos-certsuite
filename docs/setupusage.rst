@@ -75,4 +75,6 @@ working directory. Please e-mail this file to fxos-cert@mozilla.com.
 Known Issues
 ------------
 
-* Bug 1026259 - web-platform tests sometimes lose wifi connection
+* Bug 1116878 - the 'bluetooth' webapi tests fail with "app = null"
+* Bug 1086171 - the web-platform-tests are disabled
+
