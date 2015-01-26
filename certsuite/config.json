@@ -1,6 +1,6 @@
 {"version": "2.0",
  "suites": [
             ["webapi", {"cmd": "webapirunner",
-                        "run_args": ["--version=%(version)s"]}],
+                        "run_args": ["--version=%(version)s"]}]
            ]
 }
