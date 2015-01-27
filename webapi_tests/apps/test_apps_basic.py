@@ -23,5 +23,6 @@ class TestAppsBasic(TestCase, AppsTestCommon):
             if app["manifest"]["name"] == "CertTest App":
                 self.assertEqual(app["manifest"]["developer"]["url"], "https://wiki.mozilla.org/Auto-tools",
                                 "Application developer url is different from https://wiki.mozilla.org/Auto-tools")
-                self.assertEqual(app["origin"], "app://certtest-app", "Application origin is different from app://certtest-app")
+                # disable origin check, because stingray use WebIDE install cert-app will change the origin to hash
+                # self.assertEqual(app["origin"], "app://certtest-app", "Application origin is different from app://certtest-app")
                 break
