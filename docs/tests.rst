@@ -15,6 +15,8 @@ These tests require some user interaction to run.
 
 .. automodule:: webapi_tests.bluetooth.test_bluetooth_discovery
 .. autoclass:: TestBluetoothDiscovery
+.. automodule:: webapi_tests.devicelight.test_devicelight
+.. autoclass:: TestDevicelight
 .. automodule:: webapi_tests.fm_radio.test_fm_radio_basic
 .. autoclass:: TestFMRadioBasic
 .. automodule:: webapi_tests.geolocation.test_geolocation_basic
@@ -37,8 +39,6 @@ These tests require some user interaction to run.
 .. autoclass:: TestDeviceOrientation
 .. automodule:: webapi_tests.orientation.test_screen_orientation
 .. autoclass:: TestScreenOrientation
-.. automodule:: webapi_tests.proximity.test_proximity
-.. autoclass:: TestProximity
 .. automodule:: webapi_tests.tcp_socket.test_tcp_socket
 .. autoclass:: TestTcpSocketFormality
 .. automodule:: webapi_tests.telephony.test_telephony_incoming

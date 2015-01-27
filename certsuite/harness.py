@@ -360,7 +360,7 @@ def install_marionette(device, version):
         logger.critical('Error installing marionette extension: %s' % e)
         logger.critical(traceback.format_exc())
         return False
-    except mozdevice.WaitTimeout:
+    except adb_b2g.WaitTimeout:
         logger.critical("Timed out waiting for device to become ready")
         return False
     device.restart()
@@ -370,7 +370,7 @@ def check_network(device):
     try:
         device.wait_for_net()
         return True
-    except mozdevice.WaitTimeout:
+    except adb_b2g.WaitTimeout:
         logger.critical("Failed to get a network connection")
         return False
 
