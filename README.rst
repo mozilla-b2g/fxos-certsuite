@@ -18,7 +18,7 @@ Prerequest
 
 Instructions to run MCTS (suggest run in Ubuntu linux)
 -----------------------------------------------------------------------
-1. git clone https://github.com/Mozilla-TWQA/fxos-certsuite
+1. git clone https://github.com/mozilla-b2g/fxos-certsuite
 2. cd fxos-certsuite
 3. virtualenv stingray2.0
 4. source stingray2.0/bin/activate
