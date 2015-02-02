@@ -334,6 +334,9 @@ def set_permission(permission, value, app):
     run_marionette_script(script % (permission, app_url, app_url, value), True)
 
 def make_html_report(path, report):
+    def decode_encode(a_string):
+        return a_string.decode('utf8', 'ingore').encode('ascii', 'ignore')
+
     def tabelize(value):
         try:
             rows = []
@@ -341,9 +344,9 @@ def make_html_report(path, report):
                 encoded_key = key
                 encoded_value = value[key]
                 if isinstance(key, basestring):
-                    encoded_key = encoded_key.encode('ascii', 'ignore')
+                    encoded_key = decode_encode(encoded_key)
                 if isinstance(encoded_value, basestring):
-                    encoded_value = encoded_value.encode('ascii', 'ignore')
+                    encoded_value = decode_encode(encoded_value)
                 rows.append(html.tr(html.td(html.pre(encoded_key)),
                                     html.td(tabelize(encoded_value))))
             return html.table(rows)
@@ -351,23 +354,25 @@ def make_html_report(path, report):
             if type(value) == type([]):
                 return html.table(map(tabelize, value))
             else:
-                return html.pre(value.encode('ascii', 'ignore'))
+                return html.pre(decode_encode(value))
 
     body_els = []
     keys = report.keys()
     keys.sort()
     links = []
     for key in keys:
-        links.append(html.li(html.a(key.encode('ascii', 'ignore'),
-                                    href="#" + key.encode('ascii', 'ignore'))))
+        encoded_key = decode_encode(key)
+        links.append(html.li(html.a(encoded_key,
+                                    href="#" + encoded_key)))
     body_els.append(html.ul(links))
     for key in keys:
-        body_els.append(html.a(html.h1(key.encode('ascii', 'ignore')),
-                               id=key.encode('ascii', 'ignore')))
+        encoded_key = decode_encode(key)
+        body_els.append(html.a(html.h1(encoded_key),
+                               id=encoded_key))
         body_els.append(tabelize(report[key]))
     with open(path, 'w') as f:
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
-        f.write(str(doc).encode('ascii', 'ignore'))
+        f.write(decode_encode(str(doc)))
 
 def _run(args, logger):
     # This function is to simply make the cli() function easier to handle
