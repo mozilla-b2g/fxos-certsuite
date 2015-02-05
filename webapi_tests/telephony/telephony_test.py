@@ -397,6 +397,13 @@ class TelephonyTestCommon(object):
         # make the call via webapi
         self.initiate_outgoing_call(destination)
 
+    def hangup_all(self):
+        try:
+            while len(self.active_call_list) != 0:
+              self.hangup_call()
+        except:
+            pass
+
     def disable_dialer(self):
         # disable system dialer agent so it doesn't steal the
         # incoming/outgoing calls away from the certest app
