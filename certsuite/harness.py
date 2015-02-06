@@ -41,6 +41,7 @@ import gaiautils
 import report
 
 logger = None
+remove_after_mcts = False
 stdio_handler = handlers.StreamHandler(sys.stderr,
                                        formatters.MachFormatter())
 config_path = os.path.abspath(
@@ -331,6 +332,7 @@ def install_marionette(device, version):
         logger.info("Installing marionette extension")
         try:
             marionette_install(version)
+            remove_after_mcts = True
         except AlreadyInstalledException:
             logger.info("Marionette is already installed")
     except subprocess.CalledProcessError:
@@ -451,6 +453,8 @@ def run_tests(args, config):
     finally:
         if output_zipfile:
             print >> sys.stderr, "Results saved to %s" % output_zipfile
+        if remove_after_mcts:
+            marionette_install.uninstall()
 
     return error
 
