@@ -107,6 +107,7 @@ class TestTelephonyIncomingMultiple(TestCase, TelephonyTestCommon):
         self.assertEqual(self.calls['length'], 0, "There should be 0 calls")
 
     def clean_up(self):
+        self.hangup_all()
         # re-enable the default dialer manager
         self.enable_dialer()
         self.active_call_list = []
