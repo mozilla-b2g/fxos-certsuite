@@ -40,7 +40,7 @@ def static_path(path):
 
 class NoCacheStaticFileHandler(web.StaticFileHandler):
     def set_extra_headers(self, path):
-        self.set_header("Cache-control", "no-cache")
+        self.set_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
 
 
 class FrontendServer(object):
