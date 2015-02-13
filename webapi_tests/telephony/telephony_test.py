@@ -188,6 +188,10 @@ class TelephonyTestCommon(object):
           call_to_hangup.hangUp();
         }
 
+        if (window.wrappedJSObject.calls.length > 0) {
+          window.wrappedJSObject.calls[0].resume();
+        }
+
         marionetteScriptFinished(1);
         """, script_args=[call_type, remote_hangup, active_call_selected], special_powers=True)
 
