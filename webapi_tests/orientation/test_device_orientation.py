@@ -37,7 +37,7 @@ class TestDeviceOrientation(TestCase):
         window.wrappedJSObject.absolute = null;
         window.wrappedJSObject.alphaOrig = null;
         window.wrappedJSObject.betaOrig = null;
-        window.wrappedJSObject.gammaOrig = null; 
+        window.wrappedJSObject.gammaOrig = null;
         window.wrappedJSObject.alpha = false;
         window.wrappedJSObject.beta = false;
         window.wrappedJSObject.gamma = false;

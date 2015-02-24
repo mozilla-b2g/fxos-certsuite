@@ -1,4 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 from webapi_tests import MinimalTestCase
+
 
 class TestProximity(MinimalTestCase):
     def tearDown(self):
@@ -6,6 +11,7 @@ class TestProximity(MinimalTestCase):
         window.removeEventListener('devicelight', window.wrappedJSObject.prox_function);
         """)
         MinimalTestCase.tearDown(self)
+
     def test_proximity_change(self):
         self.instruct("Ensure the phone is unlocked and held in your hand, perpendicular to the floor")
         # set up listener to store changes in an object
