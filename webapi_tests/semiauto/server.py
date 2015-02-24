@@ -23,6 +23,7 @@ clients = Queue.Queue()
 connect_timeout = 30
 logger = None
 
+
 class WSHandler(handlers.BaseHandler):
     """Sends test results over WebSocket to the host browser."""
 
@@ -33,6 +34,7 @@ class WSHandler(handlers.BaseHandler):
         if (("component" not in data or data["component"] is None)
             and data["action"] != "log"):
             self.transport.emit(data)
+
 
 def static_path(path):
     return os.path.join(static_dir, path)

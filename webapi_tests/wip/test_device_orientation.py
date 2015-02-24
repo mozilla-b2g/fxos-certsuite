@@ -1,5 +1,10 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import time
 from webapi_tests import MinimalTestCase
+
 
 class TestDeviceOrientation(MinimalTestCase):
     def tearDown(self):
@@ -19,7 +24,7 @@ class TestDeviceOrientation(MinimalTestCase):
         window.wrappedJSObject.absolute = null;
         window.wrappedJSObject.alphaOrig = null;
         window.wrappedJSObject.betaOrig = null;
-        window.wrappedJSObject.gammaOrig = null; 
+        window.wrappedJSObject.gammaOrig = null;
         window.wrappedJSObject.alpha = false;
         window.wrappedJSObject.beta = false;
         window.wrappedJSObject.gamma = false;
