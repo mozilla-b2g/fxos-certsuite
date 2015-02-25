@@ -19,6 +19,7 @@ from mozlog.structured import get_default_logger
 from mozlog.structured import handlers
 
 static_dir = os.path.join(os.path.dirname(__file__), "static")
+img_dir = os.path.join(static_dir, "img")
 clients = Queue.Queue()
 connect_timeout = 30
 logger = None
@@ -57,7 +58,9 @@ class FrontendServer(object):
             [(r"/tests", TestHandler),
              (r"/", web.RedirectHandler, {"url": "/app.html"}),
              (r"/(.*[html|css|js])$", NoCacheStaticFileHandler,
-              {"path": static_dir})])
+              {"path": static_dir}),
+             (r"/img/(.*[jpg|jpeg|png|gif])$", NoCacheStaticFileHandler,
+              {"path": img_dir})])
         self.server = tornado.httpserver.HTTPServer(
             self.routes, io_loop=self.io_loop)
 
@@ -94,18 +97,18 @@ class BlockingPromptMixin(object):
         # TODO(ato): Use timeout from webapi_tests.semiauto.testcase
         return self.response.get(block=True, timeout=sys.maxint)
 
-    def confirmation(self, question):
-        self.emit({"action": "confirm_prompt", "question": question})
+    def confirmation(self, question, image_path=""):
+        self.emit({"action": "confirm_prompt", "question": question, "image": image_path})
         resp = self.get_response()
         return True if "confirm_prompt_ok" in resp else False
 
-    def prompt(self, message):
-        self.emit({"action": "prompt", "message": message})
+    def prompt(self, message, image_path=""):
+        self.emit({"action": "prompt", "message": message, "image": image_path})
         resp = self.get_response()
         return resp["prompt"] if "prompt" in resp else False
 
-    def instruction(self, instruction):
-        self.emit({"action": "instruct_prompt", "instruction": instruction})
+    def instruction(self, instruction, image_path=""):
+        self.emit({"action": "instruct_prompt", "instruction": instruction, "image": image_path})
         resp = self.get_response()
         return True if "instruct_prompt_ok" in resp else False
 

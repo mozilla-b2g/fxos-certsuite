@@ -106,7 +106,7 @@ class TestCase(unittest.TestCase):
 
         return TestCase.stored.marionette
 
-    def prompt(self, question):
+    def prompt(self, question, image_path=""):
         """Prompt the user for a response.  Returns a future which must be
         yielded.
 
@@ -129,12 +129,12 @@ class TestCase(unittest.TestCase):
 
         """
 
-        resp = self.handler.prompt(question)
+        resp = self.handler.prompt(question, image_path)
         if type(resp) == bool and not resp:
             self.fail("Failed on prompt cancel: %s" % question)
         return resp
 
-    def confirm(self, message):
+    def confirm(self, message, image_path=""):
         """Ask user to confirm a physical aspect about the device or the
         testing environment that cannot be checked by the test.
 
@@ -151,11 +151,11 @@ class TestCase(unittest.TestCase):
 
         """
 
-        success = self.handler.confirmation(message)
+        success = self.handler.confirmation(message, image_path)
         if not success:
             self.fail("Failed on confirmation: %s" % message)
 
-    def instruct(self, message):
+    def instruct(self, message, image_path=""):
         """Instruct the user to perform an action, such as rotating the phone.
 
         This will present an overlay in the host browser window where
@@ -174,7 +174,7 @@ class TestCase(unittest.TestCase):
 
         """
 
-        success = self.handler.instruction(message)
+        success = self.handler.instruction(message, image_path)
         if not success:
             self.fail("Failed on instruction: %s" % message)
 

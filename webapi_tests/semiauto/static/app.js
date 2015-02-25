@@ -195,12 +195,13 @@ var currentDialog = null;
 // with an instruction, and two buttons: "OK" and "Cancel".  A
 // confirmation will show a dialogue with a question, and two buttons:
 // "Yes" and "No".
-function Dialog(msg, type) {
+function Dialog(msg, type, image_path) {
   this.el = $("#dialog");
   this.textEl = $("#dialog .content");
   this.responseEl = $("#dialog .controls input[type=text]");
   this.okEl = $("#dialog .controls #ok");
   this.cancelEl = $("#dialog .controls #cancel");
+  this.image = $("#dialog .image");
 
   // Mouse event listeners
   this.okEl.onclick = function() { this.onok(); this.close(); }.bind(this);
@@ -208,6 +209,14 @@ function Dialog(msg, type) {
 
   this.message = msg || "";
   this.type = type || "prompt";
+  this.image_path = image_path || "";
+
+  if (this.image_path != "") {
+    var elem = document.createElement("img");
+    elem.setAttribute("src", this.image_path);
+    elem.setAttribute("alt", this.message);
+    this.image.appendChild(elem);
+  }
 
   // Assume prompt is default
   switch (this.type) {
@@ -272,6 +281,7 @@ Dialog.prototype = {
     this.responseEl.value = "";
     this.okEl.innerHTML = "OK";
     this.cancelEl.innerHTML = "Cancel";
+    this.image.innerHTML = "";
   },
 
   onok: function() {},
@@ -289,8 +299,8 @@ Client.prototype = {
   //
   // This will present the user with an overlay and the ability to
   // enter a text string which will be returned to the server.
-  promptUser: function(text) {
-    var dialog = new Dialog(text);
+  promptUser: function(text, image_path) {
+    var dialog = new Dialog(text, "prompt", image_path);
     dialog.onok = function() { this.emit("prompt", dialog.value()); }.bind(this);
     dialog.oncancel = function() { this.emit("prompt_cancel"); }.bind(this);
     dialog.show();
@@ -300,8 +310,8 @@ Client.prototype = {
   //
   // This will present the user with an ok/cancel dialogue to indicate
   // whether she was successful in carrying out the instruction.
-  instructUser: function(text) {
-    var dialog = new Dialog(text, "instruct");
+  instructUser: function(text, image_path) {
+    var dialog = new Dialog(text, "instruct", image_path);
     dialog.onok = function() { this.emit("instruct_prompt_ok"); }.bind(this);
     dialog.oncancel = function() { this.emit("instruct_prompt_cancel"); }.bind(this);
     dialog.show();
@@ -312,8 +322,8 @@ Client.prototype = {
   //
   // This will present the user with an ok/cancel dialogue to indicate
   // whether the question posed was true or false.
-  confirmPrompt: function(question) {
-    var dialog = new Dialog(question, "confirm");
+  confirmPrompt: function(question, image_path) {
+    var dialog = new Dialog(question, "confirm", image_path);
     dialog.onok = function() { this.emit("confirm_prompt_ok"); }.bind(this);
     dialog.oncancel = function() { this.emit("confirm_prompt_cancel"); }.bind(this);
     dialog.show();
@@ -346,6 +356,7 @@ Client.prototype = {
   },
 
   parseMessage: function(data) {
+    var image_path = data.image || "";
     switch (data.action) {
     case "suite_start":
       this.testList = new TestListView($("#test_list"), data.tests);
@@ -358,15 +369,15 @@ Client.prototype = {
       break;
 
     case "prompt":
-      this.promptUser(data.message);
+      this.promptUser(data.message, image_path);
       break;
 
     case "instruct_prompt":
-      this.instructUser(data.instruction);
+      this.instructUser(data.instruction, image_path);
       break;
 
     case "confirm_prompt":
-      this.confirmPrompt(data.question);
+      this.confirmPrompt(data.question, image_path);
       break;
 
     case "test_start":
