@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import ConfigParser
 import datetime
 import os
@@ -80,8 +84,11 @@ class DeviceBackup(object):
     def cleanup(self):
         shutil.rmtree(self.backup_path)
 
+
 class PushFile(object):
-    """Context manager that installs a file onto the device, and removes it again"""
+    """
+    Context manager that installs a file onto the device, and removes it again
+    """
     def __init__(self, device, local, remote):
         self.device = device
         self.local = local
@@ -207,6 +214,7 @@ class ADBB2G(adb.ADBDevice):
         if timeout is None:
             timeout = self._timeout
         self.shell_bool("stop b2g")
+
         def b2g_stopped():
             processes = set(item[1].split("/")[-1] for item in self.get_process_list())
             return "b2g" not in processes
@@ -229,7 +237,7 @@ class ADBB2G(adb.ADBDevice):
 
         if wait:
             self.wait_for_device_ready(timeout,
-                                       after_first=lambda:self.shell_bool("start b2g",
+                                       after_first=lambda: self.shell_bool("start b2g",
                                                                           timeout=timeout))
         else:
             self.shell_bool("start b2g", timeout=timeout)
@@ -256,7 +264,7 @@ class ADBB2G(adb.ADBDevice):
 
         self._logger.info("Rebooting device")
         self.wait_for_device_ready(timeout,
-                                   after_first=lambda:self.command_output(["reboot"]))
+                                   after_first=lambda: self.command_output(["reboot"]))
 
     def get_profiles(self, profile_base="/data/b2g/mozilla", timeout=None):
         """Return a list of paths to gecko profiles on the device,

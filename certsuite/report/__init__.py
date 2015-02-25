@@ -13,6 +13,7 @@ import results
 import subsuite
 import summary
 
+
 def parse_log(path):
     with open(path) as f:
         regression_handler = results.LogHandler()

@@ -23,6 +23,7 @@ from mozlog.structured import structuredlog
 JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
 
+
 def unzip_omnifile(omnifile, path):
     # The following is the right way to do this in python, however that throws a BadZipFile error
     # referencing an incorrect magic number. However the normal unzip command works just fine.
@@ -42,6 +43,7 @@ def unzip_omnifile(omnifile, path):
         if omnizip:
             omnizip.close()
 
+
 class CleanedTempFolder(object):
     def __init__(self, root_folder=None):
         self.root_folder = root_folder
@@ -52,6 +54,7 @@ class CleanedTempFolder(object):
 
     def __exit__(self, type, value, traceback):
         shutil.rmtree(self.folder)
+
 
 class OmniAnalyzer(object):
     def __init__(self, reference_omni_ja, logger=None):
@@ -91,6 +94,7 @@ class OmniAnalyzer(object):
 
         return diff
 
+
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--reference-omni-ja", help="Path to reference omni.ja file")
@@ -102,6 +106,7 @@ def main(argv):
     diff = omni_analyzer.run()
     with open(args.results_file, 'w') as f:
         f.write(diff)
+
 
 if __name__ == "__main__":
     main(sys.argv)

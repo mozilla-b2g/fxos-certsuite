@@ -4,7 +4,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-
 import argparse
 import json
 import os
@@ -350,6 +349,7 @@ def install_marionette(device, version):
     device.restart()
     return True
 
+
 def check_network(device):
     try:
         device.wait_for_net()
@@ -369,6 +369,7 @@ def ensure_settings(device):
         for k, v in test_settings.iteritems():
             settings.set(k, v)
     return True
+
 
 @wptserve.handlers.handler
 def test_handler(request, response):

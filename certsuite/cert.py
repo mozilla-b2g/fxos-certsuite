@@ -49,6 +49,7 @@ last_test_started = 'None'
 
 supported_versions = ["2.1", "2.0", "1.4", "1.3"]
 
+
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
     global headers
@@ -60,6 +61,7 @@ def webapi_results_handler(request, response):
     response.headers.set('Access-Control-Allow-Origin', '*')
     response.content = "ok"
 
+
 @wptserve.handlers.handler
 def webapi_results_embed_apps_handler(request, response):
     global webapi_results_embed_app
@@ -67,6 +69,7 @@ def webapi_results_embed_apps_handler(request, response):
 
     response.headers.set('Access-Control-Allow-Origin', '*')
     response.content = "ok"
+
 
 @wptserve.handlers.handler
 def webapi_log_handler(request, response):
@@ -90,10 +93,12 @@ routes = [("POST", "/webapi_results", webapi_results_handler),
 static_path = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "static"))
 
+
 def read_manifest(app):
     with open(os.path.join(app, 'manifest.webapp')) as f:
         manifest = f.read()
     return manifest
+
 
 def package_app(path, extrafiles={}):
     app_path = 'app.zip'
@@ -105,6 +110,7 @@ def package_app(path, extrafiles={}):
                 zip_file.write(os.path.join(root, f), f)
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
+
 
 def install_app(logger, appname, version, apptype, apppath, all_perms,
                 extrafiles, launch=False):
@@ -126,6 +132,7 @@ def install_app(logger, appname, version, apptype, apppath, all_perms,
     if launch:
         logger.debug('launching: %s' % appname)
         fxos_appgen.launch_app(appname)
+
 
 def test_user_agent(user_agent, logger):
     # See https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference#Firefox_OS
@@ -156,6 +163,7 @@ def test_user_agent(user_agent, logger):
         logger.test_status('user-agent', 'user-agent-string', 'FAIL', message='Invalid user-agent string: %s: %s' % (user_agent, message))
 
     return valid
+
 
 def test_open_remote_window(logger, version, addr):
     global webapi_results
@@ -192,6 +200,7 @@ def test_open_remote_window(logger, version, addr):
 
     return results
 
+
 def diff_results(a, b):
 
     a_set = set(a.keys())
@@ -209,6 +218,7 @@ def diff_results(a, b):
 
     return result
 
+
 def log_results(diff, logger, report, test_group, name):
     if diff:
         report[name.replace('-', '_')] = diff
@@ -219,6 +229,7 @@ def log_results(diff, logger, report, test_group, name):
                 logger.test_status(test_group, name, 'FAIL', message='Unexpected result for: %s' % result)
     else:
         logger.test_status(test_group, name, 'PASS')
+
 
 def parse_webapi_results(expected_results_path, results, prefix, logger, report):
     with open(expected_results_path) as f:
@@ -256,6 +267,7 @@ def parse_webapi_results(expected_results_path, results, prefix, logger, report)
     log_results(added_webidl_results, logger, report, 'webapi', prefix + 'added-webidl-results')
     log_results(missing_webidl_results, logger, report, 'webapi', prefix + 'missing-webidl-results')
 
+
 def parse_permissions_results(expected_results_path, results, prefix, logger, report):
     with open(expected_results_path) as f:
         expected_results = json.load(f)
@@ -264,6 +276,7 @@ def parse_permissions_results(expected_results_path, results, prefix, logger, re
     unexpected_results = diff_results(expected_results, results)
     log_results(unexpected_results, logger, report, 'permissions', prefix + 'unexpected-permissions-results')
     return not unexpected_results
+
 
 def run_marionette_script(script, chrome=False, async=False):
     """Create a Marionette instance and run the provided script"""
@@ -278,6 +291,7 @@ def run_marionette_script(script, chrome=False, async=False):
     m.delete_session()
     return result
 
+
 def kill(name):
     """Kill the specified app"""
     script = """
@@ -285,6 +299,7 @@ def kill(name):
       manager.kill('%s');
     """
     return run_marionette_script(script % name)
+
 
 def get_permission(permission, app):
     # The object created to wrap PermissionSettingsModule is to work around
@@ -297,6 +312,7 @@ def get_permission(permission, app):
     """
     app_url = 'app://' + app
     return run_marionette_script(script % (permission, app_url, app_url), True)
+
 
 def get_permissions():
     """Return permissions in PermissionsTable.jsm"""
@@ -312,6 +328,7 @@ def get_permissions():
       return result;
     """
     return run_marionette_script(script, True)
+
 
 def set_permission(permission, value, app):
     """Set a permission for the specified app
@@ -332,6 +349,7 @@ def set_permission(permission, value, app):
     """
     app_url = 'app://' + app
     run_marionette_script(script % (permission, app_url, app_url, value), True)
+
 
 def make_html_report(path, report):
     def decode_encode(a_string):
@@ -373,6 +391,7 @@ def make_html_report(path, report):
     with open(path, 'w') as f:
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
         f.write(decode_encode(str(doc)))
+
 
 def _run(args, logger):
     # This function is to simply make the cli() function easier to handle
@@ -449,7 +468,7 @@ def _run(args, logger):
         report['buildprops'][prop] = val
 
     # get process list
-    report['processes_running'] = map(lambda p: { 'name': p[1], 'user': p[2] },
+    report['processes_running'] = map(lambda p: {'name': p[1], 'user': p[2]},
                                       dm.getProcessList())
 
     # kernel version
@@ -719,6 +738,7 @@ def _run(args, logger):
         make_html_report(args.html_result_file, report)
         logger.debug('HTML Results have been stored in: %s' % args.html_result_file)
 
+
 def cli():
     global logger
     global webapi_results
@@ -763,6 +783,7 @@ def cli():
     except:
         logger.critical(traceback.format_exc())
         raise
+
 
 if __name__ == "__main__":
     cli()
