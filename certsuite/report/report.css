@@ -20,6 +20,7 @@ body {
 }
 .PASS { background-color: green }
 .FAIL { background-color: red }
+.OK { background-color: lightgreen}
 .TIMEOUT { background-color: blue }
 .ERROR { background-color: purple }
 

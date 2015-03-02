@@ -10,6 +10,8 @@ from mozlog.structured import reader
 result_status = dict((v,k) for k,v in
                      enumerate(["PASS", "FAIL", "OK", "ERROR", "TIMEOUT", "CRASH"]))
 
+def is_skip(data):
+    return data['status'] == 'SKIP'
 
 def is_regression(data):
     if "expected" not in data:
@@ -34,13 +36,13 @@ class LogHandler(reader.LogHandler):
     def test_status(self, data):
         test_id = self.test_id(data)
 
-        if is_regression(data):
+        if not is_skip(data):
             self.results.regressions[test_id][data["subtest"]] = data
 
     def test_end(self, data):
         test_id = self.test_id(data)
 
-        if is_regression(data):
+        if not is_skip(data):
             self.results.regressions[test_id][None] = data
 
     def log(self, data):

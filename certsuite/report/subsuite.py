@@ -76,15 +76,29 @@ class HTMLBuilder(object):
             cells, needs_subtest = self.make_test_name(test, test_data, i)
             for subtest in sorted(test_data.keys()):
                 if needs_subtest:
-                    cells.append(html.td(subtest))
+                    if subtest:
+                        cells.append(html.td(subtest))
+                    else:
+                        cells.append(html.td('parent'))
+
                 subtest_data = test_data[subtest]
+
+                if  'expected' in subtest_data:
+                    cell_expected = subtest_data["expected"].title()
+                    class_expected = subtest_data["expected"]
+                else:
+                    cell_expected = subtest_data["status"]
+                    class_expected = subtest_data["status"]
+
+                cell_message  = subtest_data.get("message", "")
+
                 cells.extend([
-                    html.td(subtest_data["expected"].title(),
-                            class_="condition %s" % subtest_data["expected"]),
+                    html.td(cell_expected,
+                            class_="condition %s" % class_expected),
                     html.td(subtest_data["status"].title(),
                             class_="condition %s" % subtest_data["status"]),
-                    html.td(subtest_data.get("message", ""),
-                            class_="message")
+                    html.td(cell_message,
+                            class_="message %s" % ("even" if i % 2 else "odd"))
                 ])
                 tr = html.tr(cells)
                 rv.append(tr)
@@ -111,7 +125,11 @@ def make_report(results):
 
     return u"<!DOCTYPE html>\n" + doc.unicode(indent=2)
 
-if __name__ == "__main__":
+def make_file_report(path):
+    from __init__ import parse_log
+    results = parse_log(path)
+    make_report(results)
+
+if __name__ == "__main__":  
     import sys
-    with open(sys.argv[1]) as log_file:
-        print make_report(log_file)
+    print make_file_report(sys.argv[1])
