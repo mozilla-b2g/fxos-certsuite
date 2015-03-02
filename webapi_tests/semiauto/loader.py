@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
+import json
 import unittest
 
 
@@ -15,7 +17,13 @@ class TestLoader(unittest.loader.TestLoader):
     """
 
     def __init__(self, **kwargs):
-        version = kwargs.pop('version')
+        try:
+            version = kwargs.pop('version')
+        except:
+            config_path = os.path.abspath(os.path.join(os.path.realpath(__file__), "../../../certsuite/config.json"))
+            with open(config_path) as f:
+                config = json.load(f)
+            version = config['version']
         super(TestLoader, self).__init__()
         self.opts = kwargs
         self.opts.update({'version': version})
