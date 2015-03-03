@@ -7,7 +7,7 @@ from collections import defaultdict
 from mozlog.structured import reader
 
 
-result_status = dict((v,k) for k,v in
+result_status = dict((v, k) for k, v in
                      enumerate(["PASS", "FAIL", "OK", "ERROR", "TIMEOUT", "CRASH"]))
 
 
@@ -46,6 +46,7 @@ class LogHandler(reader.LogHandler):
     def log(self, data):
         if data["level"] in ("ERROR", "CRITICAL"):
             self.results.errors.append(data)
+
 
 class Results(object):
     def __init__(self):

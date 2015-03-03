@@ -12,10 +12,11 @@ import sys
 
 # Map to types recognized by the idlharness.js tests
 typenames = {
-    "Boolean" : "boolean",
-    "Double" : "double",
-    "UnrestrictedDouble" : "double",
+    "Boolean": "boolean",
+    "Double": "double",
+    "UnrestrictedDouble": "double",
 }
+
 
 def jsonify_interface(intf):
     result = {}
@@ -63,8 +64,8 @@ def jsonify_interface(intf):
                 for arg in args:
                     argument = {}
                     argument['name'] = arg.identifier.name
-                    argument['optional'] = False #TODO
-                    argument['variadic'] = False #TODO
+                    argument['optional'] = False  # TODO
+                    argument['variadic'] = False  # TODO
                     argument['idlType'] = jsonify_type(arg.type)
                     arguments.append(argument)
                 member['arguments'] = arguments
@@ -76,6 +77,7 @@ def jsonify_interface(intf):
 
     return json.dumps(result)
 
+
 def jsonify_type(t):
     result = {}
     result['sequence'] = t.isSequence()
@@ -85,6 +87,7 @@ def jsonify_type(t):
     result['idlType'] = typenames.get(str(t), str(t))
     return result
 
+
 def jsonify_typedef(typedef):
     result = {}
 
@@ -93,6 +96,7 @@ def jsonify_typedef(typedef):
     result['extAttrs'] = []
 
     return json.dumps(result)
+
 
 def main(argv):
     """
@@ -156,6 +160,7 @@ def main(argv):
         merged.write('UNTESTED_IDL=')
         merged.write(json.dumps(untested))
         merged.write(';\n')
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv))

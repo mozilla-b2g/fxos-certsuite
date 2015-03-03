@@ -8,6 +8,7 @@ from py.xml import html, raw
 
 here = os.path.split(__file__)[0]
 
+
 class HTMLBuilder(object):
     def make_report(self, results):
         self.results = results
@@ -106,10 +107,12 @@ class HTMLBuilder(object):
         else:
             return [html.td(test_name, rowspan=len(test_data), class_="parent_test %s" % pos_cls)], True
 
+
 def make_report(results):
     doc = HTMLBuilder().make_report(results)
 
     return u"<!DOCTYPE html>\n" + doc.unicode(indent=2)
+
 
 if __name__ == "__main__":
     import sys

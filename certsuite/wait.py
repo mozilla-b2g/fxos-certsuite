@@ -10,6 +10,7 @@ import traceback
 DEFAULT_TIMEOUT = 120
 DEFAULT_INTERVAL = 0.1
 
+
 class Wait(object):
     """An explicit conditional utility class for waiting until a condition
     evalutes to true or not null.
@@ -139,8 +140,10 @@ class Wait(object):
             "Timed out after %s seconds%s" %
             ((self.clock.now - start), message), cause=last_exc)
 
+
 def until_pred(clock, end):
     return clock.now >= end
+
 
 class SystemClock(object):
     def __init__(self):
@@ -152,6 +155,7 @@ class SystemClock(object):
     @property
     def now(self):
         return self._time.time()
+
 
 class TimeoutException(Exception):
     def __init__(self, message="", cause=None):

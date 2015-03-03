@@ -10,6 +10,7 @@ from py.xml import html, raw
 
 here = os.path.split(__file__)[0]
 
+
 class HTMLBuilder(object):
     def make_report(self, time, summary_results, subsuite_results):
         self.time = time
@@ -96,6 +97,7 @@ class HTMLBuilder(object):
             rv.append(html.tr(cells))
 
         return rv
+
 
 def make_report(time, summary_results, subsuite_results):
     doc = HTMLBuilder().make_report(time, summary_results, subsuite_results)

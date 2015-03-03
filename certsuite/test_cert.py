@@ -5,10 +5,12 @@
 import unittest
 from cert import test_user_agent
 
+
 class Logger(object):
     """Dummy logger"""
     def test_status(this, *args):
         pass
+
 
 class TestCert(unittest.TestCase):
 
@@ -28,6 +30,7 @@ class TestCert(unittest.TestCase):
 
         self.assertTrue(test_user_agent("Mozilla/5.0 (Mobile;   nnnn   ; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "extra whitespace in device")
         self.assertTrue(test_user_agent("Mozilla/5.0 (Mobile;nnnn; rv:26.0) Gecko/26.0 Firefox/26.0", self.logger), "no whitespace in device")
+
 
 if __name__ == '__main__':
     unittest.main()
