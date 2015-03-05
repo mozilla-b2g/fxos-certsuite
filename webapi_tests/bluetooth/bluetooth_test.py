@@ -107,7 +107,17 @@ class BluetoothTestCommon(object):
             else:
                 self.fail("mozBluetooth.getDefaultAdapter failed")
 
-        adapter = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter")
+        # https://developer.mozilla.org/en-US/docs/Web/API/BluetoothAdapter
+        # TODO: work around until bug https://bugzilla.mozilla.org/show_bug.cgi?id=1138331 is fixed
+        adapter = {}
+        adapter['name'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.name")
+        adapter['class'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.class")
+        adapter['address'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.address")
+        adapter['discoverable'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.discoverable")
+        adapter['discoverableTimeout'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.discoverableTimeout")
+        adapter['discovering'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.discovering")
+        adapter['devices'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.devices")
+        adapter['uuids'] = self.marionette.execute_script("return window.wrappedJSObject.bt_adapter.uuids")
         self.assertIsNotNone(adapter, "mozBluetooth.getDefaultAdapter returned none")
         self.have_adapter = True
         return adapter
