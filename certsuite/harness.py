@@ -35,6 +35,8 @@ from marionette_extension import AlreadyInstalledException
 from marionette_extension import install as marionette_install
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters, set_default_logger
+from reportmanager import ReportManager
+from logmanager import LogManager
 
 import adb_b2g
 import gaiautils
@@ -85,59 +87,10 @@ def get_metadata():
     dist = pkg_resources.get_distribution("fxos-certsuite")
     return {"version": dist.version}
 
-
 def log_metadata():
     metadata = get_metadata()
     for key in sorted(metadata.keys()):
         logger.info("fxos-certsuite %s: %s" % (key, metadata[key]))
-
-
-class LogManager(object):
-    def __init__(self):
-        self.time = datetime.now()
-        self.structured_path = "run.log"
-        self.zip_path = 'firefox-os-certification_%s.zip' % (time.strftime("%Y%m%d%H%M%S"))
-        self.structured_file = None
-        self.subsuite_results = []
-
-    def add_file(self, path, file_obj):
-        self.zip_file.write(path, file_obj)
-
-    def add_subsuite_report(self, path):
-        results = report.parse_log(path)
-        self.subsuite_results.append(results)
-        if not results.is_pass:
-            html_str = report.subsuite.make_report(results)
-            path = "%s/report.html" % results.name
-            self.zip_file.writestr(path, html_str)
-
-    def add_summary_report(self, path):
-        summary_results = report.parse_log(path)
-        html_str = report.summary.make_report(self.time,
-                                              summary_results,
-                                              self.subsuite_results)
-        path = "report.html"
-        self.zip_file.writestr(path, html_str)
-
-    def __enter__(self):
-        self.zip_file = zipfile.ZipFile(self.zip_path, 'w', zipfile.ZIP_DEFLATED)
-        self.structured_file = open(self.structured_path, "w")
-        return self
-
-    def __exit__(self, ex_type, ex_value, tb):
-        args = ex_type, ex_value, tb
-        if ex_type in (SystemExit, KeyboardInterrupt):
-            logger.info("Testrun interrupted")
-        try:
-            self.structured_file.__exit__(*args)
-            self.zip_file.write(self.structured_path)
-            self.add_summary_report(self.structured_path)
-        finally:
-            try:
-                os.unlink(self.structured_path)
-            finally:
-                self.zip_file.__exit__(*args)
-
 
 # Consider upstreaming this to marionette-client:
 class MarionetteSession(object):
@@ -187,7 +140,7 @@ class TestRunner(object):
         for suite, groups in d.iteritems():
             yield suite, groups
 
-    def run_suite(self, suite, groups, log_manager):
+    def run_suite(self, suite, groups, log_manager, report_manager):
         with TemporaryDirectory() as temp_dir:
             result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
@@ -195,7 +148,7 @@ class TestRunner(object):
                 file_name = os.path.split(path)[1]
                 log_manager.add_file(path, "%s/%s" % (suite, file_name))
 
-            log_manager.add_subsuite_report(structured_path)
+            report_manager.add_subsuite_report(structured_path)
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -255,7 +208,7 @@ class TestRunner(object):
 
         cmd = [suite_opts['cmd']]
 
-        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
+        log_name = "%s/%s_structured_%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
         cmd.extend(["--log-raw=-"])
 
         if groups:
@@ -424,9 +377,11 @@ def run_tests(args, config):
     output_zipfile = None
 
     try:
-        with LogManager() as log_manager:
+        with LogManager() as log_manager, ReportManager() as report_manager:
             output_zipfile = log_manager.zip_path
             setup_logging(log_manager)
+            report_manager.setup_report(log_manager.zip_file,
+                    log_manager.subsuite_results, log_manager.structured_path)
 
             log_metadata()
 
@@ -437,7 +392,7 @@ def run_tests(args, config):
                 runner = TestRunner(args, config)
                 for suite, groups in runner.iter_suites():
                     try:
-                        runner.run_suite(suite, groups, log_manager)
+                        runner.run_suite(suite, groups, log_manager, report_manager)
                     except:
                         logger.error("Encountered error:\n%s" %
                                      traceback.format_exc())
