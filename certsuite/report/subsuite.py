@@ -46,7 +46,7 @@ class HTMLBuilder(object):
             rows.append(html.tr(
                 html.td(error["level"],
                         class_="log_%s" % error["level"]),
-                html.td(error.get("message", ""))
+                html.td(html.pre(error.get("message", "")))
             ))
         return html.table(rows, id_="errors")
 
