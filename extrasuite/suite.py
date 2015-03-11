@@ -8,8 +8,10 @@ import sys
 import logging
 import argparse
 import traceback
-from mozdevice import DeviceManagerADB
+from mozdevice import DeviceManagerADB, DMError, ADBError
 from mozlog.structured import commandline
+from time import sleep
+
 
 class ExtraTest( object ):
 	
@@ -44,6 +46,28 @@ class ExtraTest( object ):
 		for t in cls.test_list( group ):
 			t.run()
 
+
+def wait_for_adb_device():
+	try:
+		adb = DeviceManagerADB()
+	except DMError:
+		adb = None
+		print "Waiting for adb connection..."
+	while adb is None:
+		try:
+			adb = DeviceManagerADB()
+		except DMError:
+			sleep( 0.2 )
+	if len( adb.devices() ) < 1:
+		print "Waiting for adb device..."
+		while len( adb.devices() ) < 1:
+			sleep( 0.2 )
+
+def adb_has_root():
+	# normally this should check via root=True to .shellCheckOutput, but doesn't work
+	adb = DeviceManagerADB()
+	return adb.shellCheckOutput( ["id"] ).startswith( "uid=0(root)" )
+
 def extracli():
     parser = argparse.ArgumentParser( description="Runner for extra test suite")
     parser.add_argument("-l", "--list-test-groups", action="store_true",
@@ -75,6 +99,9 @@ def extracli():
             from IPython import embed
             embed()
         else:
+            wait_for_adb_device()
+            if not adb_has_root():
+                print "WARNING: adb has no root. Results will be incomplete."
             if len( args.include ) == 0: # run all groups
                 for t in ExtraTest.test_list():
                     print "running %s" % t

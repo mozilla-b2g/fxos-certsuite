@@ -238,7 +238,7 @@ def check_preconditions(config):
 
     for precondition in [check_root,
                          check_marionette_installed,
-                         ensure_settings,
+                         ensure_settings
                          check_network,
                          check_server]:
         try:
