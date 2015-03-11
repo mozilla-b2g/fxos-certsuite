@@ -28,6 +28,20 @@ to pass.
 The device must have an SD card inserted with some free space available for
 a subset of the tests to pass.
 
+Required Package
+-------------------------
+
+1. texlive
+#. texlive-latex-extra
+
+If you need to install texlive and texlive-latex-extra, see
+https://www.tug.org/texlive/
+
+#. pandoc
+
+If you need to install pandoc, see
+http://johnmacfarlane.net/pandoc/
+
 Network
 -------
 
