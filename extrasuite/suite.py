@@ -55,14 +55,13 @@ def extracli():
                         "groups by repeating flag")
     parser.add_argument("--version", action="store", dest="version",
                         help="B2G version")
+    parser.add_argument("--ipython", dest="ipython", action="store_true",
+                        help="drop to ipython session")  
     parser.add_argument("-v", dest="verbose", action="store_true",
                         help="Verbose output")  
     commandline.add_logging_group(parser)
     args = parser.parse_args()
     logger = commandline.setup_logging("extrasuite", vars(args), {"raw": sys.stdout})
-
-    from IPython import embed
-    embed()
 
     try:
         logger.debug( "extra cli runnng with args %s" % args )
@@ -72,9 +71,10 @@ def extracli():
         elif args.list_all_tests:
             for test in ExtraTest.test_list():
                 print "%s.%s" % (test.group, test.__name__)
-        else:
+        elif args.ipython:
             from IPython import embed
             embed()
+        else:
             if len( args.include ) == 0: # run all groups
                 for t in ExtraTest.test_list():
                     print "running %s" % t
