@@ -5,7 +5,14 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 echo "Setting up virtualenv"
-
+function check-apt-get ( $package ) {
+  which apt-get
+  if [ $? != 0 ]; then
+    echo "No apg-get found in the platform"
+    echo "Please reference documentation.pdf and install " $package " by yourself"
+    exit 1
+  fi
+}
 function notify_sudo {
   if [ "$SUDO_NOTIFY" = "1" ]; then
     return
@@ -38,11 +45,13 @@ fi
 which pandoc
 if [ $? != 0]; then
   notify_sudo
+  check-apt-get('pandoc')
   sudo apt-get install pandoc || { echo 'error installing pandoc' ; exit 1; }
 fi
 
 which pdflatex
 if [ $? != 0 ]; then
   notify_sudo
+  check-apt-get('texlive texlive-latex-extra')
   sudo apt-get install texlive texlive-latex-extra || { echo 'error installing texlive' ; exit 1; }
 fi
