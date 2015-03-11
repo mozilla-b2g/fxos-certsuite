@@ -108,7 +108,6 @@ class MarionetteSession(object):
         if self.marionette.session is not None:
             self.marionette.delete_session()
 
-
 class TestRunner(object):
     def __init__(self, args, config):
         self.args = args
@@ -142,6 +141,9 @@ class TestRunner(object):
 
     def run_suite(self, suite, groups, log_manager, report_manager):
         with TemporaryDirectory() as temp_dir:
+
+            report_manager.logger = logger
+
             result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
             for path in result_files:
@@ -377,7 +379,7 @@ def run_tests(args, config):
     output_zipfile = None
 
     try:
-        with LogManager() as log_manager, ReportManager() as report_manager:
+        with LogManager() as log_manager, ReportManager(config) as report_manager:
             output_zipfile = log_manager.zip_path
             setup_logging(log_manager)
             report_manager.setup_report(log_manager.zip_file,

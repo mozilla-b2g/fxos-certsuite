@@ -7,7 +7,7 @@ from datetime import datetime
 class LogManager(object):
     def __init__(self):
         self.time = datetime.now()
-        self.structured_path = "run.log"
+        self.structured_path = os.path.abspath("run.log")
         self.zip_path = 'firefox-os-certification_%s.zip' % (time.strftime("%Y%m%d%H%M%S"))
         self.structured_file = None
         self.subsuite_results = []
@@ -26,7 +26,7 @@ class LogManager(object):
             logger.info("Testrun interrupted")
         try:
             self.structured_file.__exit__(*args)
-            self.zip_file.write(self.structured_path)
+            self.zip_file.write(self.structured_path, os.path.basename(self.structured_path))
         finally:
             try:
                 os.unlink(self.structured_path)

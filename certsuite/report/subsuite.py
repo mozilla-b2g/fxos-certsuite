@@ -72,45 +72,70 @@ class HTMLBuilder(object):
         rv = []
         tests = sorted(regressions.keys())
         for i, test in enumerate(tests):
+            odd_or_even = "even" if i % 2 else "odd"
             test_data = regressions[test]
-            cells, needs_subtest = self.make_test_name(test, test_data, i)
+            test_name = self.get_test_name(test, test_data)
             for subtest in sorted(test_data.keys()):
-                if needs_subtest:
-                    if subtest:
-                        cells.append(html.td(subtest))
-                    else:
-                        cells.append(html.td('parent'))
+                cells = []
+                sub_name = self.get_sub_name(test, test_data, subtest)
 
                 subtest_data = test_data[subtest]
-
-                if  'expected' in subtest_data:
-                    cell_expected = subtest_data["expected"].title()
-                    class_expected = subtest_data["expected"]
-                else:
-                    cell_expected = subtest_data["status"]
-                    class_expected = subtest_data["status"]
-
+                cell_expected = self.get_cell_expected(subtest_data)
+                class_expected = self.get_class_expected(subtest_data)
                 cell_message  = subtest_data.get("message", "")
 
                 cells.extend([
+                    html.td(test_name, class_="parent_test %s" % odd_or_even),
+                    html.td(sub_name, class_="parent_test %s" % odd_or_even),
                     html.td(cell_expected,
-                            class_="condition %s" % class_expected),
+                            class_="condition %s %s" % (class_expected, odd_or_even)),
                     html.td(subtest_data["status"].title(),
-                            class_="condition %s" % subtest_data["status"]),
+                            class_="condition %s %s" % (subtest_data["status"], odd_or_even)),
                     html.td(cell_message,
-                            class_="message %s" % ("even" if i % 2 else "odd"))
+                            class_="message %s" % odd_or_even)
                 ])
-                tr = html.tr(cells)
-                rv.append(tr)
-                cells = []
-                needs_subtest = True
+                rv.append(html.tr(cells))
         return rv
+
+    def get_cell_expected(self, subtest_data):
+        if  'expected' in subtest_data:
+            cell_expected = subtest_data["expected"].title()
+        else:
+            cell_expected = subtest_data["status"]
+        return cell_expected
+
+    def get_class_expected(self, subtest_data):
+        if  'expected' in subtest_data:
+            class_expected = subtest_data["expected"]
+        else:
+            class_expected = subtest_data["status"]
+        return class_expected
 
     def test_string(self, test_id):
         if isinstance(test_id, unicode):
             return test_id
         else:
             return " ".join(test_id)
+
+    def get_test_name(self, test, test_data):
+        test_name = self.test_string(test)
+        if len(test_data) == 1 and None in test_data.keys():
+            start_index = test_name.find('.') + 1
+            end_index = test_name.find('.' , start_index)
+            test_name = test_name[start_index:end_index]
+        return test_name
+
+    def get_sub_name(self, test, test_data, subtest):
+        test_name = self.test_string(test)
+        if len(test_data) == 1 and None in test_data.keys():
+            sub_start_index = test_name.rfind('.') + 1
+            sub_name = test_name[sub_start_index:]
+        else:
+            if subtest:
+                sub_name = subtest
+            else:
+                sub_name = 'parent'
+        return sub_name
 
     def make_test_name(self, test, test_data, index):
         pos_cls = "even" if index % 2 else "odd"
