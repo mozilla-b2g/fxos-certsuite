@@ -47,7 +47,7 @@ class HTMLBuilder(object):
             rows.append(html.tr(
                 html.td(error["level"],
                         class_="log_%s" % error["level"]),
-                html.td(error.get("message", ""))
+                html.td(html.pre(error.get("message", "")))
             ))
         return html.table(rows, id_="errors")
 
@@ -85,14 +85,11 @@ class HTMLBuilder(object):
             else:
                 cells.append(html.td("0", class_="condition PASS"))
 
-            if result.is_pass:
-                cells.append(html.td())
-            else:
-                cells.append(html.td(
-                    html.a("details",
-                           href=details_link),
-                    class_="details"
-                ))
+            cells.append(html.td(
+                html.a("details",
+                       href=details_link),
+                class_="details"
+            ))
             rv.append(html.tr(cells))
 
         return rv
