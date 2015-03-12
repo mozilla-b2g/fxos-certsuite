@@ -35,14 +35,14 @@ Indices and tables
 * :ref:`search`
 '''
 class ReportManager(object):
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, runner):
+        self.runner = runner
         self.zip_file = None
         self.subsuite_results = []
         self.structured_path = None
-        self.logger = get_default_logger()
+        self.logger = runner.logger
         self.index_content = '\n   summary\n'
-        self.temp_dir = TemporaryDirectory()
+        self.args = runner.args
 
     def setup_report(self, zip_file = None, 
         subsuite_results = None, 
@@ -63,7 +63,7 @@ class ReportManager(object):
     def __exit__(self, *args, **kwargs):
         self.add_summary_report(self.structured_path)
         sys.setdefaultencoding(self.encoding)
-        self.temp_obj.__exit__(*args)
+        #self.temp_obj.__exit__(*args)
 
     def runcmd(self, cmd):
         env = dict(os.environ)
@@ -95,6 +95,12 @@ class ReportManager(object):
         path = "%s/report.html" % results.name
         self.zip_file.writestr(path, html_str)
 
+        if self.args.report == []:
+            return
+
+        # store result to 
+        self.result[results.name] = results
+
         report_path = self.temp_dir + os.sep + 'report' + os.sep
         # generate subsuite 
         os.makedirs(os.path.dirname(report_path + path))
@@ -117,9 +123,10 @@ class ReportManager(object):
                                               self.subsuite_results)
         path = "report.html"
         self.zip_file.writestr(path, html_str)
-
-        if self.subsuite_results == []:
-            # no test suite ran, just return and not generate report
+        
+        # no test suite ran, just return and not generate report
+        # check if need to generate related report    
+        if  self.subsuite_results == [] or self.args.report == []:            
             return
 
         report_path = self.temp_dir + os.sep + 'report' + os.sep
@@ -129,7 +136,7 @@ class ReportManager(object):
         cmd = ['pandoc', report_path + path, '-o', report_path + 'summary.rst']
         self.runcmd(cmd)
 
-        # generate report index file
+       # generate report index file
         contents = [_index_header, self.index_content, _index_footer]
         with open(report_path + 'index.rst', 'w') as f:
             f.write('\n'.join(contents))
@@ -142,11 +149,18 @@ class ReportManager(object):
         # generate report pdf
         cwd = os.getcwd()
         os.chdir(report_path)
-        cmd = ['make', 'latexpdf']
+        cmd = ['make', 'latexpdf', 'epub', 'singlehtml']
         self.runcmd(cmd)
 
         # put report pdf to zip
-        pdf_path = 'report.pdf'
-        build_path = report_path + os.sep.join(['_build', 'latex', 'FirefoxOSCertificationTestsuiteReport.pdf'])
-        self.zip_file.write(build_path, pdf_path)
+        if 'PDF' in self.args.report:
+            pdf_path = 'report.pdf'
+            build_path = report_path + os.sep.join(['_build', 'latex', 'FirefoxOSCertificationTestsuiteReport.pdf'])
+            self.zip_file.write(build_path, pdf_path)
+
+        if 'HTML' in self.args.report:
+            singlehtml_path = 'index.html'
+            build_path = report_path + os.sep.join(['_build', 'singlehtml', 'index.html'])
+            self.zip_file.write(build_path, singlehtml_path)
+
         os.chdir(cwd)

@@ -5,12 +5,13 @@ import time
 from datetime import datetime
 
 class LogManager(object):
-    def __init__(self):
+    def __init__(self, runner):
         self.time = datetime.now()
         self.structured_path = os.path.abspath("run.log")
         self.zip_path = 'firefox-os-certification_%s.zip' % (time.strftime("%Y%m%d%H%M%S"))
         self.structured_file = None
         self.subsuite_results = []
+        self.logger = runner.logger
 
     def add_file(self, path, file_obj):
         self.zip_file.write(path, file_obj)
@@ -23,7 +24,7 @@ class LogManager(object):
     def __exit__(self, ex_type, ex_value, tb):
         args = ex_type, ex_value, tb
         if ex_type in (SystemExit, KeyboardInterrupt):
-            logger.info("Testrun interrupted")
+            self.logger.info("Testrun interrupted")
         try:
             self.structured_file.__exit__(*args)
             self.zip_file.write(self.structured_path, os.path.basename(self.structured_path))
