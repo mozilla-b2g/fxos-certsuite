@@ -4,6 +4,8 @@ import time
 
 from datetime import datetime
 
+from mozlog.structured import get_default_logger
+
 class LogManager(object):
     def __init__(self):
         self.time = datetime.now()
@@ -23,6 +25,7 @@ class LogManager(object):
     def __exit__(self, ex_type, ex_value, tb):
         args = ex_type, ex_value, tb
         if ex_type in (SystemExit, KeyboardInterrupt):
+            logger = get_default_logger()
             logger.info("Testrun interrupted")
         try:
             self.structured_file.__exit__(*args)
