@@ -148,7 +148,7 @@ class TestRunner(object):
                 file_name = os.path.split(path)[1]
                 log_manager.add_file(path, "%s/%s" % (suite, file_name))
 
-            report_manager.add_subsuite_report(structured_path)
+            report_manager.add_subsuite_report(structured_path, result_files)
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -208,7 +208,8 @@ class TestRunner(object):
 
         cmd = [suite_opts['cmd']]
 
-        log_name = "%s/%s_structured_%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
+        subtests = '' if groups == [] else '_' + "_".join(item.replace("/", "-") for item in groups)
+        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, subtests)
         cmd.extend(["--log-raw=-"])
 
         if groups:
@@ -380,8 +381,7 @@ def run_tests(args, config):
         with LogManager() as log_manager, ReportManager() as report_manager:
             output_zipfile = log_manager.zip_path
             setup_logging(log_manager)
-            report_manager.setup_report(log_manager.zip_file,
-                    log_manager.subsuite_results, log_manager.structured_path)
+            report_manager.setup_report(log_manager.zip_file, log_manager.structured_path)
 
             log_metadata()
 
