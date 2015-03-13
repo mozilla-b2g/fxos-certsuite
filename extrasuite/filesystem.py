@@ -7,18 +7,35 @@
 import re
 import os
 import sys
-
 import subprocess
+
+#######################################################################################################################
+# shared module functions
+#########################
+
 def runcmd( cmd ):
+	"""
+	A convenience wrapper that runs cmd in a subshell and
+	returns its stdout+stderr as string.
+	"""
 	p = subprocess.Popen( cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True )
 	return p.communicate()
 
 
 def parse_ls( out ):
+		"""
+		Parser for Android's ls -lR output.
+		Takes a string, returns parsed structure.
+		"""
+
+		# assumed ls -lR line format:
 		# -rw-r--r-- root     shell           0 2013-07-05 02:26 tasks
 		# drwxr-xr-x root     root              2013-07-05 02:26 log
 		# brw------- root     root     179,   0 2013-07-05 02:26 mmcblk0
 		# lrwxrwxrwx root     root              2013-07-05 02:34 subsystem -> ../class/bdi
+
+		# CAVE: format may change through versions.
+		# TODO: implement plausibility test.
 
 		mode = r'^(.)'
 		field = r'([^ ]+) +'
@@ -101,11 +118,25 @@ def parse_ls( out ):
 				yield specs
 
 
+#######################################################################################################################
+# Test implementations
+################################
+
+# derived from shared test class
 from suite import ExtraTest
 
+
+#######################################################################################################################
+# filesystem.wordwritable
+
 class worldwritable( ExtraTest ):
-	module = sys.modules[__name__]
+	"""
+	Test that checks gonk file system for world-writable files.
+	"""
+
 	group = "filesystem"
+	module = sys.modules[__name__]
+
 	whitelist = {
 		'ok': [
 			'^/dev/null$',
@@ -146,9 +177,17 @@ class worldwritable( ExtraTest ):
 					print f
 
 
+#######################################################################################################################
+# filesystem.suidroot
+
 class suidroot( ExtraTest ):
-	module = sys.modules[__name__]
+	"""
+	Test that checks gonk file system for suid root binaries.
+	"""
+
 	group = "filesystem"
+	module = sys.modules[__name__]
+
 	whitelist = {
 		'ok': [
 			'^/system/bin/run-as$'

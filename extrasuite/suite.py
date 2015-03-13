@@ -13,17 +13,32 @@ from mozlog.structured import commandline
 from time import sleep
 
 
+#######################################################################################################################
+# Test class that all test must be derived from
+###############################################
+
 class ExtraTest( object ):
+	"""
+	Parent class for all tests in this suite.
+	Every child must set its .group string and implement
+    its .run() method.
+	"""
 	
 	@classmethod
 	def groupname( cls ):
+		"""
+		Getter that returns a test's group name.
+		"""
 		if cls.group:
 			return cls.group
 		else:
-			 return "unknown"
+			 return 'unknown'
 
 	@staticmethod
 	def group_list():
+		"""
+		Returns a list of all groups in the test suite.
+		"""
 		groups = []
 		for t in ExtraTest.__subclasses__():
 			if t.groupname() not in groups:
@@ -32,6 +47,9 @@ class ExtraTest( object ):
 
 	@staticmethod
 	def test_list( group=None ):
+		"""
+		Returns a list of all tests, optionally filtered by group.
+		"""
 		if group is None:
 			return ExtraTest.__subclasses__()
 		else:
@@ -43,9 +61,16 @@ class ExtraTest( object ):
 
 	@classmethod
 	def run( cls, group=None ):
+		"""
+		Runs all the tests, optionally just within the specified group.
+		"""
 		for t in cls.test_list( group ):
 			t.run()
 
+
+#######################################################################################################################
+# Shared module functionality
+#############################
 
 def wait_for_adb_device():
 	try:
@@ -68,7 +93,16 @@ def adb_has_root():
 	adb = DeviceManagerADB()
 	return adb.shellCheckOutput( ["id"] ).startswith( "uid=0(root)" )
 
+
+#######################################################################################################################
+# Command line handler
+######################
+
 def extracli():
+    """
+    Entry point for the runner defined in setup.py.
+    """
+
     parser = argparse.ArgumentParser( description="Runner for extra test suite")
     parser.add_argument("-l", "--list-test-groups", action="store_true",
                         help="List all logical test groups")
@@ -83,8 +117,11 @@ def extracli():
                         help="drop to ipython session")  
     parser.add_argument("-v", dest="verbose", action="store_true",
                         help="Verbose output")  
+
+    # add specialized mozilla logger options
     commandline.add_logging_group(parser)
     args = parser.parse_args()
+    # set up mozilla logger
     logger = commandline.setup_logging("extrasuite", vars(args), {"raw": sys.stdout})
 
     try:
