@@ -9,6 +9,10 @@ import os
 import sys
 import subprocess
 
+# getter for shared logger instance
+from mozlog.structured import get_default_logger
+
+
 #######################################################################################################################
 # shared module functions
 #########################
@@ -43,6 +47,8 @@ def parse_ls( out ):
 		date = r'(\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}) '
 		name = r'(.+)$'
 		link = r'(.+) -> (.+)$'
+
+		logger = get_default_logger()
 
 		# adb returns newline as \r\n
 		for dirstr in out[2:-2].split( '\r\n\r\n' ):
@@ -106,14 +112,14 @@ def parse_ls( out ):
 							'name': m.group(7)
 						}
 					except:
-						print >>sys.stderr, "parse error on", filestr
+						logger.error( "parse error on %s" % filestr )
 
 				try:
 					specs['name'] = '/'+os.path.relpath( "%s/%s" % (dirname, specs['name'] ), '/' )
 					if 'link' in specs.keys():
 						specs['link'] = '/'+os.path.relpath( "%s/%s" % (dirname, specs['link'] ), '/' )
 				except:
-					print >>sys.stderr, "no name from", filestr 
+					logger.warning( "no name from %s" % filestr )
 
 				yield specs
 
@@ -139,6 +145,9 @@ class worldwritable( ExtraTest ):
 
 	whitelist = {
 		'ok': [
+			'^/proc/.*$', # whitelisting for now
+			'^/sys/.*$', # whitelisting for now
+			'^/system/.*$', # /system/ is supposed to be read-only
 			'^/dev/null$',
 			'^/dev/zero$',
 			'^/dev/full$',
@@ -171,10 +180,15 @@ class worldwritable( ExtraTest ):
 	@classmethod
 	def run( cls ):
 		out, err = runcmd( "adb shell ls -alR /" )
+		found = []
 		for f in parse_ls( out ):
 			if f['perm'][7] == 'w' and f['mode'] != 'l':
 				if not cls.whitelist_check( f['name'] ):
-					print f
+					found.append( f['name'] )
+		if len(found) > 0:
+			cls.log_status( 'FAIL', 'why are these world-writable?\n%s' % '\n'.join(found) )
+		else:
+			cls.log_status( 'PASS', 'no unexpected suidroot executables found' )
 
 
 #######################################################################################################################
@@ -207,9 +221,14 @@ class suidroot( ExtraTest ):
 	@classmethod
 	def run( cls ):
 		out, err = runcmd( "adb shell ls -alR /" )
+		found = []
 		for f in parse_ls( out ):
 			if f['perm'][2] == 's' and f['uid'] == 'root':
 				if not cls.whitelist_check( f['name'] ):
-					print f
-
+					found.append( f['name'] )
+		if len(found) > 0:
+			cls.log_status( 'FAIL', 'why are these suid root?\n%s' % '\n'.join(found) )
+		else:
+			cls.log_status( 'PASS', 'no unexpected suidroot executables found' )
+			
 

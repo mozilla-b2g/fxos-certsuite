@@ -9,9 +9,8 @@ import logging
 import argparse
 import traceback
 from mozdevice import DeviceManagerADB, DMError, ADBError
-from mozlog.structured import commandline
+from mozlog.structured import commandline, get_default_logger
 from time import sleep
-
 
 #######################################################################################################################
 # Test class that all test must be derived from
@@ -59,6 +58,27 @@ class ExtraTest( object ):
 					tests.append( t )
 			return tests
 
+	@staticmethod
+	def run_groups( groups=[] ):
+		logger = get_default_logger()
+		if groups is None or len( groups ) == 0: # run all groups
+			logger.debug( 'running extrasuite tests for all groups %s' % str( ExtraTest.group_list() ) )
+			groups = ExtraTest.group_list()
+		else:
+			logger.debug( 'running extrasuite tests for groups %s' % str( groups ) )
+		logger.suite_start( tests=groups )
+		for g in groups:
+			logger.debug( "running extrasuite test group %s" % g )
+			logger.test_start( g )
+			try:
+				ExtraTest.run( g )
+				logger.test_end( g, 'OK' )
+			except:
+				logger.critical(traceback.format_exc())
+				logger.end_test( g, 'FAIL' ) 		
+				raise
+		logger.suite_end()
+
 	@classmethod
 	def run( cls, group=None ):
 		"""
@@ -67,6 +87,10 @@ class ExtraTest( object ):
 		for t in cls.test_list( group ):
 			t.run()
 
+	@classmethod
+	def log_status( cls, status, msg ):
+		logger = get_default_logger()
+		logger.test_status( cls.groupname(), cls.__name__, status, message=msg )
 
 #######################################################################################################################
 # Shared module functionality
@@ -121,6 +145,7 @@ def extracli():
     # add specialized mozilla logger options
     commandline.add_logging_group(parser)
     args = parser.parse_args()
+
     # set up mozilla logger
     logger = commandline.setup_logging("extrasuite", vars(args), {"raw": sys.stdout})
 
@@ -138,17 +163,9 @@ def extracli():
         else:
             wait_for_adb_device()
             if not adb_has_root():
-                print "WARNING: adb has no root. Results will be incomplete."
-            if len( args.include ) == 0: # run all groups
-                for t in ExtraTest.test_list():
-                    print "running %s" % t
-                    t.run()
-            else:                        # run only included groups
-                for g in args.include:
-                    for t in ExtraTest.test_list( g ):
-                        print "running %s" % t
-                        t.run()
-			
+                logger.warning( "adb has no root. Results will be incomplete." )
+            ExtraTest.run_groups( args.include )
+
     except:
         logger.critical(traceback.format_exc())
         raise
