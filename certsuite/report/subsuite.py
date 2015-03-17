@@ -89,8 +89,8 @@ class HTMLBuilder(object):
                 html.tr(
                     html.th("Parent Test", class_='sortable', col='parent'),
                     html.th("Subtest", class_='sortable', col='subtest'),
-                    html.th("Expected", class_='sortable', col='expected'),
-                    html.th("Result", class_='sortable', col='result'),
+                    html.th("Expected", col='expected'),
+                    html.th("Result", col='result'),
                 ), id='results-table-head'
             ),
             html.tbody(*self.make_table_rows(),id='results-table-body'), 
