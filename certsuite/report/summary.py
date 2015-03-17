@@ -81,7 +81,7 @@ class HTMLBuilder(object):
         return html.table(
             html.thead(
                 html.tr(
-                    html.th("Subsuite"),
+                    html.th("Subsuite", class_='sortable', col='subsuite'),
                     html.th("Subsuite Errors"),
                     html.th("Test Regressions"),
                     html.th("Details")
@@ -101,7 +101,7 @@ class HTMLBuilder(object):
             if result.has_errors:
                 cells.append(html.td(
                     len(result.errors),
-                    class_="condition FAIL",
+                    class_="condition FAIL col-subsuite",
                 ))
             else:
                 cells.append(html.td("0",
