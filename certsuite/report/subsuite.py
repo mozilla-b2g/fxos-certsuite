@@ -46,6 +46,7 @@ class HTMLBuilder(object):
                 rcname, os.path.sep.join(['resources', 'htmlreport', 
                     'main.js']))),
                 type='text/javascript'),
+            html.a('#', href='http://mozilla.org', id='tabzilla'),
             html.h1("FirefoxOS Certification Suite Report: %s" 
                 % self.results.name),
             ]
