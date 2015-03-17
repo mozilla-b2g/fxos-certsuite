@@ -33,6 +33,7 @@ from marionette.by import By
 from marionette.wait import Wait
 from marionette_extension import AlreadyInstalledException
 from marionette_extension import install as marionette_install
+from marionette_extension import uninstall as marionette_uninstall
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters, set_default_logger
 from reportmanager import ReportManager
@@ -390,16 +391,18 @@ def run_tests(args, config):
             with adb_b2g.DeviceBackup() as backup:
                 device = backup.device
                 runner = TestRunner(args, config)
-                for suite, groups in runner.iter_suites():
-                    try:
-                        runner.run_suite(suite, groups, log_manager, report_manager)
-                    except:
-                        logger.error("Encountered error:\n%s" %
-                                     traceback.format_exc())
-                        error = True
-                    finally:
-                        backup.restore()
-                        device.reboot()
+                try:
+                    for suite, groups in runner.iter_suites():
+                        try:
+                            runner.run_suite(suite, groups, log_manager, report_manager)
+                        except:
+                            logger.error("Encountered error:\n%s" %
+                                         traceback.format_exc())
+                            error = True
+                finally:
+                    marionette_uninstall()
+                    backup.restore()
+                    device.reboot()
 
             if error:
                 logger.critical("Encountered errors during run")
@@ -409,8 +412,6 @@ def run_tests(args, config):
     finally:
         if output_zipfile:
             print >> sys.stderr, "Results saved to %s" % output_zipfile
-        if remove_marionette_after_run:
-            marionette_install.uninstall()
 
     return error
 
