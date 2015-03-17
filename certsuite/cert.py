@@ -47,7 +47,7 @@ webapi_results_embed_app = None
 
 last_test_started = 'None'
 
-supported_versions = ["2.1", "2.0", "1.4", "1.3"]
+supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
