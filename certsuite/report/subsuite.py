@@ -118,14 +118,14 @@ class HTMLBuilder(object):
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(json.dumps(subtest_data))
 
                 cells.extend([
-                    html.td(test_name, class_="parent_test %s" % odd_or_even),
+                    html.td(test_name, class_="parent_test %s col-parent" % odd_or_even),
                     html.td(
-                        html.a(sub_name, class_='test', href=href, target='_blank'),
+                        html.a(sub_name, class_='test col-subtest', href=href, target='_blank'),
                         class_="parent_test %s" % odd_or_even),
                     html.td(cell_expected,
-                            class_="condition %s %s" % (class_expected, odd_or_even)),
+                            class_="condition col-expected %s %s" % (class_expected, odd_or_even)),
                     html.td(subtest_data["status"].title(),
-                            class_="condition %s %s" % (subtest_data["status"], odd_or_even))
+                            class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even))
                 ])
                 if cell_message == "":
                     rv.extend([
