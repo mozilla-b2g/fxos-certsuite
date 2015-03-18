@@ -54,6 +54,7 @@ class Results(object):
         self.name = None
         self.regressions = defaultdict(dict)
         self.errors = []
+        self.map = {}
 
     @property
     def is_pass(self):
@@ -66,3 +67,12 @@ class Results(object):
     @property
     def has_errors(self):
         return len(self.errors) > 0
+
+    def has(self, key):
+        return key in self.map.keys()
+
+    def set(self, key, value):
+        self.map[key] = value
+
+    def get(self, key):
+        return self.map[key] if self.has(key) else None
