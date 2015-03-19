@@ -9,6 +9,7 @@ import ConfigParser
 import json
 import logging
 import os
+import sys
 import pkg_resources
 import re
 import StringIO
@@ -334,45 +335,31 @@ def set_permission(permission, value, app):
     run_marionette_script(script % (permission, app_url, app_url, value), True)
 
 def make_html_report(path, report):
-    def decode_encode(a_string):
-        return a_string.decode('utf8', 'ingore').encode('ascii', 'ignore')
-
     def tabelize(value):
         try:
             rows = []
             for key in value.keys():
-                encoded_key = key
-                encoded_value = value[key]
-                if isinstance(key, basestring):
-                    encoded_key = decode_encode(encoded_key)
-                if isinstance(encoded_value, basestring):
-                    encoded_value = decode_encode(encoded_value)
-                rows.append(html.tr(html.td(html.pre(encoded_key)),
-                                    html.td(tabelize(encoded_value))))
+                rows.append(html.tr(html.td(html.pre(key)), html.td(tabelize(value[key]))))
             return html.table(rows)
         except AttributeError:
             if type(value) == type([]):
                 return html.table(map(tabelize, value))
             else:
-                return html.pre(decode_encode(value))
+                return html.pre(value)
 
     body_els = []
     keys = report.keys()
     keys.sort()
     links = []
     for key in keys:
-        encoded_key = decode_encode(key)
-        links.append(html.li(html.a(encoded_key,
-                                    href="#" + encoded_key)))
+        links.append(html.li(html.a(key, href="#" + key)))
     body_els.append(html.ul(links))
     for key in keys:
-        encoded_key = decode_encode(key)
-        body_els.append(html.a(html.h1(encoded_key),
-                               id=encoded_key))
+        body_els.append(html.a(html.h1(key), id=key))
         body_els.append(tabelize(report[key]))
     with open(path, 'w') as f:
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
-        f.write(decode_encode(str(doc)))
+        f.write(str(doc))
 
 def get_application_ini(dm):
     # application.ini information
@@ -735,6 +722,9 @@ def cli():
     global logger
     global webapi_results
     global webapi_results_embed_app
+
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--version",
