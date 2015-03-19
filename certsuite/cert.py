@@ -374,7 +374,7 @@ def make_html_report(path, report):
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
         f.write(decode_encode(str(doc)))
 
-def get_application_ini():
+def get_application_ini(dm):
     # application.ini information
     appinicontents = dm.pullFile('/system/b2g/application.ini')
     sf = StringIO.StringIO(appinicontents)
@@ -385,7 +385,7 @@ def get_application_ini():
         application_ini[section] = dict(config.items(section))
     return application_ini
 
-def get_buildprop():
+def get_buildprop(dm):
     # get build properties
     buildprops = {}
     buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
@@ -397,10 +397,10 @@ def get_buildprop():
         buildprops[prop] = val
     return buildprops
 
-def get_processes_running():
+def get_processes_running(dm):
     return map(lambda p: { 'name': p[1], 'user': p[2] }, dm.getProcessList())
 
-def get_kernel_version():
+def get_kernel_version(dm):
     return dm.shellCheckOutput(["cat", "/proc/version"])
 
 def _run(args, logger):
@@ -468,13 +468,13 @@ def _run(args, logger):
         print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
         raise
 
-    report['buildprops'] = get_buildprop()
+    report['buildprops'] = get_buildprop(dm)
 
-    report['processes_running'] = get_processes_running()
+    report['processes_running'] = get_processes_running(dm)
 
-    report['kernel_version'] = get_kernel_version()
+    report['kernel_version'] = get_kernel_version(dm)
 
-    report['application_ini'] = get_application_ini()
+    report['application_ini'] = get_application_ini(dm)
 
     logger.suite_start(tests=[])
     # run the omni.ja analyzer
