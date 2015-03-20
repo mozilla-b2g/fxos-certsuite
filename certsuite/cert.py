@@ -282,7 +282,7 @@ def run_marionette_script(script, chrome=False, async=False):
 def kill(name):
     """Kill the specified app"""
     script = """
-      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+      let manager = window.wrappedJSObject.appWindowManager || new window.wrappedJSObject.AppWindowManager();
       manager.kill('%s');
     """
     return run_marionette_script(script % name)
