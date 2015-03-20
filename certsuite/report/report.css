@@ -13,7 +13,7 @@ body {
 
 .condition {
     font-variant: small-caps;
-    color: white;
+    color: white !important;
     text-align: center;
     font-size: 1.1em;
     width:5em;
