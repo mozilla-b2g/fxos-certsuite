@@ -8,6 +8,7 @@ import base64
 import marionette.runner.mixins
 import sys
 import json
+import cgi
 
 from py.xml import html, raw
 
@@ -75,10 +76,22 @@ class HTMLBuilder(object):
     def make_errors_table(self, errors):
         rows = []
         for error in errors:
+            error_message = error.get("message", "")
+            log = html.div(class_='log')
+            for line in error_message.splitlines():
+                separator = line.startswith(' ' * 10)
+                if separator:
+                    log.append(line[:80])
+                else:
+                    if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
+                        log.append(html.span(raw(cgi.escape(line)), class_='error'))
+                    else:
+                        log.append(raw(cgi.escape(line)))
+                log.append(html.br())
             rows.append(html.tr(
                 html.td(error["level"],
                         class_="log_%s" % error["level"]),
-                html.td(error.get("message", ""), class_='log')
+                html.td(log, class_='log')
             ))
         return html.table(rows, id_="errors")
 
@@ -113,6 +126,21 @@ class HTMLBuilder(object):
                 cell_expected = self.get_cell_expected(subtest_data).upper()
                 class_expected = self.get_class_expected(subtest_data)
                 cell_message  = subtest_data.get("message", "")
+                
+                if cell_message != "":
+                    log = html.div(class_='log')
+                    for line in cell_message.splitlines():
+                        separator = line.startswith(' ' * 10)
+                        if separator:
+                            log.append(line[:80])
+                        else:
+                            if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
+                                log.append(html.span(raw(cgi.escape(line)), class_='error'))
+                            else:
+                                log.append(raw(cgi.escape(line)))
+                        log.append(html.br())
+                    cell_message = log
+
 
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(json.dumps(subtest_data))
 
