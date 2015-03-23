@@ -8,6 +8,7 @@ import base64
 import marionette.runner.mixins
 import sys
 import json
+import cgi
 
 from py.xml import html, raw
 
@@ -67,19 +68,30 @@ class HTMLBuilder(object):
                     href = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(files[key])
                 else:
                     href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(files[key])
-                details.append(html.a(key, href=href, target='_blank'))
-                details.append(' ')
-            body_parts.extend(details)
+                details.append(html.li(html.a(key, href=href, target='_blank')))
+            body_parts.append(html.ul(details))
 
         return html.body(body_parts)
 
     def make_errors_table(self, errors):
         rows = []
         for error in errors:
+            error_message = error.get("message", "")
+            log = html.div(class_='log')
+            for line in error_message.splitlines():
+                separator = line.startswith(' ' * 10)
+                if separator:
+                    log.append(line[:80])
+                else:
+                    if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
+                        log.append(html.span(raw(cgi.escape(line)), class_='error'))
+                    else:
+                        log.append(raw(cgi.escape(line)))
+                log.append(html.br())
             rows.append(html.tr(
                 html.td(error["level"],
                         class_="log_%s" % error["level"]),
-                html.td(error.get("message", ""), class_='log')
+                html.td(log, class_='log')
             ))
         return html.table(rows, id_="errors")
 
@@ -114,6 +126,21 @@ class HTMLBuilder(object):
                 cell_expected = self.get_cell_expected(subtest_data).upper()
                 class_expected = self.get_class_expected(subtest_data)
                 cell_message  = subtest_data.get("message", "")
+                
+                if cell_message != "":
+                    log = html.div(class_='log')
+                    for line in cell_message.splitlines():
+                        separator = line.startswith(' ' * 10)
+                        if separator:
+                            log.append(line[:80])
+                        else:
+                            if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
+                                log.append(html.span(raw(cgi.escape(line)), class_='error'))
+                            else:
+                                log.append(raw(cgi.escape(line)))
+                        log.append(html.br())
+                    cell_message = log
+
 
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(json.dumps(subtest_data))
 
@@ -125,18 +152,17 @@ class HTMLBuilder(object):
                     html.td(cell_expected,
                             class_="condition col-expected %s %s" % (class_expected, odd_or_even)),
                     html.td(subtest_data["status"].title(),
-                            class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even))
+                            class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even)),
+                    html.td(html.div(cell_message, class_='log'), class_='debug')
                 ])
                 if cell_message == "":
-                    rv.extend([
-                        html.tr(cells, class_='passed result_table_row'),
-                        html.tr(html.td(cell_message, class_='debug', colspan=5))
-                        ])
+                    rv.append(
+                        html.tr(cells, class_='passed results-table-row')
+                        )
                 else:
-                    rv.extend([
-                        html.tr(cells, class_='error result_table_row'),
-                        html.tr(html.td(html.div(cell_message, class_='log'), class_='debug', colspan=5))
-                        ])
+                    rv.append(
+                        html.tr(cells, class_='error results-table-row')
+                        )
         return rv
 
     def get_cell_expected(self, subtest_data):

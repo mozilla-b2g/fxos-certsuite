@@ -49,6 +49,7 @@ class HTMLBuilder(object):
                 rcname, os.path.sep.join(['resources', 'htmlreport', 
                     'main.js']))),
                 type='text/javascript'),
+            html.a('#', href='http://mozilla.org', id='tabzilla'),
             html.h1("FirefoxOS Certification Suite Report"),
             html.p("Run at %s" % self.time.strftime("%Y-%m-%d %H:%M:%S"))
             )]
@@ -70,10 +71,22 @@ class HTMLBuilder(object):
     def make_errors_table(self, errors):
         rows = []
         for error in errors:
+            error_message = error.get("message", "")
+            log = html.div(class_='log')
+            for line in error_message.splitlines():
+                separator = line.startswith(' ' * 10)
+                if separator:
+                    log.append(line[:80])
+                else:
+                    if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
+                        log.append(html.span(raw(cgi.escape(line)), class_='error'))
+                    else:
+                        log.append(raw(cgi.escape(line)))
+                log.append(html.br())
             rows.append(html.tr(
                 html.td(error["level"],
                         class_="log_%s" % error["level"]),
-                html.td(error.get("message", ""), class_='log')
+                html.td(log, class_='log')
             ))
         return html.table(rows, id_="errors")
 
@@ -88,8 +101,9 @@ class HTMLBuilder(object):
                 )
             ),
             html.tbody(
-                self.make_table_rows(self.subsuite_results)
-            )
+                self.make_table_rows(self.subsuite_results),id='results-table-body'
+            ), 
+            id='results-table'
         )
 
     def make_table_rows(self, results):
@@ -97,7 +111,7 @@ class HTMLBuilder(object):
         for key in results.keys():
             result = results[key]['results']
             details_link = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(results[key]['html_str'])
-            cells = [html.td(key)]
+            cells = [html.td(key, class_="col-subsuite")]
             if result.has_errors:
                 cells.append(html.td(
                     len(result.errors),
@@ -116,7 +130,7 @@ class HTMLBuilder(object):
                 html.a("details", href=details_link, target='_blank'),
                 class_="details"
             ))
-            rv.append(html.tr(cells))
+            rv.append(html.tr(cells, class_='results-table-row'))
 
         return rv
 
