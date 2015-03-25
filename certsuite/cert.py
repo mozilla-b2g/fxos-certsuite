@@ -47,6 +47,7 @@ webapi_results = None
 webapi_results_embed_app = None
 
 last_test_started = 'None'
+logger = None
 
 supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
@@ -72,6 +73,7 @@ def webapi_results_embed_apps_handler(request, response):
 @wptserve.handlers.handler
 def webapi_log_handler(request, response):
     global last_test_started
+    global logger
 
     log_string = request.POST["log"]
     index = log_string.find('test started:')
