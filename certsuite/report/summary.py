@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import cgi
 import pkg_resources
 import base64
 import marionette.runner.mixins
