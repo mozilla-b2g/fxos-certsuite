@@ -17,11 +17,13 @@ import tempfile
 import traceback
 import zipfile
 import shutil
+import pickle
 
 from mozlog.structured import structuredlog
 
 JS_FILES = re.compile('\.jsm*$')
 MANIFEST_FILES = re.compile('\.manifest$')
+
 
 def unzip_omnifile(omnifile, path):
     # The following is the right way to do this in python, however that throws a BadZipFile error
@@ -42,6 +44,7 @@ def unzip_omnifile(omnifile, path):
         if omnizip:
             omnizip.close()
 
+
 class CleanedTempFolder(object):
     def __init__(self, root_folder=None):
         self.root_folder = root_folder
@@ -53,9 +56,11 @@ class CleanedTempFolder(object):
     def __exit__(self, type, value, traceback):
         shutil.rmtree(self.folder)
 
+
 class OmniAnalyzer(object):
     def __init__(self, reference_omni_ja, logger=None):
         self.reference_omni_ja = reference_omni_ja
+        self.omni_ja_on_device = '/system/b2g/omni.ja'
         if logger is None:
             self.logger = structuredlog.StructuredLogger("omni-analyzer")
         else:
@@ -70,10 +75,11 @@ class OmniAnalyzer(object):
             print ("Error connecting to device via adb (error: %s). Please be sure device is connected and 'remote debugging' is enabled." % e.msg)
             sys.exit(1)
         omnifile = os.path.join(workdir, 'omni.ja')
-        dm.getFile('/system/b2g/omni.ja', omnifile)
+        dm.getFile(self.omni_ja_on_device, omnifile)
         unzip_omnifile(omnifile, os.path.join(workdir, 'device'))
 
     def run(self):
+        is_run_success = False
         diff = ''
         with CleanedTempFolder() as workdir:
             self.getomni(workdir)
@@ -82,14 +88,22 @@ class OmniAnalyzer(object):
             cmd = ['diff', '-U', '8', '--new-file', os.path.join(workdir, 'reference'), os.path.join(workdir, 'device')]
             try:
                 diff = subprocess.check_output(cmd)
+                self.logger.test_status('omni-analyzer', 'diff', 'PASS', message='The %s on device is the same as reference file omni.ja.' % self.omni_ja_on_device)
+                is_run_success = True
             except subprocess.CalledProcessError as e:
                 if e.returncode == 1:
                     # return code 1 simply indicates differences were found
                     diff = e.output
+                    diff_file = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(diff)
+                    diff_link = {'text': 'Diff Result', 'href': diff_file, 'target': '_blank'}
+                    diff_message = pickle.dumps(diff_link)
+                    is_run_success = True
                 else:
-                    self.logger.error('error running diff: %s' % e.returncode)
+                    diff_message = 'error running diff: %s' % e.returncode
+                    self.logger.error(diff_message)
+                self.logger.test_status('omni-analyzer', 'diff', 'FAIL', message=diff_message)
+        return diff, is_run_success
 
-        return diff
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -102,6 +116,7 @@ def main(argv):
     diff = omni_analyzer.run()
     with open(args.results_file, 'w') as f:
         f.write(diff)
+
 
 if __name__ == "__main__":
     main(sys.argv)

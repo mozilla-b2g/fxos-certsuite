@@ -9,11 +9,13 @@ import marionette.runner.mixins
 import sys
 import json
 import cgi
+import pickle
 
 from py.xml import html, raw
 
 here = os.path.split(__file__)[0]
 rcname = marionette.runner.mixins.__name__
+
 
 class HTMLBuilder(object):
     def make_report(self, results):
@@ -32,7 +34,7 @@ class HTMLBuilder(object):
             html.title("FirefoxOS Certification Suite Report: %s" % self.results.name),
             style,
             html.style(raw(pkg_resources.resource_string(
-                rcname, os.path.sep.join(['resources', 'htmlreport', 
+                rcname, os.path.sep.join(['resources', 'htmlreport',
                     'style.css']))),
                 type='text/css'),
         )
@@ -40,15 +42,15 @@ class HTMLBuilder(object):
     def make_body(self):
         body_parts = [
             html.script(raw(pkg_resources.resource_string(
-                rcname, os.path.sep.join(['resources', 'htmlreport', 
+                rcname, os.path.sep.join(['resources', 'htmlreport',
                     'jquery.js']))),
                 type='text/javascript'),
             html.script(raw(pkg_resources.resource_string(
-                rcname, os.path.sep.join(['resources', 'htmlreport', 
+                rcname, os.path.sep.join(['resources', 'htmlreport',
                     'main.js']))),
                 type='text/javascript'),
             html.a('#', href='http://mozilla.org', id='tabzilla'),
-            html.h1("FirefoxOS Certification Suite Report: %s" 
+            html.h1("FirefoxOS Certification Suite Report: %s"
                 % self.results.name),
             ]
 
@@ -105,7 +107,7 @@ class HTMLBuilder(object):
                     html.th("Result", col='result'),
                 ), id='results-table-head'
             ),
-            html.tbody(*self.make_table_rows(),id='results-table-body'), 
+            html.tbody(*self.make_table_rows(), id='results-table-body'),
             id='results-table'
         )
 
@@ -125,22 +127,30 @@ class HTMLBuilder(object):
                 subtest_data = test_data[subtest]
                 cell_expected = self.get_cell_expected(subtest_data).upper()
                 class_expected = self.get_class_expected(subtest_data)
-                cell_message  = subtest_data.get("message", "")
-                
-                if cell_message != "":
-                    log = html.div(class_='log')
-                    for line in cell_message.splitlines():
-                        separator = line.startswith(' ' * 10)
-                        if separator:
-                            log.append(line[:80])
-                        else:
-                            if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
-                                log.append(html.span(raw(cgi.escape(line)), class_='error'))
-                            else:
-                                log.append(raw(cgi.escape(line)))
-                        log.append(html.br())
-                    cell_message = log
+                cell_message = subtest_data.get("message", "")
 
+                if cell_message != "":
+                    try:
+                        # if cell_message is dict obj, then it will be {'text': HTML_A_TEXT, 'href': HTML_A_HREF, 'target': HTML_A_TARGET}
+                        link = pickle.loads(cell_message)
+                        if 'text' in link and 'href' in link:
+                            if 'target' in link:
+                                cell_message = html.a(link['text'], href=link['href'], target=link['target'])
+                            else:
+                                cell_message = html.a(link['text'], href=link['href'])
+                    except:
+                        log = html.div(class_='log')
+                        for line in cell_message.splitlines():
+                            separator = line.startswith(' ' * 10)
+                            if separator:
+                                log.append(line[:80])
+                            else:
+                                if line.lower().find("error") != -1 or line.lower().find("exception") != -1:
+                                    log.append(html.span(raw(cgi.escape(line)), class_='error'))
+                                else:
+                                    log.append(raw(cgi.escape(line)))
+                            log.append(html.br())
+                        cell_message = log
 
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(json.dumps(subtest_data))
 
@@ -189,7 +199,7 @@ class HTMLBuilder(object):
         test_name = self.test_string(test)
         if len(test_data) == 1 and None in test_data.keys():
             start_index = test_name.find('.') + 1
-            end_index = test_name.find('.' , start_index)
+            end_index = test_name.find('.', start_index)
             test_name = test_name[start_index:end_index]
         return test_name
 
@@ -205,6 +215,7 @@ class HTMLBuilder(object):
                 sub_name = 'parent'
         return sub_name
 
+
 def make_report(results):
     doc = HTMLBuilder().make_report(results)
     with open('/tmp/test.html', 'w') as f:
@@ -212,12 +223,14 @@ def make_report(results):
         f.write(u"<!DOCTYPE html>\n" + doc.unicode(indent=2))
     return u"<!DOCTYPE html>\n" + doc.unicode(indent=2)
 
+
 def make_file_report(path):
     from __init__ import parse_log
     results = parse_log(path)
     make_report(results)
 
-if __name__ == "__main__":  
+
+if __name__ == "__main__":
     import sys
     reload(sys)
     sys.setdefaultencoding('utf-8')
