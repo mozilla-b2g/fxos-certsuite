@@ -729,7 +729,7 @@ def cli():
     parser = argparse.ArgumentParser()
     parser.add_argument("--version",
                         help="version of FxOS under test",
-                        default="2.1",
+                        default="2.2",
                         action="store")
     parser.add_argument("--debug",
                         help="enable debug logging",
