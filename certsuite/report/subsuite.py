@@ -218,16 +218,16 @@ class HTMLBuilder(object):
 
 def make_report(results):
     doc = HTMLBuilder().make_report(results)
-    with open('/tmp/test.html', 'w') as f:
-        print 'write file /tmp/test.html'
-        f.write(u"<!DOCTYPE html>\n" + doc.unicode(indent=2))
     return u"<!DOCTYPE html>\n" + doc.unicode(indent=2)
 
 
 def make_file_report(path):
     from __init__ import parse_log
     results = parse_log(path)
-    make_report(results)
+    with open('/tmp/test.html', 'w') as f:
+        print 'write file /tmp/test.html'
+        f.write(make_report(results))
+    
 
 
 if __name__ == "__main__":
