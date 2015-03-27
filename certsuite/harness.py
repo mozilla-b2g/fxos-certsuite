@@ -202,7 +202,7 @@ class TestRunner(object):
 
         return output_files, structured_path
 
-    def build_command(self, suite, groups, temp_dir, device_profile=None):
+    def build_command(self, suite, groups, temp_dir):
         suite_opts = self.config["suites"][suite]
 
         subn = self.config.copy()
@@ -417,8 +417,7 @@ def edit_device_profile(device_profile_path):
 def check_device_profile(device_profile_path):
     try:
         with open(device_profile_path, 'r') as device_profile_file:
-            device_profile_string = device_profile_file.read()
-            device_profile_object = json.loads(device_profile_string)
+            device_profile_object = json.loads(device_profile_file)
             if not 'result' in device_profile_object:
                 logger.error('Invalide device profile file [%s]' % device_profile_path)
             else:
