@@ -146,13 +146,13 @@ class HTMLBuilder(object):
                         html.a(sub_name, class_='test col-subtest', href=href, target='_blank'),
                         class_="parent_test %s" % odd_or_even),
                     html.td(cell_expected,
-                            class_="condition col-expected %s %s" % (class_expected, odd_or_even)),
+                        class_="condition col-expected %s %s" % (class_expected, odd_or_even)),
                     html.td(subtest_data["status"].title(),
-                            class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even))
+                        class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even))
                 ])
                 if cell_message == "":
-                   rv.append(
-                         html.tr(cells, class_='passed results-table-row')
+                    rv.append(
+                        html.tr(cells, class_='passed results-table-row')
                         )
                 else:
                     rv.extend([
