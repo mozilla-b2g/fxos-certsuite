@@ -145,10 +145,6 @@ class TestRunner(object):
         with TemporaryDirectory() as temp_dir:
             result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
-            for path in result_files:
-                file_name = os.path.split(path)[1]
-                log_manager.add_file(path, "%s/%s" % (suite, file_name))
-
             report_manager.add_subsuite_report(structured_path, result_files)
 
     def run_test(self, suite, groups, temp_dir):
