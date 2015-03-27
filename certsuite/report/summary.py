@@ -16,9 +16,9 @@ here = os.path.split(__file__)[0]
 rcname = marionette.runner.mixins.__name__
 
 class HTMLBuilder(object):
-    def make_report(self, time, summary_results, subsuite_results, log_path):
+    def make_report(self, time, summary_results, subsuite_results, logs):
         self.time = time
-        self.log_path = log_path
+        self.logs = logs
         self.summary_results = summary_results
         self.subsuite_results = subsuite_results
         return html.html(
@@ -59,14 +59,16 @@ class HTMLBuilder(object):
             body_parts.append(self.make_errors_table(self.summary_results.errors))
         body_parts.append(self.make_result_table())
 
-        details_log = ''
-        with open(self.log_path, 'r') as f:
-            details_log = f.read()
-        href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(details_log)
-        body_parts.extend([
-            html.h2("Details log information"),
-            html.a(html.a('log', href=href, target='_blank'))
-            ])
+        if self.logs:
+            body_parts.append(html.h2("Details log information"))
+            ulbody = [];
+            for log_path in self.logs:
+                details_log = ''
+                with open(log_path, 'r') as f:
+                    details_log = f.read()
+                href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(details_log)
+                ul.append(html.a(html.a(log__path, href=href, target='_blank')))
+            body_parts.append(html.ul(ulbody))
         return html.body(body_parts)
 
     def make_errors_table(self, errors):

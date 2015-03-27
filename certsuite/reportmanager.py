@@ -15,6 +15,7 @@ class ReportManager(object):
         self.zip_file = None
         self.subsuite_results = {}
         self.structured_path = None
+        self.unlink_devcie_profile_file = True
 
     def setup_report(self, zip_file = None, 
         structured_path = None):
@@ -25,9 +26,12 @@ class ReportManager(object):
     def __enter__(self):
         return self
 
-    def __exit__(self, *arfs, **kwargs):
+    def __exit__(self, *args, **kwargs):
         if self.structured_path:
             self.add_summary_report(self.structured_path)
+        if self.unlink_devcie_profile_file:
+            os.unlink(report_manager.device_profile)
+            
 
     def add_subsuite_report(self, path, result_files):
         results = report.parse_log(path)
@@ -52,6 +56,6 @@ class ReportManager(object):
         html_str = report.summary.make_report(self.time,
                                               summary_results,
                                               self.subsuite_results,
-                                              path)
+                                              [path, self.device_profile])
         path = "report.html"
         self.zip_file.writestr(path, html_str)
