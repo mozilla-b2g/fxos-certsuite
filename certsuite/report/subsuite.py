@@ -3,7 +3,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import pkg_resources
 import base64
 import marionette.runner.mixins
 import sys
@@ -32,24 +31,11 @@ class HTMLBuilder(object):
         return html.head(
             html.meta(charset="utf-8"),
             html.title("FirefoxOS Certification Suite Report: %s" % self.results.name),
-            style,
-            html.style(raw(pkg_resources.resource_string(
-                rcname, os.path.sep.join(['resources', 'htmlreport',
-                    'style.css']))),
-                type='text/css'),
+            style
         )
 
     def make_body(self):
         body_parts = [
-            html.script(raw(pkg_resources.resource_string(
-                rcname, os.path.sep.join(['resources', 'htmlreport',
-                    'jquery.js']))),
-                type='text/javascript'),
-            html.script(raw(pkg_resources.resource_string(
-                rcname, os.path.sep.join(['resources', 'htmlreport',
-                    'main.js']))),
-                type='text/javascript'),
-            html.a('#', href='http://mozilla.org', id='tabzilla'),
             html.h1("FirefoxOS Certification Suite Report: %s"
                 % self.results.name),
             ]
@@ -60,18 +46,18 @@ class HTMLBuilder(object):
         if self.results.has_regressions:
             body_parts.append(html.h2("Test Regressions"))
             body_parts.append(self.make_regression_table())
-        if self.results.has('files'):
-            body_parts.append(html.h2("Details information"))
-            details = []
-            files = self.results.get('files')
-            for key in files.keys():
-                href = '#'
-                if key[-4:] == 'html' or key[-3:] == 'htm':
-                    href = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(files[key])
-                else:
-                    href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(files[key])
-                details.append(html.li(html.a(key, href=href, target='_blank')))
-            body_parts.append(html.ul(details))
+        #if self.results.has('files'):
+        #    body_parts.append(html.h2("Details information"))
+        #    details = []
+        #    files = self.results.get('files')
+        #    for key in files.keys():
+        #        href = '#'
+        #        if key[-4:] == 'html' or key[-3:] == 'htm':
+        #            href = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(files[key])
+        #        else:
+        #            href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(files[key])
+        #        details.append(html.li(html.a(key, href=href, target='_blank')))
+        #    body_parts.append(html.ul(details))
 
         return html.body(body_parts)
 
@@ -101,8 +87,8 @@ class HTMLBuilder(object):
         return html.table(
             html.thead(
                 html.tr(
-                    html.th("Parent Test", class_='sortable', col='parent'),
-                    html.th("Subtest", class_='sortable', col='subtest'),
+                    html.th("Parent Test", col='parent'),
+                    html.th("Subtest", col='subtest'),
                     html.th("Expected", col='expected'),
                     html.th("Result", col='result'),
                 ), id='results-table-head'
@@ -162,17 +148,17 @@ class HTMLBuilder(object):
                     html.td(cell_expected,
                             class_="condition col-expected %s %s" % (class_expected, odd_or_even)),
                     html.td(subtest_data["status"].title(),
-                            class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even)),
-                    html.td(html.div(cell_message, class_='log'), class_='debug')
+                            class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even))
                 ])
                 if cell_message == "":
-                    rv.append(
-                        html.tr(cells, class_='passed results-table-row')
+                   rv.append(
+                         html.tr(cells, class_='passed results-table-row')
                         )
                 else:
-                    rv.append(
-                        html.tr(cells, class_='error results-table-row')
-                        )
+                    rv.extend([
+                        html.tr(cells, class_='error results-table-row'),
+                        html.tr(html.td(html.div(cell_message, class_='log'), class_='debug', colspan=5))
+                        ])
         return rv
 
     def get_cell_expected(self, subtest_data):
@@ -227,8 +213,6 @@ def make_file_report(path):
     with open('/tmp/test.html', 'w') as f:
         print 'write file /tmp/test.html'
         f.write(make_report(results))
-    
-
 
 if __name__ == "__main__":
     import sys

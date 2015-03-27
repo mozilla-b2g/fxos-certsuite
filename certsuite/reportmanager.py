@@ -41,6 +41,7 @@ class ReportManager(object):
         results.set('files', files_map)
 
         self.subsuite_results[results.name] = {}
+        self.subsuite_results[results.name]['files'] = files_map
         self.subsuite_results[results.name]['results'] = results
         self.subsuite_results[results.name]['html_str'] = report.subsuite.make_report(results)
 
