@@ -42,9 +42,12 @@ class ReportManager(object):
             file_name = os.path.split(path)[1]
             with open(path, 'r') as f:
                 files_map[file_name] = f.read()
+            self.zip_file.writestr("%s/%s" % (results.name, os.path.basename(path)),
+                                   files_map[file_name])
         results.set('files', files_map)
 
         self.subsuite_results[results.name] = {}
+        self.subsuite_results[results.name]['files'] = files_map
         self.subsuite_results[results.name]['results'] = results
         self.subsuite_results[results.name]['html_str'] = report.subsuite.make_report(results)
 

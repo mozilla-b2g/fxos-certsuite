@@ -128,11 +128,18 @@ class HTMLBuilder(object):
                 cells.append(html.td(num_regressions, class_="condition FAIL"))
             else:
                 cells.append(html.td("0", class_="condition PASS"))
-
-            cells.append(html.td(
-                html.a("details", href=details_link, target='_blank'),
-                class_="details"
-            ))
+            
+            ulbody = [html.li(html.a("subsuite report", href=details_link, target='_blank'))]
+            files = results[key]['files']
+            for fname in files.keys():
+                href = '%s/%s' % (key, fname)
+                #if key[-4:] == 'html' or key[-3:] == 'htm':
+                #    href = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(files[key])
+                #else:
+                #    href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(files[key])
+                ulbody.append(html.li(html.a(fname, href=href, target='_blank')))
+            
+            cells.append(html.td(html.ul(ulbody), class_="details"))
             rv.append(html.tr(cells, class_='results-table-row'))
 
         return rv
