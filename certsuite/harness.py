@@ -413,7 +413,7 @@ def edit_device_profile(device_profile_path):
 def check_device_profile(device_profile_path):
     try:
         with open(device_profile_path, 'r') as device_profile_file:
-            device_profile_object = json.loads(device_profile_file)
+            device_profile_object = json.load(device_profile_file)
             if not 'result' in device_profile_object:
                 logger.error('Invalide device profile file [%s]' % device_profile_path)
             else:

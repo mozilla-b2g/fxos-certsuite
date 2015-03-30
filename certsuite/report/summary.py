@@ -67,7 +67,7 @@ class HTMLBuilder(object):
                 with open(log_path, 'r') as f:
                     details_log = f.read()
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(details_log)
-                ul.append(html.a(html.a(log__path, href=href, target='_blank')))
+                ulbody.append(html.a(html.a(log_path, href=href, target='_blank')))
             body_parts.append(html.ul(ulbody))
         return html.body(body_parts)
 
