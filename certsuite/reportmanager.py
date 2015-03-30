@@ -59,6 +59,6 @@ class ReportManager(object):
         html_str = report.summary.make_report(self.time,
                                               summary_results,
                                               self.subsuite_results,
-                                              [path, self.device_profile])
+                                              [path, self.device_profile_path])
         path = "report.html"
         self.zip_file.writestr(path, html_str)
