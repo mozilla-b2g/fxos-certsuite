@@ -42,6 +42,11 @@ class TestCase(unittest.TestCase):
     def cleanup(self):
         if self.marionette is not None:
             certapp.kill(self.marionette, app=self.app)
+            
+    def check_skip(self, skiplist):
+        test_name = str(self.__class__).split('.')[1]
+        if test_name in skiplist:
+            self.skipTest('Skipped by device profile')
 
     def setUp(self):
         """Sets up the environment for a test case.
@@ -61,6 +66,10 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).setUp()
 
         env = environment.get(InProcessTestEnvironment)
+
+        if env.device_profile:
+            self.check_skip(env.device_profile['webapi'])
+        
         self.server = env.server
         self.handler = env.handler
 

@@ -18,6 +18,7 @@ import tempfile
 import time
 import traceback
 import zipfile
+import webbrowser
 from cStringIO import StringIO
 from collections import OrderedDict
 from datetime import datetime
@@ -36,6 +37,8 @@ from marionette_extension import install as marionette_install
 from marionette_extension import uninstall as marionette_uninstall
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters, set_default_logger
+from webapi_tests.semiauto import environment, server
+
 from reportmanager import ReportManager
 from logmanager import LogManager
 
@@ -51,9 +54,8 @@ config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "config.json"))
 
 
-def setup_logging(log_manager):
+def setup_logging(log_f):
     global logger
-    log_f = log_manager.structured_file
     logger = structuredlog.StructuredLogger("firefox-os-cert-suite")
     logger.add_handler(stdio_handler)
     logger.add_handler(handlers.StreamHandler(log_f,
@@ -218,6 +220,17 @@ class TestRunner(object):
 
         cmd.extend(item % subn for item in suite_opts.get("run_args", []))
         cmd.extend(item % subn for item in suite_opts.get("common_args", []))
+        
+        if self.args.debug and suite == 'webapi':
+            cmd.append('-v')
+        if self.args.debug and suite == 'cert':
+            cmd.append('--debug')
+            
+        if self.args.device_profile or self.args.edit_device_profile:
+            if suite == 'webapi' or suite == 'cert':
+                device_profile = self.args.device_profile or self.args.edit_device_profile
+                cmd.append('--device-profile')
+                cmd.append(device_profile)
 
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
@@ -373,6 +386,45 @@ def list_tests(args, config):
         print "%s:%s" % (test, group)
     return True
 
+def edit_device_profile(device_profile_path):
+    resp = ''
+    try:
+        env = environment.get(environment.InProcessTestEnvironment, addr=None, verbose=False)
+        url = "http://%s:%d/profile.html" % (env.server.addr[0], env.server.addr[1])
+        webbrowser.open(url)
+        environment.env.handler = server.wait_for_client()
+        
+        question = ''
+        resp = environment.env.handler.prompt(question)
+
+        message = 'Create device profile failed!!'    
+        if resp != '':
+            result = json.loads(resp)
+            if result['return'] == 'ok':
+                with open(device_profile_path, 'w') as device_profile_f:
+                    json.dump(result, device_profile_f, indent=4)
+                message = 'Create device profile successfully!!'
+            else:
+                message = 'Create device profile is cancelled by user!!'
+        else:
+            message = ''
+        logger.info(message)
+    except:
+        logger.error("Failed create device profile:\n%s" % traceback.format_exc())
+    
+    return True
+
+def check_device_profile(device_profile_path):
+    try:
+        with open(device_profile_path, 'r') as device_profile_file:
+            device_profile_object = json.loads(device_profile_file)
+            if not 'result' in device_profile_object:
+                logger.error('Invalide device profile file [%s]' % device_profile_path)
+            else:
+                if not 'contact' in device_profile_object['result']:
+                    logger.error('Invalide device profile file [%s]' % device_profile_path)
+    except:
+        logger.critical("Encountered error at checking device profile file [%s]:\n%s" % (device_profile_path, traceback.format_exc()))
 
 def run_tests(args, config):
     error = False
@@ -381,7 +433,22 @@ def run_tests(args, config):
     try:
         with LogManager() as log_manager, ReportManager() as report_manager:
             output_zipfile = log_manager.zip_path
-            setup_logging(log_manager)
+            setup_logging(log_manager.structured_file)
+
+            if args.edit_device_profile:
+                report_manager.unlink_devcie_profile_file = False
+                report_manager.device_profile_path = args.edit_device_profile
+            else:
+                report_manager.device_profile_path = os.path.abspath('device_profile.json')
+            
+            if args.device_profile:
+                report_manager.unlink_devcie_profile_file = False
+                report_manager.device_profile_path = args.device_profile
+            else:
+                edit_device_profile(report_manager.device_profile_path)
+
+            check_device_profile(report_manager.device_profile_path)
+
             report_manager.setup_report(log_manager.zip_file, log_manager.structured_path)
 
             log_metadata()
@@ -400,7 +467,8 @@ def run_tests(args, config):
                                          traceback.format_exc())
                             error = True
                 finally:
-                    marionette_uninstall()
+                    if not args.debug:
+                        marionette_uninstall()
                     backup.restore()
                     device.reboot()
 
@@ -419,10 +487,19 @@ def run_tests(args, config):
 def get_parser():
     parser = argparse.ArgumentParser()
     #TODO make this more robust
-    parser.add_argument('--config',
+    parser.add_argument('-c', '--config',
                         help='Path to config file', type=os.path.abspath,
                         action='store', default=config_path)
-    parser.add_argument('--list-tests',
+    parser.add_argument('-d', '--debug',
+                        help='enable debug',
+                        action='store_true')
+    parser.add_argument('-e', '--edit-device-profile',
+                        help='Path to device profile file', type=os.path.abspath,
+                        action='store', default=None)
+    parser.add_argument('-p', '--device-profile',
+                        help='Path to device profile file', type=os.path.abspath,
+                        action='store')
+    parser.add_argument('-l', '--list-tests',
                         help='list all tests available to run',
                         action='store_true')
     parser.add_argument('tests',
@@ -439,8 +516,8 @@ def main():
 
     if args.list_tests:
         return list_tests(args, config)
-    else:
-        return run_tests(args, config)
+
+    return run_tests(args, config)
 
 
 if __name__ == '__main__':

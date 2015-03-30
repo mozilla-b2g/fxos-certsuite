@@ -432,6 +432,13 @@ def _run(args, logger):
         return 0
 
     test_groups = set(args.include if args.include else test_groups)
+
+    if args.device_profile:
+        skiplist = []
+        with open(args.device_profile, 'r') as device_profile_file:
+            skiplist = json.load(device_profile_file)['result']['cert']
+        test_groups = [x for x in test_groups if x not in skiplist]
+
     report = {'buildprops': {}}
 
     logging.basicConfig()
@@ -782,6 +789,8 @@ def cli():
     parser.add_argument("--generate-reference",
                         help="Generate expected result files",
                         action="store_true")
+    parser.add_argument('-p', "--device-profile", action="store",  type=os.path.abspath,
+                        help="specify the device profile file path which could include skipped test case information")
     commandline.add_logging_group(parser)
 
     args = parser.parse_args()
