@@ -30,7 +30,7 @@ class ReportManager(object):
         if self.structured_path:
             self.add_summary_report(self.structured_path)
         if self.unlink_devcie_profile_file:
-            os.unlink(report_manager.device_profile)
+            os.unlink(self.device_profile_path)
             
 
     def add_subsuite_report(self, path, result_files):

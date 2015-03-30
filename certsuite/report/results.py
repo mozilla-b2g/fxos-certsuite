@@ -42,8 +42,7 @@ class LogHandler(reader.LogHandler):
     def test_end(self, data):
         test_id = self.test_id(data)
 
-        if not is_skip(data):
-            self.results.regressions[test_id][None] = data
+        self.results.regressions[test_id][None] = data
 
     def log(self, data):
         if data["level"] in ("ERROR", "CRITICAL"):
