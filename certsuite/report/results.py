@@ -36,8 +36,7 @@ class LogHandler(reader.LogHandler):
     def test_status(self, data):
         test_id = self.test_id(data)
 
-        if not is_skip(data):
-            self.results.regressions[test_id][data["subtest"]] = data
+        self.results.regressions[test_id][data["subtest"]] = data
 
     def test_end(self, data):
         test_id = self.test_id(data)

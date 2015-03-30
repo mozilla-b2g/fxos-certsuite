@@ -114,6 +114,7 @@ class HTMLBuilder(object):
                 cell_expected = self.get_cell_expected(subtest_data).upper()
                 class_expected = self.get_class_expected(subtest_data)
                 cell_message = subtest_data.get("message", "")
+                cell_status = subtest_data["status"]
 
                 if cell_message != "":
                     try:
@@ -147,17 +148,17 @@ class HTMLBuilder(object):
                         class_="parent_test %s" % odd_or_even),
                     html.td(cell_expected,
                         class_="condition col-expected %s %s" % (class_expected, odd_or_even)),
-                    html.td(subtest_data["status"].title(),
-                        class_="condition col-result %s %s" % (subtest_data["status"], odd_or_even))
+                    html.td(cell_status.title(),
+                        class_="condition col-result %s %s" % (cell_status, odd_or_even))
                 ])
                 if cell_message == "":
                     rv.append(
-                        html.tr(cells, class_='passed results-table-row')
+                        html.tr(cells, class_='passed results-table-row' % cell_status)
                         )
                 else:
-                    rv.extend([
-                        html.tr(cells, class_='error results-table-row'),
-                        html.tr(html.td(html.div(cell_message, class_='log'), class_='debug', colspan=5))
+                   rv.extend([
+                        html.tr(cells, class_='error results-table-row %s' % cell_status),
+                        html.tr(html.td(html.div(cell_message, class_='log %s' % cell_status), class_='debug', colspan=5))
                         ])
         return rv
 

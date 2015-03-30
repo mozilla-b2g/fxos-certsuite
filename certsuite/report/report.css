@@ -13,6 +13,7 @@ body {
 .PASS { background-color: green }
 .FAIL { background-color: red }
 .OK { background-color: lightgreen}
+.SKIP {text-decoration:line-through}
 .TIMEOUT { background-color: blue }
 .ERROR { background-color: purple }
 .log_ERROR {
