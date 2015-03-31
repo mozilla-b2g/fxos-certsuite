@@ -11,6 +11,7 @@ import cgi
 import pickle
 
 from py.xml import html, raw
+from results import KEY_MAIN
 
 here = os.path.split(__file__)[0]
 rcname = marionette.runner.mixins.__name__
@@ -153,12 +154,12 @@ class HTMLBuilder(object):
                 ])
                 if cell_message == "":
                     rv.append(
-                        html.tr(cells, class_='passed results-table-row' % cell_status)
+                        html.tr(cells, class_='passed results-table-row %s' % cell_status)
                         )
                 else:
                    rv.extend([
                         html.tr(cells, class_='error results-table-row %s' % cell_status),
-                        html.tr(html.td(html.div(cell_message, class_='log %s' % cell_status), class_='debug', colspan=5))
+                        html.tr(html.td(html.div(cell_message, class_='log'), class_='debug', colspan=5))
                         ])
         return rv
 
@@ -184,7 +185,7 @@ class HTMLBuilder(object):
 
     def get_test_name(self, test, test_data):
         test_name = self.test_string(test)
-        if len(test_data) == 1 and None in test_data.keys():
+        if len(test_data) == 1 and KEY_MAIN in test_data.keys():
             start_index = test_name.find('.') + 1
             end_index = test_name.find('.', start_index)
             test_name = test_name[start_index:end_index]
@@ -192,14 +193,14 @@ class HTMLBuilder(object):
 
     def get_sub_name(self, test, test_data, subtest):
         test_name = self.test_string(test)
-        if len(test_data) == 1 and None in test_data.keys():
+        if len(test_data) == 1 and KEY_MAIN in test_data.keys():
             sub_start_index = test_name.rfind('.') + 1
             sub_name = test_name[sub_start_index:]
         else:
-            if subtest:
-                sub_name = subtest
-            else:
+            if subtest == KEY_MAIN:
                 sub_name = 'parent'
+            else:
+                sub_name = subtest
         return sub_name
 
 

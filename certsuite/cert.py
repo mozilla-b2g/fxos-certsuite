@@ -441,7 +441,7 @@ def _run(args, logger):
         test_groups = [x for x in test_groups if x not in skiplist]
 
     report = {'buildprops': {}}
-    
+
     logging.basicConfig()
     # Step 1: Get device information
     try:
