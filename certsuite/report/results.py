@@ -8,7 +8,9 @@ from mozlog.structured import reader
 
 
 result_status = dict((v,k) for k,v in
-                     enumerate(["PASS", "FAIL", "OK", "ERROR", "TIMEOUT", "CRASH"]))
+                     enumerate(["PASS", "FAIL", "OK", "SKIP", "ERROR", "TIMEOUT", "CRASH"]))
+
+KEY_MAIN = 'MAIN'
 
 def is_skip(data):
     return data['status'] == 'SKIP'
@@ -36,14 +38,12 @@ class LogHandler(reader.LogHandler):
     def test_status(self, data):
         test_id = self.test_id(data)
 
-        if not is_skip(data):
-            self.results.regressions[test_id][data["subtest"]] = data
+        self.results.regressions[test_id][data["subtest"]] = data
 
     def test_end(self, data):
         test_id = self.test_id(data)
 
-        if not is_skip(data):
-            self.results.regressions[test_id][None] = data
+        self.results.regressions[test_id][KEY_MAIN] = data
 
     def log(self, data):
         if data["level"] in ("ERROR", "CRITICAL"):

@@ -437,6 +437,7 @@ def _run(args, logger):
         skiplist = []
         with open(args.device_profile, 'r') as device_profile_file:
             skiplist = json.load(device_profile_file)['result']['cert']
+        skip_tests = [x for x in test_groups if x in skiplist]
         test_groups = [x for x in test_groups if x not in skiplist]
 
     report = {'buildprops': {}}
@@ -496,6 +497,12 @@ def _run(args, logger):
     report['application_ini'] = get_application_ini(dm)
 
     logger.suite_start(tests=[])
+
+    # record skipped test to report
+    for test in skip_tests:
+        logger.test_start(test)
+        logger.test_end(test, 'SKIP', message='Skipped by device profile')
+
     # run the omni.ja analyzer
     if 'omni-analyzer' in test_groups:
         logger.test_start('omni-analyzer')

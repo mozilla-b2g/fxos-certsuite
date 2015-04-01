@@ -2,7 +2,7 @@ body {
   font-family: 'DejaVu Sans', 'Sans';
   font-size: 14px;
 }
-:link {text-decoration:none;}
+:link { text-decoration: none }
 .condition {
   font-variant: small-caps;
   color: white !important;
@@ -12,14 +12,18 @@ body {
 }
 .PASS { background-color: green }
 .FAIL { background-color: red }
-.OK { background-color: lightgreen}
+.OK { background-color: lightgreen }
+.SKIP {
+  text-decoration: line-through;
+  background-color:cadetblue;
+}
 .TIMEOUT { background-color: blue }
 .ERROR { background-color: purple }
 .log_ERROR {
   color:orange;
 }
-.log_CRITICAL {color:red;}
-.message {font-family: "DejaVu Sans Mono", Monospace}
+.log_CRITICAL { color:red }
+.message { font-family: "DejaVu Sans Mono", Monospace }
 table {
   border-spacing: 0;
   border-collapse: collapse;
@@ -39,9 +43,9 @@ td > a {
   height:100%;
   width:100%;
 }
-.details {text-align:center;}
+.details { text-align:center }
 tbody > tr:nth-child(2n) { background-color: #f4f4f4 }
-table#errors tr {background-color: white;}
-td.parent_test {font-family: "DejaVu Sans Mono", Monospace;}
-td.parent_test.even {background-color: #fff;}
-td.parent_test.odd {background-color: #f4f4f4;}
+table#errors tr { background-color: white; }
+td.parent_test { font-family: "DejaVu Sans Mono", Monospace; }
+td.parent_test.even { background-color: #fff; }
+td.parent_test.odd { background-color: #f4f4f4; }

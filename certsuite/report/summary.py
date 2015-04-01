@@ -4,6 +4,7 @@
 
 import os
 import cgi
+import json
 import pkg_resources
 import base64
 import marionette.runner.mixins
@@ -50,24 +51,42 @@ class HTMLBuilder(object):
                 rcname, os.path.sep.join(['resources', 'htmlreport', 
                     'main.js']))),
                 type='text/javascript'),
-            html.a('#', href='http://mozilla.org', id='tabzilla'),
             html.h1("FirefoxOS Certification Suite Report"),
             html.p("Run at %s" % self.time.strftime("%Y-%m-%d %H:%M:%S"))
             )]
+        if self.logs:
+            device_profile_object = None
+            with open(self.logs[-1]) as f:
+                device_profile_object = json.load(f)['result']['contact']
+            device_profile = [html.h2('Device Information')]
+            device_table = html.table()
+            for key in device_profile_object:
+                device_table.append(
+                    html.tr(
+                        html.td(key),
+                        html.td(device_profile_object[key])
+                    )
+                )
+                #device_profile.append(html.p("%s, %s"% (key, device_profile_object[key])))
+            device_profile.append(device_table)
+            body_parts.extend(device_profile);
+
         if self.summary_results.has_errors:
             body_parts.append(html.h2("Errors During Run"))
             body_parts.append(self.make_errors_table(self.summary_results.errors))
+        body_parts.append(html.h2("Test Results"))
         body_parts.append(self.make_result_table())
 
         if self.logs:
-            body_parts.append(html.h2("Details log information"))
             ulbody = [];
             for log_path in self.logs:
                 details_log = ''
                 with open(log_path, 'r') as f:
                     details_log = f.read()
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(details_log)
-                ulbody.append(html.a(html.a(log_path, href=href, target='_blank')))
+                ulbody.append(html.li(html.a(os.path.basename(log_path), href=href, target='_blank')))
+            device_profile_object = None
+            body_parts.append(html.h2("Details log information"))
             body_parts.append(html.ul(ulbody))
         return html.body(body_parts)
 
