@@ -216,17 +216,15 @@ class TestRunner(object):
 
         cmd.extend(item % subn for item in suite_opts.get("run_args", []))
         cmd.extend(item % subn for item in suite_opts.get("common_args", []))
-        
+
         if self.args.debug and suite == 'webapi':
             cmd.append('-v')
         if self.args.debug and suite == 'cert':
             cmd.append('--debug')
-            
-        if self.args.device_profile or self.args.edit_device_profile:
-            if suite == 'webapi' or suite == 'cert':
-                device_profile = self.args.device_profile or self.args.edit_device_profile
-                cmd.append('--device-profile')
-                cmd.append(device_profile)
+
+        if suite == 'webapi' or suite == 'cert':
+            cmd.append('--device-profile')
+            cmd.append(self.args.device_profile)
 
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
@@ -382,19 +380,19 @@ def list_tests(args, config):
         print "%s:%s" % (test, group)
     return True
 
-def edit_device_profile(device_profile_path):
+def edit_device_profile(device_profile_path, message):
     resp = ''
+    result = None
     try:
-        env = environment.get(environment.InProcessTestEnvironment, addr=None, verbose=False)
+        env = environment.get(environment.InProcessTestEnvironment)
         url = "http://%s:%d/profile.html" % (env.server.addr[0], env.server.addr[1])
         webbrowser.open(url)
         environment.env.handler = server.wait_for_client()
-        
-        question = ''
-        resp = environment.env.handler.prompt(question)
 
-        message = 'Create device profile failed!!'    
-        if resp != '':
+        resp = environment.env.handler.prompt(message)
+
+        message = 'Create device profile failed!!'
+        if resp:
             result = json.loads(resp)
             if result['return'] == 'ok':
                 with open(device_profile_path, 'w') as device_profile_f:
@@ -407,20 +405,68 @@ def edit_device_profile(device_profile_path):
         logger.info(message)
     except:
         logger.error("Failed create device profile:\n%s" % traceback.format_exc())
-    
-    return True
 
-def check_device_profile(device_profile_path):
+    return result
+
+def load_device_profile(device_profile_path):
+    device_profile_object = None
     try:
         with open(device_profile_path, 'r') as device_profile_file:
             device_profile_object = json.load(device_profile_file)
             if not 'result' in device_profile_object:
                 logger.error('Invalide device profile file [%s]' % device_profile_path)
-            else:
-                if not 'contact' in device_profile_object['result']:
+                device_profile_object = None
+            elif not 'contact' in device_profile_object['result']:
                     logger.error('Invalide device profile file [%s]' % device_profile_path)
+                    device_profile_object = None
     except:
         logger.critical("Encountered error at checking device profile file [%s]:\n%s" % (device_profile_path, traceback.format_exc()))
+        device_profile_object = None
+    finally:
+        return device_profile_object
+
+def prepare_device_profile(edit_profile, profile_path, suites):
+    profile_object = {'return': 'cancel'}
+
+    if os.path.exists(profile_path):
+        profile_object = load_device_profile(profile_path)
+        logger.debug('load profile from [%s]' % profile_path)
+        if not profile_object:
+            edit_profile = True
+    else:
+        edit_profile = True
+
+    if edit_profile:
+        # create profile information to be displayed in profile.html
+        profile_data = {}
+        for test, group in iter_test_lists(suites):
+            if test not in profile_data.keys():
+                profile_data[test] = []
+            profile_data[test].append({
+                'id': group,
+                'checked': True,
+                'hidden': False
+            })
+
+        if profile_object is not None and profile_object['return'] == 'ok':
+            # mark unchecked for those loaded from profile to skip
+            for test in profile_data.keys():
+                for i in range(len(profile_data[test])):
+                    if profile_data[test][i]['id'] in profile_object['result'][test]:
+                        profile_data[test][i]['checked'] = False
+
+            # other profile datas are list, but profile_data['contact'] is map
+            profile_data['contact'] = profile_object['result']['contact']
+
+        message = json.dumps(profile_data)
+        logger.debug('device profile message to tonado server:\n\t%s' % message)
+
+        result = edit_device_profile(profile_path, message)
+        logger.debug('User input profile information :\n\t%s' % json.dumps(result))
+        if result:
+            profile_object = result
+
+    return profile_object
 
 def run_tests(args, config):
     error = False
@@ -431,21 +477,11 @@ def run_tests(args, config):
             output_zipfile = log_manager.zip_path
             setup_logging(log_manager.structured_file)
 
-            if args.edit_device_profile:
-                report_manager.unlink_devcie_profile_file = False
-                report_manager.device_profile_path = args.edit_device_profile
-            else:
-                report_manager.device_profile_path = os.path.abspath('device_profile.json')
-            
-            if args.device_profile:
-                report_manager.unlink_devcie_profile_file = False
-                report_manager.device_profile_path = args.device_profile
-            else:
-                edit_device_profile(report_manager.device_profile_path)
+            config['profile'] = prepare_device_profile( args.edit_device_profile,
+                                                        args.device_profile,
+                                                        config['suites'])
 
-            check_device_profile(report_manager.device_profile_path)
-
-            report_manager.setup_report(log_manager.zip_file, log_manager.structured_path)
+            report_manager.setup_report(args.device_profile, log_manager.zip_file, log_manager.structured_path)
 
             log_metadata()
 
@@ -487,20 +523,20 @@ def get_parser():
                         help='Path to config file', type=os.path.abspath,
                         action='store', default=config_path)
     parser.add_argument('-d', '--debug',
-                        help='enable debug',
+                        help='Enable debug',
                         action='store_true')
     parser.add_argument('-e', '--edit-device-profile',
-                        help='Path to device profile file', type=os.path.abspath,
-                        action='store', default=None)
+                        help='Edit the device profile',
+                        action='store_true', default=False)
     parser.add_argument('-p', '--device-profile',
                         help='Path to device profile file', type=os.path.abspath,
-                        action='store')
+                        action='store', default='device_profile.json')
     parser.add_argument('-l', '--list-tests',
-                        help='list all tests available to run',
+                        help='List all tests available to run',
                         action='store_true')
     parser.add_argument('tests',
                         metavar='TEST',
-                        help='tests to run',
+                        help='Tests to run',
                         nargs='*')
     return parser
 
