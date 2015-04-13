@@ -71,10 +71,10 @@ class TestDeviceOrientation(TestCase):
         # set up listener to store changes in an object
         self.marionette.execute_script(script)
         self.instruct("Keep the phone on the surface and rotate the phone by more than 90 degrees "\
-                      "then back to its starting position (z-axis test)")
+                      "then back to its starting position (z-axis test)", "img/orientation_z-axis.png")
         self.instruct("Pick up the phone and rotate the phone so the screen is perpendicular to the table, "\
-                      "so the screen is facing you, then hold it parallel to the floor (y-axis test)")
-        self.instruct("Rotate the phone left or right by more than 90 degrees and back to its starting position (x-axis test)")
+                      "so the screen is facing you, then hold it parallel to the floor (x-axis test)", "img/orientation_x-axis.png")
+        self.instruct("Rotate the phone left or right by more than 90 degrees and back to its starting position (y-axis test)", "img/orientation_y-axis.png")
         self.assertEqual(type(self.get_window_value("absolute")), bool, "expected absolute")
         self.assertTrue(self.get_window_value('alpha'), "expected alpha")
         self.assertTrue(self.get_window_value('beta'), "expected beta")

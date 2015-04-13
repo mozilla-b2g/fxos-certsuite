@@ -9,6 +9,7 @@ import ConfigParser
 import json
 import logging
 import os
+import sys
 import pkg_resources
 import re
 import StringIO
@@ -46,8 +47,10 @@ webapi_results = None
 webapi_results_embed_app = None
 
 last_test_started = 'None'
+logger = None
 
 supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
+
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
@@ -60,6 +63,7 @@ def webapi_results_handler(request, response):
     response.headers.set('Access-Control-Allow-Origin', '*')
     response.content = "ok"
 
+
 @wptserve.handlers.handler
 def webapi_results_embed_apps_handler(request, response):
     global webapi_results_embed_app
@@ -68,9 +72,11 @@ def webapi_results_embed_apps_handler(request, response):
     response.headers.set('Access-Control-Allow-Origin', '*')
     response.content = "ok"
 
+
 @wptserve.handlers.handler
 def webapi_log_handler(request, response):
     global last_test_started
+    global logger
 
     log_string = request.POST["log"]
     index = log_string.find('test started:')
@@ -90,10 +96,12 @@ routes = [("POST", "/webapi_results", webapi_results_handler),
 static_path = os.path.abspath(os.path.join(
     os.path.dirname(__file__), "static"))
 
+
 def read_manifest(app):
     with open(os.path.join(app, 'manifest.webapp')) as f:
         manifest = f.read()
     return manifest
+
 
 def package_app(path, extrafiles={}):
     app_path = 'app.zip'
@@ -105,6 +113,7 @@ def package_app(path, extrafiles={}):
                 zip_file.write(os.path.join(root, f), f)
         for f in extrafiles:
             zip_file.writestr(f, extrafiles[f])
+
 
 def install_app(logger, appname, version, apptype, apppath, all_perms,
                 extrafiles, launch=False):
@@ -126,6 +135,7 @@ def install_app(logger, appname, version, apptype, apppath, all_perms,
     if launch:
         logger.debug('launching: %s' % appname)
         fxos_appgen.launch_app(appname)
+
 
 def test_user_agent(user_agent, logger):
     # See https://developer.mozilla.org/en-US/docs/Gecko_user_agent_string_reference#Firefox_OS
@@ -156,6 +166,7 @@ def test_user_agent(user_agent, logger):
         logger.test_status('user-agent', 'user-agent-string', 'FAIL', message='Invalid user-agent string: %s: %s' % (user_agent, message))
 
     return valid
+
 
 def test_open_remote_window(logger, version, addr):
     global webapi_results
@@ -192,6 +203,7 @@ def test_open_remote_window(logger, version, addr):
 
     return results
 
+
 def diff_results(a, b):
 
     a_set = set(a.keys())
@@ -209,6 +221,7 @@ def diff_results(a, b):
 
     return result
 
+
 def log_results(diff, logger, report, test_group, name):
     if diff:
         report[name.replace('-', '_')] = diff
@@ -219,6 +232,7 @@ def log_results(diff, logger, report, test_group, name):
                 logger.test_status(test_group, name, 'FAIL', message='Unexpected result for: %s' % result)
     else:
         logger.test_status(test_group, name, 'PASS')
+
 
 def parse_webapi_results(expected_results_path, results, prefix, logger, report):
     with open(expected_results_path) as f:
@@ -256,6 +270,7 @@ def parse_webapi_results(expected_results_path, results, prefix, logger, report)
     log_results(added_webidl_results, logger, report, 'webapi', prefix + 'added-webidl-results')
     log_results(missing_webidl_results, logger, report, 'webapi', prefix + 'missing-webidl-results')
 
+
 def parse_permissions_results(expected_results_path, results, prefix, logger, report):
     with open(expected_results_path) as f:
         expected_results = json.load(f)
@@ -264,6 +279,7 @@ def parse_permissions_results(expected_results_path, results, prefix, logger, re
     unexpected_results = diff_results(expected_results, results)
     log_results(unexpected_results, logger, report, 'permissions', prefix + 'unexpected-permissions-results')
     return not unexpected_results
+
 
 def run_marionette_script(script, chrome=False, async=False):
     """Create a Marionette instance and run the provided script"""
@@ -278,13 +294,15 @@ def run_marionette_script(script, chrome=False, async=False):
     m.delete_session()
     return result
 
+
 def kill(name):
     """Kill the specified app"""
     script = """
-      let manager = window.wrappedJSObject.AppWindowManager || window.wrappedJSObject.WindowManager;
+      let manager = window.wrappedJSObject.appWindowManager || new window.wrappedJSObject.AppWindowManager();
       manager.kill('%s');
     """
     return run_marionette_script(script % name)
+
 
 def get_permission(permission, app):
     # The object created to wrap PermissionSettingsModule is to work around
@@ -297,6 +315,7 @@ def get_permission(permission, app):
     """
     app_url = 'app://' + app
     return run_marionette_script(script % (permission, app_url, app_url), True)
+
 
 def get_permissions():
     """Return permissions in PermissionsTable.jsm"""
@@ -312,6 +331,7 @@ def get_permissions():
       return result;
     """
     return run_marionette_script(script, True)
+
 
 def set_permission(permission, value, app):
     """Set a permission for the specified app
@@ -333,46 +353,67 @@ def set_permission(permission, value, app):
     app_url = 'app://' + app
     run_marionette_script(script % (permission, app_url, app_url, value), True)
 
-def make_html_report(path, report):
-    def decode_encode(a_string):
-        return a_string.decode('utf8', 'ingore').encode('ascii', 'ignore')
 
+def make_html_report(path, report):
     def tabelize(value):
         try:
             rows = []
             for key in value.keys():
-                encoded_key = key
-                encoded_value = value[key]
-                if isinstance(key, basestring):
-                    encoded_key = decode_encode(encoded_key)
-                if isinstance(encoded_value, basestring):
-                    encoded_value = decode_encode(encoded_value)
-                rows.append(html.tr(html.td(html.pre(encoded_key)),
-                                    html.td(tabelize(encoded_value))))
+                rows.append(html.tr(html.td(html.pre(key)), html.td(tabelize(value[key]))))
             return html.table(rows)
         except AttributeError:
             if type(value) == type([]):
                 return html.table(map(tabelize, value))
             else:
-                return html.pre(decode_encode(value))
+                return html.pre(value)
 
     body_els = []
     keys = report.keys()
     keys.sort()
     links = []
     for key in keys:
-        encoded_key = decode_encode(key)
-        links.append(html.li(html.a(encoded_key,
-                                    href="#" + encoded_key)))
+        links.append(html.li(html.a(key, href="#" + key)))
     body_els.append(html.ul(links))
     for key in keys:
-        encoded_key = decode_encode(key)
-        body_els.append(html.a(html.h1(encoded_key),
-                               id=encoded_key))
+        body_els.append(html.a(html.h1(key), id=key))
         body_els.append(tabelize(report[key]))
     with open(path, 'w') as f:
         doc = html.html(html.head(html.style('table, td {border: 1px solid;}')), html.body(body_els))
-        f.write(decode_encode(str(doc)))
+        f.write(str(doc))
+
+
+def get_application_ini(dm):
+    # application.ini information
+    appinicontents = dm.pullFile('/system/b2g/application.ini')
+    sf = StringIO.StringIO(appinicontents)
+    config = ConfigParser.ConfigParser()
+    config.readfp(sf)
+    application_ini = {}
+    for section in config.sections():
+        application_ini[section] = dict(config.items(section))
+    return application_ini
+
+
+def get_buildprop(dm):
+    # get build properties
+    buildprops = {}
+    buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
+    for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
+                          in line]:
+        eq = buildprop.find('=')
+        prop = buildprop[:eq]
+        val = buildprop[eq + 1:]
+        buildprops[prop] = val
+    return buildprops
+
+
+def get_processes_running(dm):
+    return map(lambda p: {'name': p[1], 'user': p[2]}, dm.getProcessList())
+
+
+def get_kernel_version(dm):
+    return dm.shellCheckOutput(["cat", "/proc/version"])
+
 
 def _run(args, logger):
     # This function is to simply make the cli() function easier to handle
@@ -391,6 +432,14 @@ def _run(args, logger):
         return 0
 
     test_groups = set(args.include if args.include else test_groups)
+
+    if args.device_profile:
+        skiplist = []
+        with open(args.device_profile, 'r') as device_profile_file:
+            skiplist = json.load(device_profile_file)['result']['cert']
+        skip_tests = [x for x in test_groups if x in skiplist]
+        test_groups = [x for x in test_groups if x not in skiplist]
+
     report = {'buildprops': {}}
 
     logging.basicConfig()
@@ -439,39 +488,33 @@ def _run(args, logger):
         print 'Could not open result file for writing: %s errno: %d' % (result_file_path, e.errno)
         raise
 
-    # get build properties
-    buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
-    for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
-                          in line]:
-        eq = buildprop.find('=')
-        prop = buildprop[:eq]
-        val = buildprop[eq + 1:]
-        report['buildprops'][prop] = val
+    report['buildprops'] = get_buildprop(dm)
 
-    # get process list
-    report['processes_running'] = map(lambda p: { 'name': p[1], 'user': p[2] },
-                                      dm.getProcessList())
+    report['processes_running'] = get_processes_running(dm)
 
-    # kernel version
-    report['kernel_version'] = dm.shellCheckOutput(["cat", "/proc/version"])
+    report['kernel_version'] = get_kernel_version(dm)
 
-    # application.ini information
-    appinicontents = dm.pullFile('/system/b2g/application.ini')
-    sf = StringIO.StringIO(appinicontents)
-    config = ConfigParser.ConfigParser()
-    config.readfp(sf)
-    report['application_ini'] = {}
-    for section in config.sections():
-        report['application_ini'][section] = dict(config.items(section))
+    report['application_ini'] = get_application_ini(dm)
 
     logger.suite_start(tests=[])
+
+    # record skipped test to report
+    for test in skip_tests:
+        logger.test_start(test)
+        logger.test_end(test, 'SKIP', message='Skipped by device profile')
+
     # run the omni.ja analyzer
     if 'omni-analyzer' in test_groups:
+        logger.test_start('omni-analyzer')
         omni_ref_path = pkg_resources.resource_filename(
                             __name__, os.path.join('expected_omni_results', 'omni.ja.%s' % args.version))
         omni_analyzer = OmniAnalyzer(omni_ref_path, logger=logger)
-        diff = omni_analyzer.run()
+        diff, is_run_success = omni_analyzer.run()
         report["omni_result"] = diff
+        if is_run_success:
+            logger.test_end('omni-analyzer', 'OK')
+        else:
+            logger.test_end('omni-analyzer', 'FAIL')
 
     # start webserver
     if 'webapi' in test_groups or 'permissions' in test_groups:
@@ -719,15 +762,19 @@ def _run(args, logger):
         make_html_report(args.html_result_file, report)
         logger.debug('HTML Results have been stored in: %s' % args.html_result_file)
 
+
 def cli():
     global logger
     global webapi_results
     global webapi_results_embed_app
 
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--version",
                         help="version of FxOS under test",
-                        default="2.1",
+                        default="2.2",
                         action="store")
     parser.add_argument("--debug",
                         help="enable debug logging",
@@ -749,6 +796,8 @@ def cli():
     parser.add_argument("--generate-reference",
                         help="Generate expected result files",
                         action="store_true")
+    parser.add_argument('-p', "--device-profile", action="store",  type=os.path.abspath,
+                        help="specify the device profile file path which could include skipped test case information")
     commandline.add_logging_group(parser)
 
     args = parser.parse_args()
@@ -763,6 +812,7 @@ def cli():
     except:
         logger.critical(traceback.format_exc())
         raise
+
 
 if __name__ == "__main__":
     cli()
