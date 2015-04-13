@@ -509,7 +509,10 @@ def _run(args, logger):
         omni_ref_path = pkg_resources.resource_filename(
                             __name__, os.path.join('expected_omni_results', 'omni.ja.%s' % args.version))
         omni_analyzer = OmniAnalyzer(omni_ref_path, logger=logger)
-        diff, is_run_success = omni_analyzer.run()
+        if args.html_result_file is not None:
+            diff, is_run_success = omni_analyzer.run(html_format=True, results_file=os.path.join(os.path.dirname(args.html_result_file), 'omni_diff_report.html'))
+        else:
+            diff, is_run_success = omni_analyzer.run()
         report["omni_result"] = diff
         if is_run_success:
             logger.test_end('omni-analyzer', 'OK')
