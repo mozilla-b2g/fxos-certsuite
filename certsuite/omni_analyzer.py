@@ -18,6 +18,7 @@ import traceback
 import zipfile
 import shutil
 import pickle
+from diff_py import *
 
 from mozlog.structured import structuredlog
 
@@ -78,7 +79,7 @@ class OmniAnalyzer(object):
         dm.getFile(self.omni_ja_on_device, omnifile)
         unzip_omnifile(omnifile, os.path.join(workdir, 'device'))
 
-    def run(self):
+    def run(self, results_file=None, html_format=False):
         is_run_success = False
         diff = ''
         with CleanedTempFolder() as workdir:
@@ -94,9 +95,16 @@ class OmniAnalyzer(object):
                 if e.returncode == 1:
                     # return code 1 simply indicates differences were found
                     diff = e.output
-                    diff_file = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(diff)
-                    diff_link = {'text': 'Diff Result', 'href': diff_file, 'target': '_blank'}
-                    diff_message = pickle.dumps(diff_link)
+                    if html_format:
+                        dh = HTMLDiffHelper()
+                        result = dh.diff(os.path.join(workdir, 'reference'), os.path.join(workdir, 'device'))
+                        diff_result = result.unicode(indent=2).encode('utf8')
+                    else:
+                        diff_result = diff
+                    if results_file is not None:
+                        with open(results_file, 'w') as f:
+                            f.write(diff_result)
+                    diff_message = 'The omni.ja on device is different from reference file omni.ja.'
                     is_run_success = True
                 else:
                     diff_message = 'error running diff: %s' % e.returncode
@@ -110,12 +118,11 @@ def main(argv):
     parser.add_argument("--reference-omni-ja", help="Path to reference omni.ja file")
     parser.add_argument("--results-file", help="File in which to store the results",
         default=os.path.join(os.getcwd(), "results.diff"))
+    parser.add_argument("--html", help="Output to HTML format", action='store_true')
 
     args = parser.parse_args(argv[1:])
     omni_analyzer = OmniAnalyzer(args.reference_omni_ja)
-    diff = omni_analyzer.run()
-    with open(args.results_file, 'w') as f:
-        f.write(diff)
+    diff, is_run_success = omni_analyzer.run(results_file=args.results_file, html_format=args.html)
 
 
 if __name__ == "__main__":

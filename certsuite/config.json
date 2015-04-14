@@ -8,7 +8,8 @@
                                    "--html-result-file=%(temp_dir)s/cert_results.html"
 ],
                       "extra_files": ["%(temp_dir)s/cert_results.json",
-                                      "%(temp_dir)s/cert_results.html"]}],
+                                      "%(temp_dir)s/cert_results.html",
+                                      "%(temp_dir)s/omni_diff_report.html"]}],
             ["web-platform-tests", {"cmd": "wptrunner",
                                     "common_args": ["--include-manifest=web-platform-tests/include.ini", "--config=web-platform-tests/wptrunner.ini"],
                                     "run_args": ["--product=b2g", "--test-type=testharness", "--b2g-no-backup"]}]
