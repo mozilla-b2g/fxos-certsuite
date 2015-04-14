@@ -132,7 +132,6 @@ class HTMLBuilder(object):
         rv = []
         for key in results.keys():
             result = results[key]['results']
-            details_link = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(results[key]['html_str'])
             cells = [html.td(key, class_="col-subsuite")]
             if result.has_errors:
                 cells.append(html.td(
@@ -148,6 +147,7 @@ class HTMLBuilder(object):
             else:
                 cells.append(html.td("0", class_="condition PASS"))
             
+            details_link = 'data:text/html;charset=utf-8;base64,%s' % base64.b64encode(results[key]['html_str'])
             ulbody = [html.li(html.a("subsuite report", href=details_link, target='_blank'))]
             files = results[key]['files']
             for fname in files.keys():

@@ -14,3 +14,4 @@ sphinx
 tornado >= 3.2
 wptrunner == 1.4
 wptserve >= 1.0.1
+diff_py >= 0.0.11
