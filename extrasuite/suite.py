@@ -75,7 +75,7 @@ class ExtraTest( object ):
 				logger.test_end( g, 'OK' )
 			except:
 				logger.critical(traceback.format_exc())
-				logger.end_test( g, 'FAIL' ) 		
+				logger.test_end( g, 'FAIL' )
 				raise
 		logger.suite_end()
 
