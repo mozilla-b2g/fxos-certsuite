@@ -29,25 +29,41 @@ from certsuite.cert import run_marionette_script
 class certdump( object ):
 
 	@staticmethod
+	def js_test():
+		return '''
+			return Components;
+		'''
+
+	@staticmethod
+	def js_nssversions():
+		return '''
+			const { 'classes': Cc, 'interfaces': Ci } = Components;
+
+			let nssversion = Cc[ "@mozilla.org/security/nssversion;1" ].getService( Ci.nsINSSVersion );
+			return {
+				'NSS_Version': nssversion.NSS_Version,
+				'NSSUTIL_Version': nssversion.NSSUTIL_Version,
+				'NSSSSL_Version': nssversion.NSSSSL_Version,
+				'NSPR_Version': nssversion.NSPR_Version,
+				'NSSSMIME_Version': nssversion.NSSSMIME_Version
+			};
+		'''
+
+	@staticmethod
 	def js_certdump():
 		return '''
 			const { 'classes': Cc, 'interfaces': Ci } = Components;
 	 
-			let certdb = Cc[ "@mozilla.org/security/x509certdb;1" ].getService( Ci.nsIX509CertDB ); // for FxOS >= 2.1
-			if ( typeof( certdb.getCerts ) === "undefined" ) {
-				certdb = Cc[ "@mozilla.org/security/x509certdb;1" ].getService( Ci.nsIX509CertDB2 ); // for FxOS < 2.1
-			}
+			let certdb = Cc[ "@mozilla.org/security/x509certdb;1" ].getService( Ci.nsIX509CertDB );
+			if ( "nsIX509CertDB2" in Ci ) certdb.QueryInterface( Ci.nsIX509CertDB2 ); // for FxOS < 2.1
 			let certs = certdb.getCerts();
 			let enumerator = certs.getEnumerator();
 			let certlist = [];
 			while (enumerator.hasMoreElements()) {
 				let cert = enumerator.getNext().QueryInterface( Ci.nsIX509Cert );
-				let sslTrust, emailTrust, objsignTrust;
-				if( typeof( cert.isCertTrusted ) !== "undefined" ) {
-					sslTrust = certdb.isCertTrusted( cert, Ci.nsIX509Cert.CA_CERT, Ci.nsIX509CertDB.TRUSTED_SSL );
-					emailTrust = certdb.isCertTrusted( cert, Ci.nsIX509Cert.CA_CERT, Ci.nsIX509CertDB.TRUSTED_EMAIL );
-					objsignTrust = certdb.isCertTrusted( cert, Ci.nsIX509Cert.CA_CERT, Ci.nsIX509CertDB.TRUSTED_OBJSIGN );
-				}
+				let sslTrust = certdb.isCertTrusted( cert, Ci.nsIX509Cert.CA_CERT, Ci.nsIX509CertDB.TRUSTED_SSL );
+				let emailTrust = certdb.isCertTrusted( cert, Ci.nsIX509Cert.CA_CERT, Ci.nsIX509CertDB.TRUSTED_EMAIL );
+				let objsignTrust = certdb.isCertTrusted( cert, Ci.nsIX509Cert.CA_CERT, Ci.nsIX509CertDB.TRUSTED_OBJSIGN );
 				let certinfo = {
 					'cert': cert,
 					'sslTrust': sslTrust,
@@ -59,11 +75,6 @@ class certdump( object ):
 			return certlist;
 		'''
 
-	@staticmethod
-	def js_test():
-		return '''
-			return Components;
-		'''
 
 	def __init__( self ):
 		self.logger = get_default_logger()
@@ -108,6 +119,7 @@ class certmods( ExtraTest ):
 
 		dumper = certdump()
 		certs = dumper.get_via_marionette()
+		# TODO: just listing all of the certs, no filtering
 		issues = [ x['cert'][u'subjectName'] for x in certs ]
 
 		if len(issues) > 0:
