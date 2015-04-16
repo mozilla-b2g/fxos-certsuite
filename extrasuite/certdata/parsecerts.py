@@ -86,15 +86,13 @@ class sqlcerts( object ):
 #define CKO_NSS_DELSLOT            (CKO_NSS + 6)
 
 
-class libckbi( object ):
+class ELFbin( object ):
 
 	def __init__( self, filename ):
 		self.f = open( filename, "r" )
 		self.elf = elffile.ELFFile( self.f )
 		self.sn = []
 		self.sni = {}
-		for section in '.text', '.data', '.rodata', '.data.rel.ro.local':
-			self.add_section( section )
 
 	def add_section( self, name ):
 		s = self.elf.get_section_by_name( name )
@@ -133,6 +131,13 @@ class libckbi( object ):
 	def close( self ):
 		self.f.close()
 		self.elf = None
+
+class libckbi( ELFbin ):
+
+	def __init__( self, filename ):
+		super( libckbi, self ).__init__( filename )
+		for section in '.text', '.data', '.rodata', '.data.rel.ro.local':
+			self.add_section( section )
 
 	def is_ns_builtins_data_entry( self, addr, typecode=None ):
 		# (num) (addr) (addr) (0x0 x 12)
@@ -259,20 +264,7 @@ class libckbi( object ):
 		else:
 			return mapped, repr(value)
 
-
-if os.path.isfile( sys.argv[1] ) and sys.argv[1] == "libnssckbi.so":
-	lib = libckbi( sys.argv[1] )
-	builtins = lib.list_builtins_data()
-	allb = []
-	for builtin in builtins:
-		oneb = {}
-		for itemtype, item in builtin:
-			verbtype, verbitem = lib.map_type( itemtype, item )
-			oneb[verbtype] = verbitem
-			allb.append( oneb )
-	print json.dumps( allb, sort_keys=True, indent=4, separators=(',', ': ') )
-	sys.exit(0)
-
+#############################################################################################
 
 cmd = sys.argv[1]
 filename = sys.argv[2]
@@ -301,6 +293,19 @@ elif cmd == 'certs':
 elif cmd == 'cn':
 	for cn in dbc.iter_cns():
 		print cn
+
+elif cmd == 'lib':
+	filename = sys.argv[2]
+	lib = libckbi( filename )
+	builtins = lib.list_builtins_data()
+	allb = []
+	for builtin in builtins:
+		oneb = {}
+		for itemtype, item in builtin:
+			verbtype, verbitem = lib.map_type( itemtype, item )
+			oneb[verbtype] = verbitem
+			allb.append( oneb )
+	print json.dumps( allb, sort_keys=True, indent=4, separators=(',', ': ') )
 
 elif cmd == 'ipython':
 	from IPython import embed
