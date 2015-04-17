@@ -216,6 +216,8 @@ function Dialog(msg, type, image_path) {
     elem.setAttribute("src", this.image_path);
     elem.setAttribute("alt", this.message);
     this.image.appendChild(elem);
+    // add the min-height of dialog when there is an image
+    this.el.style.minHeight = "480px";
   }
 
   // Assume prompt is default
@@ -282,6 +284,7 @@ Dialog.prototype = {
     this.okEl.innerHTML = "OK";
     this.cancelEl.innerHTML = "Cancel";
     this.image.innerHTML = "";
+    this.el.style.minHeight = "";
   },
 
   onok: function() {},
