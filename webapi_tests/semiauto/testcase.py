@@ -42,11 +42,18 @@ class TestCase(unittest.TestCase):
     def cleanup(self):
         if self.marionette is not None:
             certapp.kill(self.marionette, app=self.app)
-            
+
     def check_skip(self, skiplist):
-        test_name = str(self.__class__).split('.')[1]
-        if test_name in skiplist:
+        self.test_name = str(self.__class__).split('.')[1]
+        if self.test_name in skiplist:
             self.skipTest('Skipped by device profile')
+
+    def showTestStatusInDevice(self, marionette):
+        marionette.execute_async_script("""
+            document.getElementsByTagName('body')[0].innerHTML =
+                '<center><h1>WebAPI<h1><h2>%s</h2><h3>%s</h3><br>running</center>';
+            marionetteScriptFinished();
+            """ % (self.test_name, self._testMethodName))
 
     def setUp(self):
         """Sets up the environment for a test case.
@@ -69,7 +76,7 @@ class TestCase(unittest.TestCase):
 
         if env.device_profile:
             self.check_skip(env.device_profile['webapi'])
-        
+
         self.server = env.server
         self.handler = env.handler
 
@@ -88,6 +95,7 @@ class TestCase(unittest.TestCase):
 
         try:
             self.app = certapp.launch(self.marionette)
+            self.showTestStatusInDevice(self.marionette)
         except certapp.LaunchError:
             self.launch_app_manually()
 
