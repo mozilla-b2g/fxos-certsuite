@@ -499,7 +499,7 @@ def run_tests(args, config):
                                          traceback.format_exc())
                             error = True
                 finally:
-                    if not args.debug:
+                    if remove_marionette_after_run:
                         marionette_uninstall()
                     backup.restore()
                     device.reboot()
