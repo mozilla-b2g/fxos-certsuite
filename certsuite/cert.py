@@ -431,8 +431,8 @@ def _run(args, logger):
             print t
         return 0
 
-   skip_tests = []
-   test_groups = set(args.include if args.include else test_groups)
+    skip_tests = []
+    test_groups = set(args.include if args.include else test_groups)
 
     if args.device_profile:
         skiplist = []
