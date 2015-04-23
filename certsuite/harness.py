@@ -42,6 +42,8 @@ from webapi_tests.semiauto import environment, server
 from reportmanager import ReportManager
 from logmanager import LogManager
 
+from report.results import KEY_MAIN
+
 import adb_b2g
 import gaiautils
 import report
@@ -53,6 +55,7 @@ stdio_handler = handlers.StreamHandler(sys.stderr,
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "config.json"))
 
+retry_path = 'retry.json'
 
 def setup_logging(log_f):
     global logger
@@ -116,6 +119,24 @@ class TestRunner(object):
     def __init__(self, args, config):
         self.args = args
         self.config = config
+        self.retry = self.loadretry()
+        self.regressions = []
+
+    def loadretry(self):
+        if not self.args.retry_failed:
+            return False
+
+        if not os.path.exists(retry_path):
+            return False
+
+        retrys = None
+        try:
+            with open(retry_path, 'r') as f:
+                retrys = json.load(f)
+        except:
+            pass
+
+        return retrys
 
     def iter_suites(self):
         '''
@@ -124,7 +145,9 @@ class TestRunner(object):
         test suite and [test_groups] is a list of group names to run in that suite,
         or the empty list to indicate all tests.
         '''
-        if not self.args.tests:
+        if self.retry:
+            tests = self.retry
+        elif not self.args.tests:
             tests = self.config["suites"].keys()
         else:
             tests = self.args.tests
@@ -143,11 +166,51 @@ class TestRunner(object):
         for suite, groups in d.iteritems():
             yield suite, groups
 
+    def test_string(self, test_id):
+        if isinstance(test_id, unicode):
+            return test_id
+        else:
+            return " ".join(test_id)
+
+    def get_test_name(self, test, test_data):
+        test_name = self.test_string(test)
+        if len(test_data) == 1 and KEY_MAIN in test_data.keys():
+            start_index = test_name.find('.') + 1
+            end_index = test_name.find('.', start_index)
+            test_name = test_name[start_index:end_index]
+        return test_name
+
+    def generate_retry(self):
+        test_map = {'certsuite' : 'cert',
+                    'webapi' : 'webapi',
+                    'web-platform-tests':'web-platform-tests'}
+
+        failed = []
+        for regressions in self.regressions:
+            if not regressions:
+                continue
+            tests = sorted(regressions.keys())
+            for i, test in enumerate(tests):
+                test_data = regressions[test]
+                for subtest in sorted(test_data.keys()):
+                    subtest_data = test_data[subtest]
+                    subsuite = self.get_test_name(test, test_data)
+                    if subtest_data["status"] == 'FAIL':
+                        failed.append("%s:%s" %
+                            (test_map[subtest_data['source']], subsuite))
+                        break
+        try:
+            if failed:
+                with open(retry_path, 'w') as f:
+                    json.dump(failed, f)
+        except:
+            logger.error("Error generate retry.json file : %s" % traceback.format_exc())
+
     def run_suite(self, suite, groups, log_manager, report_manager):
         with TemporaryDirectory() as temp_dir:
             result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
-            report_manager.add_subsuite_report(structured_path, result_files)
+            self.regressions.append(report_manager.add_subsuite_report(structured_path, result_files))
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -499,6 +562,7 @@ def run_tests(args, config):
                                          traceback.format_exc())
                             error = True
                 finally:
+                    runner.generate_retry()
                     if remove_marionette_after_run:
                         marionette_uninstall()
                     backup.restore()
@@ -534,6 +598,9 @@ def get_parser():
     parser.add_argument('-l', '--list-tests',
                         help='List all tests available to run',
                         action='store_true')
+    parser.add_argument('-r', '--retry-failed',
+                        help='Retry last failed tests to run(IGNORE any tests parameters)',
+                        action='store_true', default=False)
     parser.add_argument('tests',
                         metavar='TEST',
                         help='Tests to run',
