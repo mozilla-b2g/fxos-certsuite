@@ -93,6 +93,10 @@ class certdump( object ):
 		return run_marionette_script( certdump.js_certdump(), chrome=True )
 
 
+	def nssversion_via_marionette( self ):
+		self.dm.forward( "tcp:2828", "tcp:2828" )
+		return run_marionette_script( certdump.js_nssversions(), chrome=True )
+
 
 #######################################################################################################################
 # Test implementations
@@ -103,11 +107,11 @@ from suite import ExtraTest
 
 
 #######################################################################################################################
-# nss.certmods
+# ssl.certdb_info
 
-class cert_info( ExtraTest ):
+class certdb_info( ExtraTest ):
 	"""
-	Test that checks hardcoded certificates in libckbi.so.
+	Test that dumps CertDB from device and logs certificates for info.
 	"""
 
 	group = "ssl"
@@ -117,14 +121,39 @@ class cert_info( ExtraTest ):
 	def run( cls ):
 		logger = get_default_logger()
 
-		dumper = certdump()
-		certs = dumper.get_via_marionette()
+		try:
+			dumper = certdump()
+			certs = dumper.get_via_marionette()
+		except:
+			cls.log_status( 'FAIL', 'Failed to gather information from the device via Marionette.' )
+			return False
+
 		# TODO: just listing all of the certs, no filtering
-		issues = [ x['cert'][u'subjectName'] for x in certs ]
+		certlist = [ x['cert'][u'subjectName'] for x in certs ]
+		cls.log_status( 'PASS', 'SSL certificates on device:\n%s' % '\n'.join(certlist) )
+		return True
 
-		if len(issues) > 0:
-			cls.log_status( 'FAIL', 'critical SSL certificate issues detected::\n%s' % '\n'.join(issues) )
-		else:
-			cls.log_status( 'PASS', 'no critical libnss modifications detected' )
+#######################################################################################################################
+# ssl.cert_info
 
+class nssversion_info( ExtraTest ):
+	"""
+	Test that logs nss component versions from device.
+	"""
 
+	group = "ssl"
+	module = sys.modules[__name__]
+
+	@classmethod
+	def run( cls ):
+		logger = get_default_logger()
+
+		try:
+			dumper = certdump()
+			versions = dumper.nssversion_via_marionette()
+		except:
+			cls.log_status( 'FAIL', 'Failed to gather information from the device via Marionette.' )
+			return False
+
+		cls.log_status( 'PASS', 'NSS component versions detected:\n%s' % '\n'.join( ["%s: %s" % (k,versions[k]) for k in versions] ) )
+		return True

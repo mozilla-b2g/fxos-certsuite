@@ -179,16 +179,24 @@ class worldwritable_info( ExtraTest ):
 
 	@classmethod
 	def run( cls ):
-		out, err = runcmd( "adb shell ls -alR /" )
+		try:
+			#TODO: move to devicemanager class to enable proper error handling here
+			out, err = runcmd( "adb shell ls -alR /" )
+		except:
+			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb.' )
+			return False
+
 		found = []
 		for f in parse_ls( out ):
 			if f['perm'][7] == 'w' and f['mode'] != 'l':
 				if not cls.whitelist_check( f['name'] ):
 					found.append( f['name'] )
 		if len(found) > 0:
-			cls.log_status( 'FAIL', 'why are these world-writable?\n%s' % '\n'.join(found) )
+			cls.log_status( 'PASS', 'Please ensure that the following world-writable files will not pose a security risk:\n%s' % '\n'.join(found) )
 		else:
-			cls.log_status( 'PASS', 'no unexpected suidroot executables found' )
+			cls.log_status( 'PASS', 'No unexpected suidroot executables found.' )
+
+		return True
 
 
 #######################################################################################################################
@@ -220,15 +228,21 @@ class suidroot_info( ExtraTest ):
 
 	@classmethod
 	def run( cls ):
-		out, err = runcmd( "adb shell ls -alR /" )
+		try:
+			#TODO: move to devicemanager class to enable proper error handling here
+			out, err = runcmd( "adb shell ls -alR /" )
+		except:
+			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb.' )
+			return False
+
 		found = []
 		for f in parse_ls( out ):
 			if f['perm'][2] == 's' and f['uid'] == 'root':
 				if not cls.whitelist_check( f['name'] ):
 					found.append( f['name'] )
 		if len(found) > 0:
-			cls.log_status( 'FAIL', 'why are these suid root?\n%s' % '\n'.join(found) )
+			cls.log_status( 'PASS', 'Please ensure that the following suid root files are no security risk:\n%s' % '\n'.join(found) )
 		else:
-			cls.log_status( 'PASS', 'no unexpected suidroot executables found' )
-			
-
+			cls.log_status( 'PASS', 'No unexpected suidroot executables found.' )
+		
+		return True
