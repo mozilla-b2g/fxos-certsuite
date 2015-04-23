@@ -134,7 +134,7 @@ class certdb_info( ExtraTest ):
 		return True
 
 #######################################################################################################################
-# ssl.cert_info
+# ssl.nssversion_info
 
 class nssversion_info( ExtraTest ):
 	"""
