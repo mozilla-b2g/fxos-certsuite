@@ -135,7 +135,7 @@ from suite import ExtraTest
 #######################################################################################################################
 # filesystem.wordwritable
 
-class worldwritable( ExtraTest ):
+class worldwritable_info( ExtraTest ):
 	"""
 	Test that checks gonk file system for world-writable files.
 	"""
@@ -194,7 +194,7 @@ class worldwritable( ExtraTest ):
 #######################################################################################################################
 # filesystem.suidroot
 
-class suidroot( ExtraTest ):
+class suidroot_info( ExtraTest ):
 	"""
 	Test that checks gonk file system for suid root binaries.
 	"""

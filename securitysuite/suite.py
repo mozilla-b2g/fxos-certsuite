@@ -62,13 +62,13 @@ class ExtraTest( object ):
 	def run_groups( groups=[] ):
 		logger = get_default_logger()
 		if groups is None or len( groups ) == 0: # run all groups
-			logger.debug( 'running extrasuite tests for all groups %s' % str( ExtraTest.group_list() ) )
+			logger.debug( 'running securitysuite tests for all groups %s' % str( ExtraTest.group_list() ) )
 			groups = ExtraTest.group_list()
 		else:
-			logger.debug( 'running extrasuite tests for groups %s' % str( groups ) )
+			logger.debug( 'running securitysuite tests for groups %s' % str( groups ) )
 		logger.suite_start( tests=groups )
 		for g in groups:
-			logger.debug( "running extrasuite test group %s" % g )
+			logger.debug( "running securitysuite test group %s" % g )
 			logger.test_start( g )
 			try:
 				ExtraTest.run( g )
@@ -122,12 +122,12 @@ def adb_has_root():
 # Command line handler
 ######################
 
-def extracli():
+def securitycli():
     """
     Entry point for the runner defined in setup.py.
     """
 
-    parser = argparse.ArgumentParser( description="Runner for extra test suite")
+    parser = argparse.ArgumentParser( description="Runner for security test suite")
     parser.add_argument("-l", "--list-test-groups", action="store_true",
                         help="List all logical test groups")
     parser.add_argument("-a", "--list-all-tests", action="store_true",
@@ -147,10 +147,10 @@ def extracli():
     args = parser.parse_args()
 
     # set up mozilla logger
-    logger = commandline.setup_logging("extrasuite", vars(args), {"raw": sys.stdout})
+    logger = commandline.setup_logging("securitysuite", vars(args), {"raw": sys.stdout})
 
     try:
-        logger.debug( "extra cli runnng with args %s" % args )
+        logger.debug( "security cli runnng with args %s" % args )
         if args.list_test_groups:
             for group in ExtraTest.group_list():
                 print group
@@ -171,5 +171,5 @@ def extracli():
         raise
 
 if __name__ == "__main__":
-    extracli()
+    securitycli()
 

@@ -105,7 +105,7 @@ from suite import ExtraTest
 #######################################################################################################################
 # nss.certmods
 
-class certmods( ExtraTest ):
+class cert_info( ExtraTest ):
 	"""
 	Test that checks hardcoded certificates in libckbi.so.
 	"""
