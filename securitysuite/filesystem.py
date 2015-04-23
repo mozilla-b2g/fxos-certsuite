@@ -8,6 +8,7 @@ import re
 import os
 import sys
 import subprocess
+import mozdevice
 
 # getter for shared logger instance
 from mozlog.structured import get_default_logger
@@ -16,15 +17,6 @@ from mozlog.structured import get_default_logger
 #######################################################################################################################
 # shared module functions
 #########################
-
-def runcmd( cmd ):
-	"""
-	A convenience wrapper that runs cmd in a subshell and
-	returns its stdout+stderr as string.
-	"""
-	p = subprocess.Popen( cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True )
-	return p.communicate()
-
 
 def parse_ls( out ):
 		"""
@@ -51,8 +43,9 @@ def parse_ls( out ):
 		logger = get_default_logger()
 
 		# adb returns newline as \r\n
-		for dirstr in out[2:-2].split( '\r\n\r\n' ):
-			lines = dirstr.split( '\r\n' )
+		# but mozdevice uses \n
+		for dirstr in out[2:-2].split( '\n\n' ):
+			lines = dirstr.split( '\n' )
 			dirname = lines[0][:-1]
 			if len(lines) == 2 and lines[1].startswith( "opendir failed" ):
 				continue
@@ -179,11 +172,20 @@ class worldwritable_info( ExtraTest ):
 
 	@classmethod
 	def run( cls ):
+		logger = get_default_logger()
+
 		try:
-			#TODO: move to devicemanager class to enable proper error handling here
-			out, err = runcmd( "adb shell ls -alR /" )
-		except:
-			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb.' )
+			dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+		except mozdevice.DMError as e:
+			logger.error( "Error connecting to device via adb (error: %s). Please be " \
+			              "sure device is connected and 'remote debugging' is enabled." % \
+			              e.msg )
+			raise
+
+		try:
+			out = dm.shellCheckOutput( ['ls', '-alR', '/'], root=True )
+		except mozdevice.DMError as e:
+			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg )
 			return False
 
 		found = []
@@ -228,11 +230,20 @@ class suidroot_info( ExtraTest ):
 
 	@classmethod
 	def run( cls ):
+		logger = get_default_logger()
+
 		try:
-			#TODO: move to devicemanager class to enable proper error handling here
-			out, err = runcmd( "adb shell ls -alR /" )
-		except:
-			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb.' )
+			dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+		except mozdevice.DMError as e:
+			logger.error( "Error connecting to device via adb (error: %s). Please be " \
+			              "sure device is connected and 'remote debugging' is enabled." % \
+			              e.msg )
+			raise
+
+		try:
+			out = dm.shellCheckOutput( ['ls', '-alR', '/'], root=True )
+		except mozdevice.DMError as e:
+			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg )
 			return False
 
 		found = []
