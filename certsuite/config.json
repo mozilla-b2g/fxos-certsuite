@@ -1,6 +1,6 @@
 {"version": "2.2",
  "suites": [
-            ["extra", {"cmd": "extrarunner", "run_args":["--version=%(version)s"]}],
+            ["security", {"cmd": "securityrunner", "run_args":["--version=%(version)s"]}],
             ["webapi", {"cmd": "webapirunner",
                         "run_args": ["--version=%(version)s"]}],
             ["cert", {"cmd": "cert",
