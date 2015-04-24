@@ -107,7 +107,7 @@ from suite import ExtraTest
 
 
 #######################################################################################################################
-# ssl.certdb_info
+# kernel.seccomp
 
 class seccomp( ExtraTest ):
 	"""
