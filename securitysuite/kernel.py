@@ -17,28 +17,6 @@ from certsuite.harness import check_adb
 #########################
 
 
-class procpid( object ):
-	"""
-	Class to retrieve and analyze process information in /proc
-	"""
-
-	def __init__( self ):
-		self.logger = get_default_logger()
-		try:
-			self.dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
-		except mozdevice.DMError as e:
-			self.logger.error( "Error connecting to device via adb (error: %s). Please be " \
-			                   "sure device is connected and 'remote debugging' is enabled." % \
-			                   e.msg )
-			raise
-
-	def get_pidlist( self ):
-		out = self.dm.shellCheckOutput( ['ls','/proc/*/status'], root=True )
-		proclines = out.split('\n')[-1] # skip 'self' which is always last
-		pids = [x.split('/')[2] for x in proclines]
-		return pids
-
-
 # Sample b2g-ps output:
 
 ### ZTE Open C v1.3
@@ -97,6 +75,29 @@ class b2gps (object ):
 		return False
 
 
+
+class procpid( object ):
+	"""
+	Class to retrieve and analyze process information in /proc
+	"""
+
+	def __init__( self ):
+		self.logger = get_default_logger()
+		try:
+			self.dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+		except mozdevice.DMError as e:
+			self.logger.error( "Error connecting to device via adb (error: %s). Please be " \
+			                   "sure device is connected and 'remote debugging' is enabled." % \
+			                   e.msg )
+			raise
+
+	def get_pidlist( self ):
+		out = self.dm.shellCheckOutput( ['ls','/proc/*/status'], root=True )
+		proclines = out.split('\n')[-1] # skip 'self' which is always last
+		pids = [x.split('/')[2] for x in proclines]
+		return pids
+
+
 #######################################################################################################################
 # Test implementations
 ################################
@@ -127,7 +128,7 @@ class seccomp( ExtraTest ):
 			return False
 
 		# list of b2g versions that don't have seccomp support
-		without_seccomp = ['1.0', '1.1', '1.2', '1.3', '1.3t']
+		without_seccomp = ['1.0', '1.1', '1.2', '1.3', '1.3t', '1.4']
 		if version is not None and version in without_seccomp:
 			cls.log_status( 'PASS', "Target version %s doesn't support SECCOMP" % version )
 			return True
