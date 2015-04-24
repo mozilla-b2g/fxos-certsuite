@@ -123,11 +123,11 @@ class HTMLBuilder(object):
                         link = pickle.loads(cell_message)
                         if 'text' in link and 'href' in link:
                             if 'target' in link:
-                                cell_message = html.a(link['text'], href=link['href'], target=link['target'])
+                                cell_message = html.div(html.pre(html.a(link['text'], href=link['href'], target=link['target'])), class_='log')
                             else:
-                                cell_message = html.a(link['text'], href=link['href'])
+                                cell_message = html.div(html.pre(html.a(link['text'], href=link['href'])), class_='log')
                     except:
-                        log = html.div(class_='log')
+                        log = html.pre()
                         for line in cell_message.splitlines():
                             separator = line.startswith(' ' * 10)
                             if separator:
@@ -137,8 +137,7 @@ class HTMLBuilder(object):
                                     log.append(html.span(raw(cgi.escape(line)), class_='error'))
                                 else:
                                     log.append(raw(cgi.escape(line)))
-                            log.append(html.br())
-                        cell_message = log
+                        cell_message = html.div(log, class_='log')
 
                 href = 'data:text/plain;charset=utf-8;base64,%s' % base64.b64encode(json.dumps(subtest_data))
 
@@ -154,12 +153,12 @@ class HTMLBuilder(object):
                 ])
                 if cell_message == "":
                     rv.append(
-                        html.tr(cells, class_='passed results-table-row %s' % cell_status)
+                        html.tr(cells, class_='passed results-table-row %s %s' % (cell_status, odd_or_even))
                         )
                 else:
                    rv.extend([
-                        html.tr(cells, class_='error results-table-row %s' % cell_status),
-                        html.tr(html.td(html.div(cell_message, class_='log'), class_='debug', colspan=5))
+                        html.tr(cells, class_='error results-table-row %s %s' % (cell_status, odd_or_even)),
+                        html.tr(html.td(cell_message, class_='debug {}'.format(odd_or_even), colspan=5))
                         ])
         return rv
 

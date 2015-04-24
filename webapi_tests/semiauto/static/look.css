@@ -138,6 +138,7 @@ tr.error { background: rgb(255,255,0); }
 #dialog .image img {
   display:block;
   margin:auto;
+  max-height: 300px;
 }
 
 #dialog .content {

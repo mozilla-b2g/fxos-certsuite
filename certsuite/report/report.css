@@ -30,8 +30,9 @@ table {
 }
 th {
   padding:0.5em 1em 0.5em 1em;
-  background-color: #eee;
+  background-color: #ddd;
   font-weight: bold;
+  font-size: 1.2em;
 }
 td {
   padding: 0.5em;
@@ -44,8 +45,11 @@ td > a {
   width:100%;
 }
 .details { text-align:center }
-tbody > tr:nth-child(2n) { background-color: #f4f4f4 }
 table#errors tr { background-color: white; }
 td.parent_test { font-family: "DejaVu Sans Mono", Monospace; }
 td.parent_test.even { background-color: #fff; }
 td.parent_test.odd { background-color: #f4f4f4; }
+td.col-parent { font-weight: bold; }
+td.debug.even { background-color: #fff; }
+td.debug.odd { background-color: #f4f4f4; }
+div.log pre { padding-left: 0.5em; padding-right: 0.5em; max-width: 600px; white-space: pre-wrap; }
