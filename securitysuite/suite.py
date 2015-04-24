@@ -59,7 +59,7 @@ class ExtraTest( object ):
 			return tests
 
 	@staticmethod
-	def run_groups( groups=[] ):
+	def run_groups( groups=[], version=None ):
 		logger = get_default_logger()
 		if groups is None or len( groups ) == 0: # run all groups
 			logger.debug( 'running securitysuite tests for all groups %s' % str( ExtraTest.group_list() ) )
@@ -71,7 +71,7 @@ class ExtraTest( object ):
 			logger.debug( "running securitysuite test group %s" % g )
 			logger.test_start( g )
 			try:
-				ExtraTest.run( g )
+				ExtraTest.run( g, version=version )
 				logger.test_end( g, 'OK' )
 			except:
 				logger.critical(traceback.format_exc())
@@ -80,12 +80,12 @@ class ExtraTest( object ):
 		logger.suite_end()
 
 	@classmethod
-	def run( cls, group=None ):
+	def run( cls, group=None, version=None ):
 		"""
 		Runs all the tests, optionally just within the specified group.
 		"""
 		for t in cls.test_list( group ):
-			t.run()
+			t.run( version=version )
 
 	@classmethod
 	def log_status( cls, status, msg ):
@@ -164,7 +164,7 @@ def securitycli():
             wait_for_adb_device()
             if not adb_has_root():
                 logger.warning( "adb has no root. Results will be incomplete." )
-            ExtraTest.run_groups( args.include )
+            ExtraTest.run_groups( args.include, version=args.version )
 
     except:
         logger.critical(traceback.format_exc())

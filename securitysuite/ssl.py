@@ -118,7 +118,7 @@ class certdb_info( ExtraTest ):
 	module = sys.modules[__name__]
 
 	@classmethod
-	def run( cls ):
+	def run( cls, version=None ):
 		logger = get_default_logger()
 
 		try:
@@ -145,7 +145,7 @@ class nssversion_info( ExtraTest ):
 	module = sys.modules[__name__]
 
 	@classmethod
-	def run( cls ):
+	def run( cls, version=None ):
 		logger = get_default_logger()
 
 		try:

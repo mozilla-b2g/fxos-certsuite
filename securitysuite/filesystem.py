@@ -171,7 +171,7 @@ class worldwritable_info( ExtraTest ):
 		return r.match( name ) is not None
 
 	@classmethod
-	def run( cls ):
+	def run( cls, version=None ):
 		logger = get_default_logger()
 
 		try:
@@ -229,7 +229,7 @@ class suidroot_info( ExtraTest ):
 		return r.match( name ) is not None
 
 	@classmethod
-	def run( cls ):
+	def run( cls, version=None ):
 		logger = get_default_logger()
 
 		try:
