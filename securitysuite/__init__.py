@@ -8,3 +8,4 @@ from suite import *
 # Import all available test groups (one group per module) here:
 import filesystem
 import ssl
+import kernel
