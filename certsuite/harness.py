@@ -566,7 +566,8 @@ def run_tests(args, config):
                     if remove_marionette_after_run:
                         marionette_uninstall()
                     backup.restore()
-                    device.reboot()
+                    if not args.debug:
+                        device.reboot()
 
             if error:
                 logger.critical("Encountered errors during run")
