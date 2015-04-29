@@ -18,7 +18,7 @@ from mozlog.structured import get_default_logger
 # shared module functions
 #########################
 
-def parse_ls( out ):
+def parse_ls(out):
 		"""
 		Parser for Android's ls -lR output.
 		Takes a string, returns parsed structure.
@@ -44,20 +44,20 @@ def parse_ls( out ):
 
 		# adb returns newline as \r\n
 		# but mozdevice uses \n
-		for dirstr in out[2:-2].split( '\n\n' ):
-			lines = dirstr.split( '\n' )
+		for dirstr in out[2:-2].split('\n\n'):
+			lines = dirstr.split('\n')
 			dirname = lines[0][:-1]
-			if len(lines) == 2 and lines[1].startswith( "opendir failed" ):
+			if len(lines) == 2 and lines[1].startswith("opendir failed"):
 				continue
 			for filestr in lines[1:]:
-				if filestr.endswith( ": No such file or directory" ):
+				if filestr.endswith(": No such file or directory"):
 					continue
-				if filestr.endswith( ": Permission denied" ):
+				if filestr.endswith(": Permission denied"):
 					continue
 				specs = None
 				if filestr[0] in 'dsp': # directory, socket, pipe
 					regexp = mode + field*3 + date + name
-					m = re.search( regexp, filestr )
+					m = re.search(regexp, filestr)
 					specs = {
 						'mode': m.group(1),
 						'perm': m.group(2),
@@ -68,7 +68,7 @@ def parse_ls( out ):
 					}
 				elif filestr[0] == 'l': # symbolic link
 					regexp = mode + field*3 + date + link
-					m = re.search( regexp, filestr )
+					m = re.search(regexp, filestr)
 					specs = {
 						'mode': m.group(1),
 						'perm': m.group(2),
@@ -80,7 +80,7 @@ def parse_ls( out ):
 					}
 				elif filestr[0] in 'cb': # device
 					regexp = mode + field*3 + dev + date + name
-					m = re.search( regexp, filestr )
+					m = re.search(regexp, filestr)
 					specs = {
 						'mode':  m.group(1),
 						'perm':  m.group(2),
@@ -94,7 +94,7 @@ def parse_ls( out ):
 				else: # rest
 					try:
 						regexp = mode + field*4 + date + name
-						m = re.search( regexp, filestr )
+						m = re.search(regexp, filestr)
 						specs = {
 							'mode': m.group(1),
 							'perm': m.group(2),
@@ -105,14 +105,14 @@ def parse_ls( out ):
 							'name': m.group(7)
 						}
 					except:
-						logger.error( "parse error on %s" % filestr )
+						logger.error("parse error on %s" % filestr)
 
 				try:
-					specs['name'] = '/'+os.path.relpath( "%s/%s" % (dirname, specs['name'] ), '/' )
+					specs['name'] = '/'+os.path.relpath("%s/%s" % (dirname, specs['name']), '/')
 					if 'link' in specs.keys():
-						specs['link'] = '/'+os.path.relpath( "%s/%s" % (dirname, specs['link'] ), '/' )
+						specs['link'] = '/'+os.path.relpath("%s/%s" % (dirname, specs['link']), '/')
 				except:
-					logger.warning( "no name from %s" % filestr )
+					logger.warning("no name from %s" % filestr)
 
 				yield specs
 
@@ -128,7 +128,7 @@ from suite import ExtraTest
 #######################################################################################################################
 # filesystem.wordwritable
 
-class worldwritable_info( ExtraTest ):
+class worldwritable_info(ExtraTest):
 	"""
 	Test that checks gonk file system for world-writable files.
 	"""
@@ -164,39 +164,39 @@ class worldwritable_info( ExtraTest ):
 	}
 
 	@classmethod
-	def whitelist_check( cls, name, flag='ok', whitelist=None ):
+	def whitelist_check(cls, name, flag='ok', whitelist=None):
 		if whitelist is None:
 			whitelist = cls.whitelist
-		r = re.compile( '|'.join( whitelist[flag] ) )
-		return r.match( name ) is not None
+		r = re.compile('|'.join(whitelist[flag]))
+		return r.match(name) is not None
 
 	@classmethod
-	def run( cls, version=None ):
+	def run(cls, version=None):
 		logger = get_default_logger()
 
 		try:
-			dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+			dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
 		except mozdevice.DMError as e:
-			logger.error( "Error connecting to device via adb (error: %s). Please be " \
-			              "sure device is connected and 'remote debugging' is enabled." % \
-			              e.msg )
+			logger.error("Error connecting to device via adb (error: %s). Please be " \
+			             "sure device is connected and 'remote debugging' is enabled." % \
+			             e.msg)
 			raise
 
 		try:
-			out = dm.shellCheckOutput( ['ls', '-alR', '/'], root=True )
+			out = dm.shellCheckOutput(['ls', '-alR', '/'], root=True)
 		except mozdevice.DMError as e:
-			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg )
+			cls.log_status('FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg)
 			return False
 
 		found = []
-		for f in parse_ls( out ):
+		for f in parse_ls(out):
 			if f['perm'][7] == 'w' and f['mode'] != 'l':
-				if not cls.whitelist_check( f['name'] ):
-					found.append( f['name'] )
+				if not cls.whitelist_check(f['name']):
+					found.append(f['name'])
 		if len(found) > 0:
-			cls.log_status( 'PASS', 'Please ensure that the following world-writable files will not pose a security risk:\n%s' % '\n'.join(found) )
+			cls.log_status('PASS', 'Please ensure that the following world-writable files will not pose a security risk:\n%s' % '\n'.join(found))
 		else:
-			cls.log_status( 'PASS', 'No unexpected suidroot executables found.' )
+			cls.log_status('PASS', 'No unexpected suidroot executables found.')
 
 		return True
 
@@ -204,7 +204,7 @@ class worldwritable_info( ExtraTest ):
 #######################################################################################################################
 # filesystem.suidroot
 
-class suidroot_info( ExtraTest ):
+class suidroot_info(ExtraTest):
 	"""
 	Test that checks gonk file system for suid root binaries.
 	"""
@@ -222,38 +222,38 @@ class suidroot_info( ExtraTest ):
 	}
 
 	@classmethod
-	def whitelist_check( cls, name, flag='ok', whitelist=None ):
+	def whitelist_check(cls, name, flag='ok', whitelist=None):
 		if whitelist is None:
 			whitelist = cls.whitelist
-		r = re.compile( '|'.join( whitelist[flag] ) )
-		return r.match( name ) is not None
+		r = re.compile('|'.join(whitelist[flag]))
+		return r.match(name) is not None
 
 	@classmethod
-	def run( cls, version=None ):
+	def run(cls, version=None):
 		logger = get_default_logger()
 
 		try:
-			dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+			dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
 		except mozdevice.DMError as e:
-			logger.error( "Error connecting to device via adb (error: %s). Please be " \
-			              "sure device is connected and 'remote debugging' is enabled." % \
-			              e.msg )
+			logger.error("Error connecting to device via adb (error: %s). Please be " \
+			             "sure device is connected and 'remote debugging' is enabled." % \
+			             e.msg)
 			raise
 
 		try:
-			out = dm.shellCheckOutput( ['ls', '-alR', '/'], root=True )
+			out = dm.shellCheckOutput(['ls', '-alR', '/'], root=True)
 		except mozdevice.DMError as e:
-			cls.log_status( 'FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg )
+			cls.log_status('FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg)
 			return False
 
 		found = []
-		for f in parse_ls( out ):
+		for f in parse_ls(out):
 			if f['perm'][2] == 's' and f['uid'] == 'root':
-				if not cls.whitelist_check( f['name'] ):
-					found.append( f['name'] )
+				if not cls.whitelist_check(f['name']):
+					found.append(f['name'])
 		if len(found) > 0:
-			cls.log_status( 'PASS', 'Please ensure that the following suid root files are no security risk:\n%s' % '\n'.join(found) )
+			cls.log_status('PASS', 'Please ensure that the following suid root files are no security risk:\n%s' % '\n'.join(found))
 		else:
-			cls.log_status( 'PASS', 'No unexpected suidroot executables found.' )
+			cls.log_status('PASS', 'No unexpected suidroot executables found.')
 		
 		return True

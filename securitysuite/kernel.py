@@ -36,63 +36,63 @@ from certsuite.harness import check_adb
 # Find My Device   2 u0_a1202  1202  499   72800  22800 ffffffff b6eaf8ac S /system/b2g/b2g
 # (Preallocated a  2 u0_a1785  1785  499   71500  18248 ffffffff b6eaf8ac S /system/b2g/b2g
 
-class b2gps (object ):
+class b2gps (object):
 	"""
 	Class to retrieve and interpret output from the b2g-ps shell command
 	"""
 
-	def __init__( self ):
+	def __init__(self):
 		self.logger = get_default_logger()
 		try:
-			self.dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+			self.dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
 		except mozdevice.DMError as e:
-			self.logger.error( "Error connecting to device via adb (error: %s). Please be " \
+			self.logger.error("Error connecting to device via adb (error: %s). Please be " \
 			                   "sure device is connected and 'remote debugging' is enabled." % \
-			                   e.msg )
+			                   e.msg)
 			raise
 
 		try:
-			self.ps = self.dm.shellCheckOutput( ['b2g-ps'], root=True ).split( '\n' )
+			self.ps = self.dm.shellCheckOutput(['b2g-ps'], root=True).split('\n')
 		except mozdevice.DMError as e:
-			self.logger.error( "Error reading b2g-ps result from device: %s" % e.msg )
+			self.logger.error("Error reading b2g-ps result from device: %s" % e.msg)
 			raise
 
-	def has_known_format( self ):
+	def has_known_format(self):
 		known = [
 			'APPLICATION    SEC USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME',
 			'APPLICATION      USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME'
 		]
 		return self.ps[0] in known 
 
-	def seccomp_is_enabled( self ):
+	def seccomp_is_enabled(self):
 		return " SEC " in self.ps[0]
 
-	def b2g_uses_seccomp( self ):
+	def b2g_uses_seccomp(self):
 		# Working hypothesis: if Homescreen has seccomp, then b2g uses seccomp
 		for psline in self.ps:
-			if psline.startswith( 'Homescreen       2 ' ):
+			if psline.startswith('Homescreen       2 '):
 				return True
 		return False
 
 
 
-class procpid( object ):
+class procpid(object):
 	"""
 	Class to retrieve and analyze process information in /proc
 	"""
 
-	def __init__( self ):
+	def __init__(self):
 		self.logger = get_default_logger()
 		try:
-			self.dm = mozdevice.DeviceManagerADB( runAdbAsRoot=True )
+			self.dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
 		except mozdevice.DMError as e:
-			self.logger.error( "Error connecting to device via adb (error: %s). Please be " \
-			                   "sure device is connected and 'remote debugging' is enabled." % \
-			                   e.msg )
+			self.logger.error("Error connecting to device via adb (error: %s). Please be " \
+			                  "sure device is connected and 'remote debugging' is enabled." % \
+			                  e.msg)
 			raise
 
-	def get_pidlist( self ):
-		out = self.dm.shellCheckOutput( ['ls','/proc/*/status'], root=True )
+	def get_pidlist(self):
+		out = self.dm.shellCheckOutput(['ls','/proc/*/status'], root=True)
 		proclines = out.split('\n')[-1] # skip 'self' which is always last
 		pids = [x.split('/')[2] for x in proclines]
 		return pids
@@ -109,7 +109,7 @@ from suite import ExtraTest
 #######################################################################################################################
 # kernel.seccomp
 
-class seccomp( ExtraTest ):
+class seccomp(ExtraTest):
 	"""
 	Test that checks seccomp status.
 	"""
@@ -118,33 +118,33 @@ class seccomp( ExtraTest ):
 	module = sys.modules[__name__]
 
 	@classmethod
-	def run( cls, version=None ):
+	def run(cls, version=None):
 		logger = get_default_logger()
 
 		try:
 			ps = b2gps()
 		except:
-			cls.log_status( 'FAIL', 'Failed to retrieve b2g-ps info.' )
+			cls.log_status('FAIL', 'Failed to retrieve b2g-ps info.')
 			return False
 
 		# list of b2g versions that don't have seccomp support
 		without_seccomp = ['1.0', '1.1', '1.2', '1.3', '1.3t', '1.4']
 		if version is not None and version in without_seccomp:
-			cls.log_status( 'PASS', "Target version %s doesn't support SECCOMP" % version )
+			cls.log_status('PASS', "Target version %s doesn't support SECCOMP" % version)
 			return True
 
 		if not ps.has_known_format():
-			cls.log_status( 'FAIL', "b2g-ps output from device has unknown format" )
+			cls.log_status('FAIL', "b2g-ps output from device has unknown format")
 			return False
 
 		if not ps.seccomp_is_enabled():
-			cls.log_status( 'FAIL', "Please enable SECCOMP support on the device. The B2G version should support it." )
+			cls.log_status('FAIL', "Please enable SECCOMP support on the device. The B2G version should support it.")
 			return False
 
 		if not ps.b2g_uses_seccomp():
-			cls.log_status( 'FAIL', "Gonk has SECCOMP support, but the B2G process doesn't. Please enable." )
+			cls.log_status('FAIL', "Gonk has SECCOMP support, but the B2G process doesn't. Please enable.")
 			return False
 
-		cls.log_status( 'PASS', "SECCOMP enabled in Gonk and B2G process" )
+		cls.log_status('PASS', "SECCOMP enabled in Gonk and B2G process")
 		return True
 
