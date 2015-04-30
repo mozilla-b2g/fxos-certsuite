@@ -118,7 +118,7 @@ class HTMLBuilder(object):
                 html.tr(
                     html.th("Subsuite", class_='sortable', col='subsuite'),
                     html.th("Subsuite Errors"),
-                    html.th("Test Regressions"),
+                    html.th("Test Executions"),
                     html.th("Details")
                 )
             ),
@@ -141,9 +141,12 @@ class HTMLBuilder(object):
             else:
                 cells.append(html.td("0",
                                      class_="condition PASS"))
+            style = ''
+            if result.has_fails or result.has_errors:
+                style = 'background-color: darkblue;'
             if result.has_regressions:
                 num_regressions = sum(len(item) for item in result.regressions.itervalues())
-                cells.append(html.td(num_regressions, class_="condition FAIL"))
+                cells.append(html.td(num_regressions, class_="condition PASS", style=style))
             else:
                 cells.append(html.td("0", class_="condition PASS"))
             

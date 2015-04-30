@@ -21,7 +21,6 @@ def is_regression(data):
 
     return result_status[data["status"]] > result_status[data["expected"]]
 
-
 class LogHandler(reader.LogHandler):
     def __init__(self):
         self.results = Results()
@@ -38,10 +37,16 @@ class LogHandler(reader.LogHandler):
     def test_status(self, data):
         test_id = self.test_id(data)
 
+        if data["status"] == 'FAIL':
+            self.results.fails = self.results.fails + 1
+
         self.results.regressions[test_id][data["subtest"]] = data
 
     def test_end(self, data):
         test_id = self.test_id(data)
+
+        if data["status"] == 'FAIL':
+            self.results.fails = self.results.fails + 1
 
         self.results.regressions[test_id][KEY_MAIN] = data
 
@@ -55,6 +60,7 @@ class Results(object):
         self.regressions = defaultdict(dict)
         self.errors = []
         self.map = {}
+        self.fails = 0
 
     @property
     def is_pass(self):
@@ -63,6 +69,10 @@ class Results(object):
     @property
     def has_regressions(self):
         return len(self.regressions) > 0
+
+    @property
+    def has_fails(self):
+        return self.fails > 0
 
     @property
     def has_errors(self):
