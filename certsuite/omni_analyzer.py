@@ -79,7 +79,14 @@ class OmniAnalyzer(object):
         dm.getFile(self.omni_ja_on_device, omnifile)
         unzip_omnifile(omnifile, os.path.join(workdir, 'device'))
 
+    def log_pass(self, testid, message=''):
+        self.logger.test_end(testid, 'PASS', expected='PASS', message=message)
+        
+    def log_ok(self, testid, message=''):
+        self.logger.test_end(testid, 'OK', expected='OK', message=message)
+
     def run(self, results_file=None, html_format=False):
+        testid = '%s.%s.%s' % ('cert', 'omni-analyzer', 'check-omni-diff')
         is_run_success = False
         diff = ''
         with CleanedTempFolder() as workdir:
@@ -89,7 +96,7 @@ class OmniAnalyzer(object):
             cmd = ['diff', '-U', '8', '--new-file', os.path.join(workdir, 'reference'), os.path.join(workdir, 'device')]
             try:
                 diff = subprocess.check_output(cmd)
-                self.logger.test_status('omni-analyzer', 'diff', 'PASS', message='The %s on device is the same as reference file omni.ja.' % self.omni_ja_on_device)
+                self.log_pass(testid, 'The %s on device is the same as reference file omni.ja.' % self.omni_ja_on_device)
                 is_run_success = True
             except subprocess.CalledProcessError as e:
                 if e.returncode == 1:
@@ -109,7 +116,7 @@ class OmniAnalyzer(object):
                 else:
                     diff_message = 'error running diff: %s' % e.returncode
                     self.logger.error(diff_message)
-                self.logger.test_status('omni-analyzer', 'diff', 'FAIL', message=diff_message)
+                self.log_ok(testid, diff_message)
         return diff, is_run_success
 
 
