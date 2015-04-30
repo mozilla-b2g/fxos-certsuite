@@ -50,6 +50,11 @@ class ReportManager(object):
 
         path = "%s/report.html" % results.name
         self.zip_file.writestr(path, self.subsuite_results[results.name]['html_str'])
+        
+        if results.has_regressions:
+            return results.regressions
+        else:
+            return None
 
     def add_summary_report(self, path):
         summary_results = report.parse_log(path)

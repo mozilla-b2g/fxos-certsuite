@@ -224,7 +224,7 @@ def wait_for_homescreen(marionette):
         log(manager);
         let app = null;
         if (manager) {
-            app = ('getActiveApp' in manager) ? manager.getActiveApp() : manager.getCurrentDisplayedApp();
+            app = manager.getActiveApp();
         }
         log(app);
         if (app) {
