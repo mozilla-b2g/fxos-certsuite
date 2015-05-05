@@ -382,34 +382,6 @@ def test_user_agent(logger, report):
     else:
         log_ok(logger, testid, 'current user-agent string: %s: %s' % (user_agent, message))
 
-def test_search_id(logger, report):
-    testid = test_id('cert','search-id', 'oemid')
-    logger.test_start(testid)
-
-    fxos_appgen.launch_app('browser')
-
-    script = """
-      result = window.wrappedJSObject.UrlHelper.getUrlFromInput('hello world');
-      return result;
-    """
-    m = marionette.Marionette('localhost', 2828)
-    m.start_session()
-    browser = m.find_element('css selector', 'iframe[src="app://search.gaiamobile.org/newtab.html"]')
-    m.switch_to_frame(browser)
-    url = m.execute_script(script)
-    m.delete_session()
-
-    report['search-oemid'] = url
-
-    oemid_rexp = re.compile('client=mobile-firefoxos&channel=fm:org.mozilla:([A-Z0-9.]+):official&')
-
-    match = oemid_rexp.match(url)
-    if match:
-        log_pass(logger, testid, 'oemid: %s' % match.groups()[0])
-    else:
-        log_fail(logger, testid, 'no oemid found in url: %s' % url)
-
-
 def test_open_remote_window(logger, version, addr):
     global webapi_results
 
@@ -665,8 +637,7 @@ def _run(args, logger):
         'permissions',
         'webapi',
         'user-agent',
-        'crash-reporter',
-        'search-id',
+        'crash-reporter'
         ]
     if args.list_test_groups:
         for t in test_groups:
@@ -769,9 +740,6 @@ def _run(args, logger):
 
     if 'crash-reporter' in test_groups:
         test_crash_reporter(logger, report)
-
-    if 'search-id' in test_groups:
-        test_search_id(logger, report)
 
     logger.suite_end()
 
