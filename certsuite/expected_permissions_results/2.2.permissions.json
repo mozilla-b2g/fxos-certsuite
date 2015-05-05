@@ -119,8 +119,7 @@
   ],
   "mobileconnection": [
     "window.navigator.mozIccManager",
-    "window.navigator.mozMobileConnections",
-    "window.document.body.itemType (expected object)"
+    "window.navigator.mozMobileConnections"
   ],
   "mobileid": [
     "window.navigator.getMobileIdAssertion"
@@ -170,7 +169,9 @@
     "speaker-control"
   ],
   "storage": [],
-  "systemXHR": [],
+  "systemXHR": [
+    "systemXHR"
+  ],
   "tcp-socket": [],
   "telephony": [
     "window.navigator.mozTelephony",
@@ -203,6 +204,7 @@
     "window.MozWifiManager",
     "window.MozWifiNetwork",
     "window.navigator.mozWifiManager",
-    "window.navigator.mozWifiP2pManager"
+    "window.navigator.mozWifiP2pManager",
+    "window.document.body.itemType (expected object)"
   ]
 }
