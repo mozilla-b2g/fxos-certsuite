@@ -71,7 +71,7 @@ class ExtraTest(object):
             logger.debug("running securitysuite test group %s" % g)
             logger.test_start(g)
             try:
-                ExtraTest.run(g, version=version)
+                ExtraTest.runner(g, version=version)
                 logger.test_end(g, 'OK')
             except:
                 logger.critical(traceback.format_exc())
@@ -80,7 +80,7 @@ class ExtraTest(object):
         logger.suite_end()
 
     @classmethod
-    def run(cls, group=None, version=None):
+    def runner(cls, group=None, version=None):
         """
         Runs all the tests, optionally just within the specified group.
         """
