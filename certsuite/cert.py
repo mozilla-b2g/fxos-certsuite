@@ -263,6 +263,8 @@ def test_permissions(logger, report, args, addr):
                 'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)})
 
     for permission in [None] + permissions:
+        global webapi_results
+        global webapi_results_embed_app
         webapi_results = None
         webapi_results_embed_app = None
 
