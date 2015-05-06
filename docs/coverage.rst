@@ -1,6 +1,21 @@
 Test Coverage
 =============
 
+Security
+--------
+
+Security testing checking the process authority and ssl file checking
+
+filesystem
+  check the file system permission
+
+ssl
+  check the CA validatation
+
+kernel
+  check the authority of kernel processes
+
+
 Web Platform Tests
 ------------------
 
@@ -56,9 +71,15 @@ groups divided by directories (listed below) that make up Python
 modules.  Some of the tests may not be applicable depending on the
 device under test's capabilities and hardware configuration.
 
+apps
+  able to retrieve manifest of apps.
+
 bluetooth
   Bluetooth API provides low-level access to the device's Bluetooth
   hardware.
+
+device_storage
+  Accessibility of read/write device storage such as SD card.
 
 devicelight
   Lets you detect changes to ambient light using the device's light sensor.
@@ -68,6 +89,9 @@ fm_radio
 
 geolocation
   Provides information about the device's physical location.
+
+idle
+  idle mode for power saving
 
 mobile_message
   Lets apps send and receive SMS text messages, as well as to access
