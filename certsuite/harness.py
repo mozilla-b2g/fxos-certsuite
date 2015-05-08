@@ -69,6 +69,11 @@ def setup_logging(log_f):
 def load_config(path):
     with open(path) as f:
         config = json.load(f)
+
+    if sys.platform == 'win32':
+        config_str = json.dumps(config)
+        config_str.replace('/', os.sep)
+        config = json.loads(config_str)
     config["suites"] = OrderedDict(config["suites"])
     return config
 
@@ -271,7 +276,7 @@ class TestRunner(object):
         cmd = [suite_opts['cmd']]
 
         subtests = '' if groups == [] else '_' + "_".join(item.replace("/", "-") for item in groups)
-        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, subtests)
+        log_name = os.sep.join([temp_dir,"%s_structured%s.log" % (suite, subtests)])
         cmd.extend(["--log-raw=-"])
 
         if groups:
