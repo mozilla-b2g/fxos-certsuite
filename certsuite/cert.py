@@ -163,7 +163,6 @@ def test_omni_analyzer(logger, report, args):
 def test_webapi(logger, report, args, addr):
     errors = False
 
-    logger.test_start('webapi')
     logger.debug('Running webapi verifier tests')
 
     for apptype in ['web', 'privileged', 'certified']:

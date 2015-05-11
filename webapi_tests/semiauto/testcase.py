@@ -21,6 +21,9 @@ from webapi_tests.semiauto.environment import InProcessTestEnvironment
 instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
+# local variable for marionette
+_host = 'localhos'
+_port = 2828
 
 class TestCase(unittest.TestCase):
     stored = threading.local()
@@ -116,7 +119,7 @@ class TestCase(unittest.TestCase):
 
         m = TestCase.stored.marionette
         if m is None:
-            m = Marionette()
+            m = Marionette(host=_host, port=_port)
             m.wait_for_port()
             m.start_session()
             TestCase.stored.marionette = m
