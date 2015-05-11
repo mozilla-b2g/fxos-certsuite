@@ -18,6 +18,7 @@ import tempfile
 import time
 import traceback
 import zipfile
+import webbrowser
 from cStringIO import StringIO
 from collections import OrderedDict
 from datetime import datetime
@@ -33,23 +34,31 @@ from marionette.by import By
 from marionette.wait import Wait
 from marionette_extension import AlreadyInstalledException
 from marionette_extension import install as marionette_install
+from marionette_extension import uninstall as marionette_uninstall
 from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters, set_default_logger
+from webapi_tests.semiauto import environment, server
+
+from reportmanager import ReportManager
+from logmanager import LogManager
+
+from report.results import KEY_MAIN
 
 import adb_b2g
 import gaiautils
 import report
 
 logger = None
+remove_marionette_after_run = False
 stdio_handler = handlers.StreamHandler(sys.stderr,
                                        formatters.MachFormatter())
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "config.json"))
 
+retry_path = 'retry.json'
 
-def setup_logging(log_manager):
+def setup_logging(log_f):
     global logger
-    log_f = log_manager.structured_file
     logger = structuredlog.StructuredLogger("firefox-os-cert-suite")
     logger.add_handler(stdio_handler)
     logger.add_handler(handlers.StreamHandler(log_f,
@@ -84,59 +93,10 @@ def get_metadata():
     dist = pkg_resources.get_distribution("fxos-certsuite")
     return {"version": dist.version}
 
-
 def log_metadata():
     metadata = get_metadata()
     for key in sorted(metadata.keys()):
         logger.info("fxos-certsuite %s: %s" % (key, metadata[key]))
-
-
-class LogManager(object):
-    def __init__(self):
-        self.time = datetime.now()
-        self.structured_path = "run.log"
-        self.zip_path = 'firefox-os-certification_%s.zip' % (time.strftime("%Y%m%d%H%M%S"))
-        self.structured_file = None
-        self.subsuite_results = []
-
-    def add_file(self, path, file_obj):
-        self.zip_file.write(path, file_obj)
-
-    def add_subsuite_report(self, path):
-        results = report.parse_log(path)
-        self.subsuite_results.append(results)
-        if not results.is_pass:
-            html_str = report.subsuite.make_report(results)
-            path = "%s/report.html" % results.name
-            self.zip_file.writestr(path, html_str)
-
-    def add_summary_report(self, path):
-        summary_results = report.parse_log(path)
-        html_str = report.summary.make_report(self.time,
-                                              summary_results,
-                                              self.subsuite_results)
-        path = "report.html"
-        self.zip_file.writestr(path, html_str)
-
-    def __enter__(self):
-        self.zip_file = zipfile.ZipFile(self.zip_path, 'w', zipfile.ZIP_DEFLATED)
-        self.structured_file = open(self.structured_path, "w")
-        return self
-
-    def __exit__(self, ex_type, ex_value, tb):
-        args = ex_type, ex_value, tb
-        if ex_type in (SystemExit, KeyboardInterrupt):
-            logger.info("Testrun interrupted")
-        try:
-            self.structured_file.__exit__(*args)
-            self.zip_file.write(self.structured_path)
-            self.add_summary_report(self.structured_path)
-        finally:
-            try:
-                os.unlink(self.structured_path)
-            finally:
-                self.zip_file.__exit__(*args)
-
 
 # Consider upstreaming this to marionette-client:
 class MarionetteSession(object):
@@ -159,6 +119,24 @@ class TestRunner(object):
     def __init__(self, args, config):
         self.args = args
         self.config = config
+        self.retry = self.loadretry()
+        self.regressions = []
+
+    def loadretry(self):
+        if not self.args.retry_failed:
+            return False
+
+        if not os.path.exists(retry_path):
+            return False
+
+        retrys = None
+        try:
+            with open(retry_path, 'r') as f:
+                retrys = json.load(f)
+        except:
+            pass
+
+        return retrys
 
     def iter_suites(self):
         '''
@@ -167,7 +145,9 @@ class TestRunner(object):
         test suite and [test_groups] is a list of group names to run in that suite,
         or the empty list to indicate all tests.
         '''
-        if not self.args.tests:
+        if self.retry:
+            tests = self.retry
+        elif not self.args.tests:
             tests = self.config["suites"].keys()
         else:
             tests = self.args.tests
@@ -186,15 +166,51 @@ class TestRunner(object):
         for suite, groups in d.iteritems():
             yield suite, groups
 
-    def run_suite(self, suite, groups, log_manager):
+    def test_string(self, test_id):
+        if isinstance(test_id, unicode):
+            return test_id
+        else:
+            return " ".join(test_id)
+
+    def get_test_name(self, test, test_data):
+        test_name = self.test_string(test)
+        if len(test_data) == 1 and KEY_MAIN in test_data.keys():
+            start_index = test_name.find('.') + 1
+            end_index = test_name.find('.', start_index)
+            test_name = test_name[start_index:end_index]
+        return test_name
+
+    def generate_retry(self):
+        test_map = {'certsuite' : 'cert',
+                    'webapi' : 'webapi',
+                    'web-platform-tests':'web-platform-tests'}
+
+        failed = []
+        for regressions in self.regressions:
+            if not regressions:
+                continue
+            tests = sorted(regressions.keys())
+            for i, test in enumerate(tests):
+                test_data = regressions[test]
+                for subtest in sorted(test_data.keys()):
+                    subtest_data = test_data[subtest]
+                    subsuite = self.get_test_name(test, test_data)
+                    if subtest_data["status"] == 'FAIL':
+                        failed.append("%s:%s" %
+                            (test_map[subtest_data['source']], subsuite))
+                        break
+        try:
+            if failed:
+                with open(retry_path, 'w') as f:
+                    json.dump(failed, f)
+        except:
+            logger.error("Error generate retry.json file : %s" % traceback.format_exc())
+
+    def run_suite(self, suite, groups, log_manager, report_manager):
         with TemporaryDirectory() as temp_dir:
             result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
-            for path in result_files:
-                file_name = os.path.split(path)[1]
-                log_manager.add_file(path, "%s/%s" % (suite, file_name))
-
-            log_manager.add_subsuite_report(structured_path)
+            self.regressions.append(report_manager.add_subsuite_report(structured_path, result_files))
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -254,7 +270,8 @@ class TestRunner(object):
 
         cmd = [suite_opts['cmd']]
 
-        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, "_".join(item.replace("/", "-") for item in groups))
+        subtests = '' if groups == [] else '_' + "_".join(item.replace("/", "-") for item in groups)
+        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, subtests)
         cmd.extend(["--log-raw=-"])
 
         if groups:
@@ -262,6 +279,15 @@ class TestRunner(object):
 
         cmd.extend(item % subn for item in suite_opts.get("run_args", []))
         cmd.extend(item % subn for item in suite_opts.get("common_args", []))
+
+        if self.args.debug and suite == 'webapi':
+            cmd.append('-v')
+        if self.args.debug and suite == 'cert':
+            cmd.append('--debug')
+
+        if suite == 'webapi' or suite == 'cert':
+            cmd.append('--device-profile')
+            cmd.append(self.args.device_profile)
 
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
@@ -331,6 +357,8 @@ def install_marionette(device, version):
         logger.info("Installing marionette extension")
         try:
             marionette_install(version)
+            global remove_marionette_after_run
+            remove_marionette_after_run = True
         except AlreadyInstalledException:
             logger.info("Marionette is already installed")
     except subprocess.CalledProcessError:
@@ -415,15 +443,108 @@ def list_tests(args, config):
         print "%s:%s" % (test, group)
     return True
 
+def edit_device_profile(device_profile_path, message):
+    resp = ''
+    result = None
+    try:
+        env = environment.get(environment.InProcessTestEnvironment)
+        url = "http://%s:%d/profile.html" % (env.server.addr[0], env.server.addr[1])
+        webbrowser.open(url)
+        environment.env.handler = server.wait_for_client()
+
+        resp = environment.env.handler.prompt(message)
+
+        message = 'Create device profile failed!!'
+        if resp:
+            result = json.loads(resp)
+            if result['return'] == 'ok':
+                with open(device_profile_path, 'w') as device_profile_f:
+                    json.dump(result, device_profile_f, indent=4)
+                message = 'Create device profile successfully!!'
+            else:
+                message = 'Create device profile is cancelled by user!!'
+        else:
+            message = ''
+        logger.info(message)
+    except:
+        logger.error("Failed create device profile:\n%s" % traceback.format_exc())
+
+    return result
+
+def load_device_profile(device_profile_path):
+    device_profile_object = None
+    try:
+        with open(device_profile_path, 'r') as device_profile_file:
+            device_profile_object = json.load(device_profile_file)
+            if not 'result' in device_profile_object:
+                logger.error('Invalide device profile file [%s]' % device_profile_path)
+                device_profile_object = None
+            elif not 'contact' in device_profile_object['result']:
+                    logger.error('Invalide device profile file [%s]' % device_profile_path)
+                    device_profile_object = None
+    except:
+        logger.critical("Encountered error at checking device profile file [%s]:\n%s" % (device_profile_path, traceback.format_exc()))
+        device_profile_object = None
+    finally:
+        return device_profile_object
+
+def prepare_device_profile(edit_profile, profile_path, suites):
+    profile_object = {'return': 'cancel'}
+
+    if os.path.exists(profile_path):
+        profile_object = load_device_profile(profile_path)
+        logger.debug('load profile from [%s]' % profile_path)
+        if not profile_object:
+            edit_profile = True
+    else:
+        edit_profile = True
+
+    if edit_profile:
+        # create profile information to be displayed in profile.html
+        profile_data = {}
+        for test, group in iter_test_lists(suites):
+            if test not in profile_data.keys():
+                profile_data[test] = []
+            profile_data[test].append({
+                'id': group,
+                'checked': True,
+                'hidden': False
+            })
+
+        if profile_object is not None and profile_object['return'] == 'ok':
+            # mark unchecked for those loaded from profile to skip
+            for test in profile_data.keys():
+                for i in range(len(profile_data[test])):
+                    if profile_data[test][i]['id'] in profile_object['result'][test]:
+                        profile_data[test][i]['checked'] = False
+
+            # other profile datas are list, but profile_data['contact'] is map
+            profile_data['contact'] = profile_object['result']['contact']
+
+        message = json.dumps(profile_data)
+        logger.debug('device profile message to tonado server:\n\t%s' % message)
+
+        result = edit_device_profile(profile_path, message)
+        logger.debug('User input profile information :\n\t%s' % json.dumps(result))
+        if result:
+            profile_object = result
+
+    return profile_object
 
 def run_tests(args, config):
     error = False
     output_zipfile = None
 
     try:
-        with LogManager() as log_manager:
+        with LogManager() as log_manager, ReportManager() as report_manager:
             output_zipfile = log_manager.zip_path
-            setup_logging(log_manager)
+            setup_logging(log_manager.structured_file)
+
+            config['profile'] = prepare_device_profile( args.edit_device_profile,
+                                                        args.device_profile,
+                                                        config['suites'])
+
+            report_manager.setup_report(args.device_profile, log_manager.zip_file, log_manager.structured_path)
 
             log_metadata()
 
@@ -432,15 +553,20 @@ def run_tests(args, config):
             with adb_b2g.DeviceBackup() as backup:
                 device = backup.device
                 runner = TestRunner(args, config)
-                for suite, groups in runner.iter_suites():
-                    try:
-                        runner.run_suite(suite, groups, log_manager)
-                    except:
-                        logger.error("Encountered error:\n%s" %
-                                     traceback.format_exc())
-                        error = True
-                    finally:
-                        backup.restore()
+                try:
+                    for suite, groups in runner.iter_suites():
+                        try:
+                            runner.run_suite(suite, groups, log_manager, report_manager)
+                        except:
+                            logger.error("Encountered error:\n%s" %
+                                         traceback.format_exc())
+                            error = True
+                finally:
+                    runner.generate_retry()
+                    if remove_marionette_after_run:
+                        marionette_uninstall()
+                    backup.restore()
+                    if not args.debug:
                         device.reboot()
 
             if error:
@@ -458,15 +584,27 @@ def run_tests(args, config):
 def get_parser():
     parser = argparse.ArgumentParser()
     #TODO make this more robust
-    parser.add_argument('--config',
+    parser.add_argument('-c', '--config',
                         help='Path to config file', type=os.path.abspath,
                         action='store', default=config_path)
-    parser.add_argument('--list-tests',
-                        help='list all tests available to run',
+    parser.add_argument('-d', '--debug',
+                        help='Enable debug',
                         action='store_true')
+    parser.add_argument('-e', '--edit-device-profile',
+                        help='Edit the device profile',
+                        action='store_true', default=False)
+    parser.add_argument('-p', '--device-profile',
+                        help='Path to device profile file', type=os.path.abspath,
+                        action='store', default='device_profile.json')
+    parser.add_argument('-l', '--list-tests',
+                        help='List all tests available to run',
+                        action='store_true')
+    parser.add_argument('-r', '--retry-failed',
+                        help='Retry last failed tests to run(IGNORE any tests parameters)',
+                        action='store_true', default=False)
     parser.add_argument('tests',
                         metavar='TEST',
-                        help='tests to run',
+                        help='Tests to run',
                         nargs='*')
     return parser
 
@@ -478,8 +616,8 @@ def main():
 
     if args.list_tests:
         return list_tests(args, config)
-    else:
-        return run_tests(args, config)
+
+    return run_tests(args, config)
 
 
 if __name__ == '__main__':

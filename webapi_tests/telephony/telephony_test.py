@@ -49,12 +49,24 @@ class TelephonyTestCommon(object):
           window.wrappedJSObject.received_callschanged = true;
         };
 
+        window.wrappedJSObject.received_ready = false;
+        telephony.ready.then(
+          function() {
+            console.log("Telephony got ready");
+            window.wrappedJSObject.received_ready = true;
+          },
+          function() {
+            console.log("Telephony not ready");
+            window.wrappedJSObject.received_ready = false;
+         }
+        );
+
         marionetteScriptFinished(1);
         """, special_powers=True)
 
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_callschanged"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_ready"))
         except:
             self.fail("Telephony.oncallschanged event not found, but should have been "
                       "since initiated incoming call to firefox OS device")
@@ -364,6 +376,18 @@ class TelephonyTestCommon(object):
             };
         });
 
+        window.wrappedJSObject.received_ready = false;
+        telephony.ready.then(
+          function() {
+            console.log("Telephony got ready");
+            window.wrappedJSObject.received_ready = true;
+          },
+          function() {
+            console.log("Telephony not ready");
+            window.wrappedJSObject.received_ready = false;
+         }
+        );
+
         marionetteScriptFinished(1);
         """, script_args=[destination], special_powers=True)
 
@@ -373,7 +397,7 @@ class TelephonyTestCommon(object):
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_dialing"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_alerting"))
-            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_callschanged"))
+            wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_ready"))
         except:
             # failed to initiate call; check if the destination phone's line was busy
             busy = self.marionette.execute_script("return window.wrappedJSObject.received_busy")

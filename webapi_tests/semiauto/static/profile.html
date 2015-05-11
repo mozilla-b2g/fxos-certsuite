@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<!--
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this file,
+    You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Firefox OS MCTS </title>
+<style type="text/css">
+#tabzilla {
+  background-image: url('img/tabzilla.png');
+  float: right;
+  display: block;
+  height: 42px;
+  width: 150px;
+  position: relative;
+  text-indent: -2000px;
+  overflow: hidden;
+}
+</style>
+      <script type="text/javascript">
+      var datas = {
+        'data-list': Array('contact', 'webapi', 'cert', 'web-platform-tests'),
+        'type-list': Array('text', 'checkbox', 'checkbox', 'checkbox')
+      };
+
+      function appendCheckBox(el, idx, data) {
+        var idiv = document.createElement('div');
+        idiv.id = 'cb'+idx;
+        el.appendChild(idiv);
+
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.name = data.id;
+        cb.checked = data.checked;
+        cb.value = data.id;
+        if (data.hidden) {
+          idiv.setAttribute('style', 'display: none;');
+        }
+
+        idiv.appendChild(cb);
+        idiv.appendChild(document.createTextNode(data.id));
+      }
+
+      function resetTest(dc, tests) {
+        var contact = tests['contact'];
+        delete tests['contact'];
+        for (key in contact) {
+          el = document.getElementById(key);
+          el.value = contact[key];
+        }
+
+        var h2 = document.createElement('h2');
+        h2.appendChild(document.createTextNode('Tests'));
+        dc.appendChild(h2);
+        for (var key in tests) {
+          var mg = document.createElement('div');
+          var h3 = document.createElement('h3');
+          h3.appendChild(document.createTextNode(key));
+          mg.id = key;
+          mg.appendChild(h3);
+          for (var j = 0; j < tests[key].length; j++) {
+            appendCheckBox(mg, j, tests[key][j]);
+          }
+          dc.appendChild(mg);
+        }
+      }
+
+      function UnknownMessage(msg) {
+        this.message = msg;
+      }
+
+      function InternalError(e) {
+        this.message = "Internal error: " + e;
+      }
+
+      function Client(addr) {
+        this.addr = addr;
+        this.ws = null;
+      }
+
+      Client.prototype = {
+         connect: function() {
+          this.ws = new WebSocket("ws://" + this.addr + "/tests");
+
+          this.ws.onopen = function(e) { console.log("open", e); }.bind(this);
+          this.ws.onclose = function(e) {
+            console.log("close", e);
+          }.bind(this);
+
+          this.ws.onmessage = function(e) {
+            var message = JSON.parse(e.data);
+            console.log("recv", message);
+
+            try {
+              this.parseMessage(message);
+            } catch (e) {
+              console.log("unkwn", message);
+              this.ws.close();
+              if (!(e instanceof UnknownMessage || e instanceof InternalError))
+                e = new InternalError(e);
+              console.log(e.message);
+            }
+          }.bind(this);
+        },
+
+        promptUser: function(text, image_path){
+          this.okEl = document.getElementById('ok');
+          this.cancelEl = document.getElementById('cancel');
+          this.dc = document.getElementById('tests');
+          this.dc.innerHTML = '';
+          console.log(text);
+          tests = JSON.parse(text);
+          resetTest(this.dc, tests);
+
+          this.okEl.onclick = function() {
+            message = this.value();
+            this.emit('prompt', message);
+            this.close(); }.bind(this);
+          this.cancelEl.onclick = function() {
+            message = {'return':'cancel', 'result':'cancel'};
+            this.emit('prompt', JSON.stringify(message));
+            this.close();}.bind(this);
+        },
+
+        close: function() {
+          var msg = 'Device Profile Edit finished. Please close this tab and continue the MCTS test.';
+          this.cancelEl.onclick = function() {};
+          this.cancelEl.onclick = function() {};
+          window.alert(msg);
+          document.getElementsByTagName('body')[0].innerHTML = 
+              '<h1>' + msg + '</h1>';
+        },
+
+        value: function() {
+          var result = {};
+          for (var i = datas['type-list'].length - 1; i >= 0; i--) {
+            var type = datas['type-list'][i];
+            var data = datas['data-list'][i];
+            if (type == 'text') {
+              result[data] = {};
+            };
+            if (type == 'checkbox') {
+              result[data] = Array();
+            };
+          }
+
+          for (var i = datas['type-list'].length - 1; i >= 0; i--) {
+            var type = datas['type-list'][i];
+            var data = datas['data-list'][i];
+              if (type == 'text') {
+                var x = document.getElementById(data);
+                var y = x.getElementsByTagName('input');
+                for (var j = y.length - 1; j >= 0; j--) {
+                  result[data][y[j].name] = y[j].value;
+                };
+              };
+              if (type == 'checkbox') {
+                var x = document.getElementById(data);
+                var y = x.getElementsByTagName('input');
+                for (var j = y.length - 1, k=0; j >= 0; j--) {
+                  if (!y[j].checked) {
+                    result[data][k++] = y[j].value;
+                  };
+                };
+              };
+          };
+
+          return JSON.stringify({'return': 'ok', 'result': result});
+        },
+
+        parseMessage: function(data) {
+          var image_path = data.image || "";
+          console.log('action', data.action);
+          switch(data.action) {
+            case 'prompt':
+              this.promptUser(data.message, image_path);
+              break;
+
+            default:
+              throw new UnknownMessage(
+                "received unknown messag from server: " + data);
+          }
+        },
+
+        emit: function(event, data) {
+          var command = {};
+          command[event] = data || null;
+          var payload = JSON.stringify(command);
+          console.log("send", command);
+          this.ws.send(payload);
+        }
+      };
+
+      function App(server) {
+        this.addr = server;
+        this.client = new Client(this.addr);
+      }
+      App.prototype = {
+        start: function() {
+          this.client.connect();
+        }
+      };
+
+       //gApp = null;
+
+      const SERVER_ADDR = window.location.host;
+      function init() {
+        var app = new App(SERVER_ADDR);
+        app.start();
+        gApp = app;
+      }
+
+      document.addEventListener("DOMContentLoaded", init, false);
+      function log(x) {
+        console.log(x)
+      }
+
+      function getProfileString(datas) {
+        var result = {};
+        for (var i = datas['type-list'].length - 1; i >= 0; i--) {
+          var type = datas['type-list'][i];
+          var data = datas['data-list'][i];
+          if (type == 'text') {
+            result[data] = {};
+          };
+          if (type == 'checkbox') {
+            result[data] = Array();
+          };
+        }
+
+        for (var i = datas['type-list'].length - 1; i >= 0; i--) {
+          var type = datas['type-list'][i];
+          var data = datas['data-list'][i];
+            if (type == 'text') {
+              var x = document.getElementById(data);
+              var y = x.getElementsByTagName('input');
+              for (var j = y.length - 1; j >= 0; j--) {
+                result[data][y[j].name] = y[j].value;
+              };
+            };
+            if (type == 'checkbox') {
+              var x = document.getElementById(data);
+              var y = x.getElementsByTagName('input');
+              for (var j = y.length - 1, k=0; j >= 0; j--) {
+                if (!y[j].checked) {
+                  result[data][k++] = y[j].value;
+                };
+              };
+            };
+        };
+
+        return JSON.stringify({'return': 'ok', 'result': result});
+       }
+    </script>
+  </head>
+
+  <body>
+    <a href="http://mozilla.org/" id="tabzilla">mozilla</a>
+
+      <div id='device info' class='not-hidden'>
+        <div id='contact'>
+          <h1> Basic Information</h1>
+          <table>
+            <tr>
+          <td>email</td><td><input type='text' value='' id='email' name='email' maxlength=70 size=30></td>
+            </tr>
+            <tr>
+          <td>company</td><td><input type='text' value='' id='company' name='company' maxlength=70 size=30></td>
+            </tr>
+            <tr>
+          <td>device name</td><td><input type='text' value='' id='device' name='device' maxlength=70 size=30></td>
+            </tr>
+            <tr>
+          <td>base gaia version</td><td><input type='text' value='' id='gaia' name='gaia' maxlength=70 size=30></td>
+            </tr>
+            <tr>
+          <td>base gecko version</td><td><input type='text' value='' id='gecko' name='gecko' maxlength=70 size=30></td>
+            </tr>
+          </table>
+        </div>
+
+        <div id='tests'>
+          <h1> Tests</h1>
+          <table>
+            <tr>
+              <td width=50%>
+          <div id='webapi'>
+            <h2>webapi</h2>
+          <table>
+            <tr>
+            <td><input name='apps' type='checkbox' value='apps' checked></td><td>apps</td>
+            </tr>
+            <tr>
+            <td><input name='bluetooth' type='checkbox' value='bluetooth' checked></td><td>bluetooth</td>
+            </tr>
+            <tr>
+            <td><input name='devicelight' type='checkbox' value='devicelight' checked></td><td>devicelight</td>
+            </tr>
+            <tr>
+            <td><input name='device_storage' type='checkbox' value='device_storage' checked></td><td>device_storage</td>
+            </tr>
+            <tr>
+            <td><input name='fm_radio' type='checkbox' value='fm_radio' checked></td><td>fm_radio</td>
+            </tr>
+            <tr>
+            <td><input name='geolocation' type='checkbox' value='geolocation' checked></td><td>geolocation</td>
+            </tr>
+            <tr>
+            <td><input name='idle' type='checkbox' value='idle' checked></td><td>idle</td>
+            </tr>
+            <tr>
+            <td><input name='mobile_message' type='checkbox' value='mobile_message' checked></td><td>mobile_message</td>
+            </tr>
+            <tr>
+            <td><input name='mozpower' type='checkbox' value='mozpower' checked></td><td>mozpower</td>
+            </tr>
+            <tr>
+            <td><input name='moztime' type='checkbox' value='moztime' checked></td><td>moztime</td>
+            </tr>
+            <tr>
+            <td><input name='notification' type='checkbox' value='notification' checked></td><td>notification</td>
+            </tr>
+            <tr>
+            <td><input name='orientation' type='checkbox' value='orientation' checked></td><td>orientation</td>
+            </tr>
+            <tr>
+            <td><input name='proximity' type='checkbox' value='proximity' checked></td><td>proximity</td>
+            </tr>
+            <tr>
+            <td><input name='tcp_socket' type='checkbox' value='tcp_socket' checked></td><td>tcp_socket</td>
+            </tr>
+            <tr>
+            <td><input name='telephony' type='checkbox' value='telephony' checked></td><td>telephony</td>
+            </tr>
+            <tr>
+            <td><input name='vibration' type='checkbox' value='vibration' checked></td><td>vibration</td>
+            </tr>
+            <tr>
+            <td><input name='wifi' type='checkbox' value='wifi' checked></td><td>wifi</td>
+            </tr>
+          </table>
+          </div>
+        </td>
+        <td width=50% valign='top'>
+          <div id='cert'>
+            <h2>cert</h2>
+          <table>
+            <tr>
+            <td><input name='omni-analyzer' type='checkbox' value='omni-analyzer' checked></td><td>omni-analyzer</td>
+            </tr>
+            <tr>
+            <td><input name='permissions' type='checkbox' value='permissions' checked></td><td>permissions</td>
+            </tr>
+            <tr>
+            <td><input name='webapi' type='checkbox' value='webapi' checked></td><td>webapi</td>
+            </tr>
+            <tr>
+            <td><input name='user-agent' type='checkbox' value='user-agent' checked></td><td>user-agent</td>
+            </tr>
+            <tr>
+            <td><input name='crash-reporter' type='checkbox' value='crash-reporter' checked></td><td>crash-reporter</td>
+            </tr>
+            <tr>
+            <td><input name='search-id' type='checkbox' value='search-id' checked></td><td>search-id</td>
+            </tr>
+          </table>
+          </div>
+          <div id='web-platform-tests'>
+            <h2>web-platform-tests</h2>
+          <table>
+            <tr>
+            <td><input name='IndexedDB' type='checkbox' value='IndexedDB' checked></td><td>IndexedDB</td>
+            </tr>
+            <tr>
+            <td><input name='dom' type='checkbox' value='dom' checked></td><td>dom</td>
+            </tr>
+            <tr>
+            <td><input name='touch-events' type='checkbox' value='touch-events' checked></td><td>touch-events</td>
+            </tr>
+          </table>
+          </div>
+        </td></tr></table>
+        </div>
+          <div class="controls">
+            <button id="ok">OK</button>
+            <button id="cancel">Cancel</button>
+          </div>
+      </div>
+  </body>
+</html>

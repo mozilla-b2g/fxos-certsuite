@@ -5,6 +5,7 @@
 from webapi_tests.semiauto import TestCase
 from webapi_tests.notification import NotificationTestCommon
 
+
 class TestSimpleNotification(TestCase, NotificationTestCommon):
     """
     This is a test for the `Web Notifications API`_ which will:

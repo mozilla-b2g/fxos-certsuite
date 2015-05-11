@@ -3,7 +3,7 @@ all: test docs
 
 test:
 	adb forward tcp:2828 tcp:2828
-	python -m semiauto webapi_tests.semiauto.smoketests | python -m mozlog.structured.scripts.format mach 2>/dev/null
+	python -m webapi_tests.semiauto webapi_tests.semiauto.smoketests | python -m mozlog.structured.scripts.format mach 2>/dev/null
 
 dist:
 	python setup.py sdist

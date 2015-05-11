@@ -1,4 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
 from webapi_tests import MinimalTestCase
+
 
 class TestBattery(MinimalTestCase):
     def tearDown(self):
@@ -34,19 +39,20 @@ class TestBattery(MinimalTestCase):
                                               battery.dischargingTime];
                                   obj.push(data);
                                 };
-        window.navigator.battery.onchargingchange = function(evt) { 
+        window.navigator.battery.onchargingchange = function(evt) {
                                                  window.wrappedJSObject.change_function(
-                                                    evt, 
+                                                    evt,
                                                     window.wrappedJSObject.chargeStates);};
-        window.navigator.battery.onchargingtimechange = function(evt) { 
+        window.navigator.battery.onchargingtimechange = function(evt) {
                                                  window.wrappedJSObject.change_function(
-                                                    evt, 
+                                                    evt,
                                                     window.wrappedJSObject.chargingStates);};
         """
         self.marionette.execute_script(script)
         self.unplug_and_instruct("Wait 5 seconds")
         charge_values = self.marionette.execute_script("return window.wrappedJSObject.chargeStates")
         charging_values = self.marionette.execute_script("return window.wrappedJSObject.chargingStates")
+
         def check_values(values, event):
             state = values[0]
             self.assertEqual(state[0], event)
