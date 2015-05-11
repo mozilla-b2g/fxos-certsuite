@@ -15,8 +15,10 @@ from server import FrontendServer
 """Used to hold a TestEnvironment in a static field."""
 env = None
 
+
 class EnvironmentError(Exception):
     pass
+
 
 def get(environ, *args, **kwargs):
     global env

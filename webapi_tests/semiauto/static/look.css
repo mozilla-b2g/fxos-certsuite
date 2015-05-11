@@ -135,6 +135,12 @@ tr.error { background: rgb(255,255,0); }
   min-width: 200px;
 }
 
+#dialog .image img {
+  display:block;
+  margin:auto;
+  max-height: 300px;
+}
+
 #dialog .content {
   overflow: auto;
   height: 88%;

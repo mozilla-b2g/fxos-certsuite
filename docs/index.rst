@@ -19,6 +19,7 @@ Contents:
    tests
    interpretingresults
    coverage
+   newrelease
 
 
 Indices and tables

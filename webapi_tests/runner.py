@@ -9,6 +9,7 @@ import importlib
 import inspect
 import os
 import sys
+import json
 
 from fnmatch import fnmatch
 
@@ -16,7 +17,7 @@ from mozdevice import DeviceManagerADB
 from mozlog.structured import commandline
 
 from webapi_tests import semiauto
-
+from webapi_tests.semiauto import environment
 
 def iter_tests(start_dir, pattern="test_*.py"):
     """List available Web API tests and yield a tuple of (group, tests),
@@ -80,6 +81,8 @@ def main():
                         help="Don't start a browser but wait for manual connection")
     parser.add_argument("--version", action="store", dest="version",
                         help="B2G version")
+    parser.add_argument('-p', "--device-profile", action="store",  type=os.path.abspath,
+                        help="specify the device profile file path which could include skipped test case information")
     parser.add_argument(
         "-v", dest="verbose", action="store_true", help="Verbose output")
     commandline.add_logging_group(parser)
@@ -103,6 +106,12 @@ def main():
             for test in tests:
                 print("%s.%s" % (group, test))
         return 0
+
+    env = environment.get(environment.InProcessTestEnvironment)
+    environment.env.device_profile = None
+    if args.device_profile:
+        with open(args.device_profile, 'r') as device_profile_file:
+            environment.env.device_profile = json.load(device_profile_file)['result']
 
     test_loader = semiauto.TestLoader(version=args.version)
     tests = test_loader.loadTestsFromNames(

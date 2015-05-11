@@ -43,6 +43,18 @@ class TestCase(unittest.TestCase):
         if self.marionette is not None:
             certapp.kill(self.marionette, app=self.app)
 
+    def check_skip(self, skiplist):
+        self.test_name = str(self.__class__).split('.')[1]
+        if self.test_name in skiplist:
+            self.skipTest('Skipped by device profile')
+
+    def showTestStatusInDevice(self, marionette):
+        marionette.execute_async_script("""
+            document.getElementsByTagName('body')[0].innerHTML =
+                '<center><h1>WebAPI<h1><h2>%s</h2><h3>%s</h3><br>running</center>';
+            marionetteScriptFinished();
+            """ % (self.test_name, self._testMethodName))
+
     def setUp(self):
         """Sets up the environment for a test case.
 
@@ -61,6 +73,10 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).setUp()
 
         env = environment.get(InProcessTestEnvironment)
+
+        if env.device_profile:
+            self.check_skip(env.device_profile['webapi'])
+
         self.server = env.server
         self.handler = env.handler
 
@@ -79,6 +95,7 @@ class TestCase(unittest.TestCase):
 
         try:
             self.app = certapp.launch(self.marionette)
+            self.showTestStatusInDevice(self.marionette)
         except certapp.LaunchError:
             self.launch_app_manually()
 
@@ -106,7 +123,7 @@ class TestCase(unittest.TestCase):
 
         return TestCase.stored.marionette
 
-    def prompt(self, question):
+    def prompt(self, question, image_path=""):
         """Prompt the user for a response.  Returns a future which must be
         yielded.
 
@@ -129,12 +146,12 @@ class TestCase(unittest.TestCase):
 
         """
 
-        resp = self.handler.prompt(question)
+        resp = self.handler.prompt(question, image_path)
         if type(resp) == bool and not resp:
             self.fail("Failed on prompt cancel: %s" % question)
         return resp
 
-    def confirm(self, message):
+    def confirm(self, message, image_path=""):
         """Ask user to confirm a physical aspect about the device or the
         testing environment that cannot be checked by the test.
 
@@ -151,11 +168,11 @@ class TestCase(unittest.TestCase):
 
         """
 
-        success = self.handler.confirmation(message)
+        success = self.handler.confirmation(message, image_path)
         if not success:
             self.fail("Failed on confirmation: %s" % message)
 
-    def instruct(self, message):
+    def instruct(self, message, image_path=""):
         """Instruct the user to perform an action, such as rotating the phone.
 
         This will present an overlay in the host browser window where
@@ -174,7 +191,7 @@ class TestCase(unittest.TestCase):
 
         """
 
-        success = self.handler.instruction(message)
+        success = self.handler.instruction(message, image_path)
         if not success:
             self.fail("Failed on instruction: %s" % message)
 
@@ -207,7 +224,7 @@ def wait_for_homescreen(marionette):
         log(manager);
         let app = null;
         if (manager) {
-            app = ('getActiveApp' in manager) ? manager.getActiveApp() : manager.getCurrentDisplayedApp();
+            app = manager.getActiveApp();
         }
         log(app);
         if (app) {

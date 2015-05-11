@@ -20,6 +20,10 @@ class Smoketests(TestCase):
         answer = self.prompt("Click OK")
         self.assertIsNone(answer)
 
+    def test_prompt_image(self):
+        answer = self.prompt("If you can see the image correctly, click OK", "img/firefoxos.png")
+        self.assertIsNone(answer)
+
     def test_instruct(self):
         self.instruct("Click OK")
 
@@ -27,12 +31,18 @@ class Smoketests(TestCase):
         with self.assertRaises(Exception):
             self.instruct("Click cancel")
 
+    def test_instruct_image(self):
+        self.instruct("If you can see the image correctly, click OK", "img/firefoxos.png")
+
     def test_confirm(self):
         self.confirm("Click Yes")
 
     def test_confirm_no(self):
         with self.assertRaises(Exception):
             self.confirm("Click No")
+
+    def test_confirm_image(self):
+        self.confirm("If you can see the image correctly, click Yes", "img/firefoxos.png")
 
     def test_long_response(self):
         msg = "o" * 200

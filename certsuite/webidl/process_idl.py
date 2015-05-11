@@ -125,7 +125,7 @@ def main(argv):
     for filename in manifest['files']:
         path = os.path.realpath(os.path.join(webidl_path, filename))
         with open(path, 'r') as f:
-            parser.parse(f.read())
+            parser.parse(''.join([line for line in f.readlines() if not line.startswith('#')]))
 
     results = parser.finish()
     tested = []
