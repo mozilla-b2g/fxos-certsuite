@@ -48,6 +48,10 @@ import adb_b2g
 import gaiautils
 import report
 
+DeviceBackup = adb_b2g.DeviceBackup
+_adbflag = False
+_host = 'localhost'
+_port = 2828
 logger = None
 remove_marionette_after_run = False
 stdio_handler = handlers.StreamHandler(sys.stderr,
@@ -106,8 +110,10 @@ def log_metadata():
 # Consider upstreaming this to marionette-client:
 class MarionetteSession(object):
     def __init__(self, device):
+        global _host
+        global _port
         self.device = device
-        self.marionette = marionette.Marionette()
+        self.marionette = marionette.Marionette(host=_host, port=_port)
 
     def __enter__(self):
         self.device.forward("tcp:2828", "tcp:2828")
@@ -153,7 +159,13 @@ class TestRunner(object):
         if self.retry:
             tests = self.retry
         elif not self.args.tests:
-            tests = self.config["suites"].keys()
+            default_tests = self.config["suites"].keys()
+
+            # stingray only test 'webapi' part
+            if args.mode == 'stingray':
+                default_tests = [default_tests['webapi']]
+
+            tests = default_tests
         else:
             tests = self.args.tests
 
@@ -297,6 +309,8 @@ class TestRunner(object):
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
 
+        cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port])
+
         return cmd, output_files, log_name
 
 
@@ -329,10 +343,33 @@ def check_preconditions(config):
 
     logger.info("Passed precondition checks")
 
+class NoADBDeviceBackup():
+    def __enter__(self):
+        self.device = NoADB()
+        return self
+    def __exit__(self, *args, **kwargs):
+        pass
+
+class NoADB():
+    def reboot(self):
+        pass
+    def wait_for_net(self):
+        pass
+    def shell_output(self):
+        pass
+    def forward(self, *args):
+        pass
+    def get_process_list(self):
+        return [[1447, '/sbin/adbd', 'root']]
+    def restart(self):
+        pass
 
 def check_adb():
     try:
         logger.info("Testing ADB connection")
+        if _adbflag:
+            logger.debug('Dummy ADB, please remember install Marionette and Cert Test App to device ')
+            return NoADB()
         return adb_b2g.ADBB2G()
     except (mozdevice.ADBError, mozdevice.ADBTimeoutError) as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
@@ -358,6 +395,9 @@ def check_root(device):
 
 
 def install_marionette(device, version):
+    if _adbflag:
+        logger.debug('The marionette should be installed manually by user.')
+        return True
     try:
         logger.info("Installing marionette extension")
         try:
@@ -414,6 +454,10 @@ def wait_for_homescreen(marionette, timeout):
 
 def check_server(device):
     logger.info("Checking access to host machine")
+
+    if _adbflag:
+        return True
+
     routes = [("GET", "/", test_handler)]
 
     host_ip = moznetwork.get_ip()
@@ -555,7 +599,7 @@ def run_tests(args, config):
 
             check_preconditions(config)
 
-            with adb_b2g.DeviceBackup() as backup:
+            with DeviceBackup() as backup:
                 device = backup.device
                 runner = TestRunner(args, config)
                 try:
@@ -607,6 +651,15 @@ def get_parser():
     parser.add_argument('-r', '--retry-failed',
                         help='Retry last failed tests to run(IGNORE any tests parameters)',
                         action='store_true', default=False)
+    parser.add_argument('-H', '--host',
+                        help='Hostname or ip for target device',
+                        action='store', default='localhost')
+    parser.add_argument('-P', '--port',
+                        help='Port for target device',
+                        action='store', default='2828')
+    parser.add_argument('-m', '--mode',
+                        help='Test mode (stingray, phone) default (phone)',
+                        action='store', default='phone')
     parser.add_argument('tests',
                         metavar='TEST',
                         help='Tests to run',
@@ -618,6 +671,17 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     config = load_config(args.config)
+
+    global _host
+    global _port
+    global _adbflag
+    global DeviceBackup
+    _host = args.host
+    _port = int(args.port)
+
+    if args.mode == 'stingray':
+        _adbflag = True
+        DeviceBackup = NoADBDeviceBackup
 
     if args.list_tests:
         return list_tests(args, config)

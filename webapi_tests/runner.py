@@ -81,6 +81,12 @@ def main():
                         help="Don't start a browser but wait for manual connection")
     parser.add_argument("--version", action="store", dest="version",
                         help="B2G version")
+    parser.add_argument('-H', '--host',
+                        help='Hostname or ip for target device',
+                        action='store', default='localhost')
+    parser.add_argument('-P', '--port',
+                        help='Port for target device',
+                        action='store', default=2828)
     parser.add_argument('-p', "--device-profile", action="store",  type=os.path.abspath,
                         help="specify the device profile file path which could include skipped test case information")
     parser.add_argument(
@@ -106,6 +112,9 @@ def main():
             for test in tests:
                 print("%s.%s" % (group, test))
         return 0
+
+    semiauto.testcase._host = args.host
+    semiauto.testcase._port = int(args.port)
 
     env = environment.get(environment.InProcessTestEnvironment)
     environment.env.device_profile = None
