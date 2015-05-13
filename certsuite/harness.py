@@ -42,10 +42,16 @@ from webapi_tests.semiauto import environment, server
 from reportmanager import ReportManager
 from logmanager import LogManager
 
+from report.results import KEY_MAIN
+
 import adb_b2g
 import gaiautils
 import report
 
+DeviceBackup = adb_b2g.DeviceBackup
+_adbflag = False
+_host = 'localhost'
+_port = 2828
 logger = None
 remove_marionette_after_run = False
 stdio_handler = handlers.StreamHandler(sys.stderr,
@@ -53,6 +59,7 @@ stdio_handler = handlers.StreamHandler(sys.stderr,
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "config.json"))
 
+retry_path = 'retry.json'
 
 def setup_logging(log_f):
     global logger
@@ -66,6 +73,11 @@ def setup_logging(log_f):
 def load_config(path):
     with open(path) as f:
         config = json.load(f)
+
+    if sys.platform == 'win32':
+        config_str = json.dumps(config)
+        config_str.replace('/', os.sep)
+        config = json.loads(config_str)
     config["suites"] = OrderedDict(config["suites"])
     return config
 
@@ -98,8 +110,10 @@ def log_metadata():
 # Consider upstreaming this to marionette-client:
 class MarionetteSession(object):
     def __init__(self, device):
+        global _host
+        global _port
         self.device = device
-        self.marionette = marionette.Marionette()
+        self.marionette = marionette.Marionette(host=_host, port=_port)
 
     def __enter__(self):
         self.device.forward("tcp:2828", "tcp:2828")
@@ -116,6 +130,24 @@ class TestRunner(object):
     def __init__(self, args, config):
         self.args = args
         self.config = config
+        self.retry = self.loadretry()
+        self.regressions = []
+
+    def loadretry(self):
+        if not self.args.retry_failed:
+            return False
+
+        if not os.path.exists(retry_path):
+            return False
+
+        retrys = None
+        try:
+            with open(retry_path, 'r') as f:
+                retrys = json.load(f)
+        except:
+            pass
+
+        return retrys
 
     def iter_suites(self):
         '''
@@ -124,8 +156,16 @@ class TestRunner(object):
         test suite and [test_groups] is a list of group names to run in that suite,
         or the empty list to indicate all tests.
         '''
-        if not self.args.tests:
-            tests = self.config["suites"].keys()
+        if self.retry:
+            tests = self.retry
+        elif not self.args.tests:
+            default_tests = self.config["suites"].keys()
+
+            # stingray only test 'webapi' part
+            if args.mode == 'stingray':
+                default_tests = [default_tests['webapi']]
+
+            tests = default_tests
         else:
             tests = self.args.tests
 
@@ -143,11 +183,51 @@ class TestRunner(object):
         for suite, groups in d.iteritems():
             yield suite, groups
 
+    def test_string(self, test_id):
+        if isinstance(test_id, unicode):
+            return test_id
+        else:
+            return " ".join(test_id)
+
+    def get_test_name(self, test, test_data):
+        test_name = self.test_string(test)
+        if len(test_data) == 1 and KEY_MAIN in test_data.keys():
+            start_index = test_name.find('.') + 1
+            end_index = test_name.find('.', start_index)
+            test_name = test_name[start_index:end_index]
+        return test_name
+
+    def generate_retry(self):
+        test_map = {'certsuite' : 'cert',
+                    'webapi' : 'webapi',
+                    'web-platform-tests':'web-platform-tests'}
+
+        failed = []
+        for regressions in self.regressions:
+            if not regressions:
+                continue
+            tests = sorted(regressions.keys())
+            for i, test in enumerate(tests):
+                test_data = regressions[test]
+                for subtest in sorted(test_data.keys()):
+                    subtest_data = test_data[subtest]
+                    subsuite = self.get_test_name(test, test_data)
+                    if subtest_data["status"] == 'FAIL':
+                        failed.append("%s:%s" %
+                            (test_map[subtest_data['source']], subsuite))
+                        break
+        try:
+            if failed:
+                with open(retry_path, 'w') as f:
+                    json.dump(failed, f)
+        except:
+            logger.error("Error generate retry.json file : %s" % traceback.format_exc())
+
     def run_suite(self, suite, groups, log_manager, report_manager):
         with TemporaryDirectory() as temp_dir:
             result_files, structured_path = self.run_test(suite, groups, temp_dir)
 
-            report_manager.add_subsuite_report(structured_path, result_files)
+            self.regressions.append(report_manager.add_subsuite_report(structured_path, result_files))
 
     def run_test(self, suite, groups, temp_dir):
         logger.info('Running suite %s' % suite)
@@ -208,7 +288,7 @@ class TestRunner(object):
         cmd = [suite_opts['cmd']]
 
         subtests = '' if groups == [] else '_' + "_".join(item.replace("/", "-") for item in groups)
-        log_name = "%s/%s_structured%s.log" % (temp_dir, suite, subtests)
+        log_name = os.sep.join([temp_dir,"%s_structured%s.log" % (suite, subtests)])
         cmd.extend(["--log-raw=-"])
 
         if groups:
@@ -228,6 +308,8 @@ class TestRunner(object):
 
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
+
+        cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port])
 
         return cmd, output_files, log_name
 
@@ -261,10 +343,33 @@ def check_preconditions(config):
 
     logger.info("Passed precondition checks")
 
+class NoADBDeviceBackup():
+    def __enter__(self):
+        self.device = NoADB()
+        return self
+    def __exit__(self, *args, **kwargs):
+        pass
+
+class NoADB():
+    def reboot(self):
+        pass
+    def wait_for_net(self):
+        pass
+    def shell_output(self):
+        pass
+    def forward(self, *args):
+        pass
+    def get_process_list(self):
+        return [[1447, '/sbin/adbd', 'root']]
+    def restart(self):
+        pass
 
 def check_adb():
     try:
         logger.info("Testing ADB connection")
+        if _adbflag:
+            logger.debug('Dummy ADB, please remember install Marionette and Cert Test App to device ')
+            return NoADB()
         return adb_b2g.ADBB2G()
     except (mozdevice.ADBError, mozdevice.ADBTimeoutError) as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
@@ -290,6 +395,9 @@ def check_root(device):
 
 
 def install_marionette(device, version):
+    if _adbflag:
+        logger.debug('The marionette should be installed manually by user.')
+        return True
     try:
         logger.info("Installing marionette extension")
         try:
@@ -346,6 +454,10 @@ def wait_for_homescreen(marionette, timeout):
 
 def check_server(device):
     logger.info("Checking access to host machine")
+
+    if _adbflag:
+        return True
+
     routes = [("GET", "/", test_handler)]
 
     host_ip = moznetwork.get_ip()
@@ -487,7 +599,7 @@ def run_tests(args, config):
 
             check_preconditions(config)
 
-            with adb_b2g.DeviceBackup() as backup:
+            with DeviceBackup() as backup:
                 device = backup.device
                 runner = TestRunner(args, config)
                 try:
@@ -499,10 +611,12 @@ def run_tests(args, config):
                                          traceback.format_exc())
                             error = True
                 finally:
+                    runner.generate_retry()
                     if remove_marionette_after_run:
                         marionette_uninstall()
                     backup.restore()
-                    device.reboot()
+                    if not args.debug:
+                        device.reboot()
 
             if error:
                 logger.critical("Encountered errors during run")
@@ -534,6 +648,18 @@ def get_parser():
     parser.add_argument('-l', '--list-tests',
                         help='List all tests available to run',
                         action='store_true')
+    parser.add_argument('-r', '--retry-failed',
+                        help='Retry last failed tests to run(IGNORE any tests parameters)',
+                        action='store_true', default=False)
+    parser.add_argument('-H', '--host',
+                        help='Hostname or ip for target device',
+                        action='store', default='localhost')
+    parser.add_argument('-P', '--port',
+                        help='Port for target device',
+                        action='store', default='2828')
+    parser.add_argument('-m', '--mode',
+                        help='Test mode (stingray, phone) default (phone)',
+                        action='store', default='phone')
     parser.add_argument('tests',
                         metavar='TEST',
                         help='Tests to run',
@@ -545,6 +671,17 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     config = load_config(args.config)
+
+    global _host
+    global _port
+    global _adbflag
+    global DeviceBackup
+    _host = args.host
+    _port = int(args.port)
+
+    if args.mode == 'stingray':
+        _adbflag = True
+        DeviceBackup = NoADBDeviceBackup
 
     if args.list_tests:
         return list_tests(args, config)

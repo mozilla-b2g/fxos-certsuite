@@ -120,11 +120,20 @@
           this.okEl.onclick = function() {
             message = this.value();
             this.emit('prompt', message);
-            window.close(); }.bind(this);
+            this.close(); }.bind(this);
           this.cancelEl.onclick = function() {
             message = {'return':'cancel', 'result':'cancel'};
             this.emit('prompt', JSON.stringify(message));
-            window.close();}.bind(this);
+            this.close();}.bind(this);
+        },
+
+        close: function() {
+          var msg = 'Device Profile Edit finished. Please close this tab and continue the MCTS test.';
+          this.cancelEl.onclick = function() {};
+          this.cancelEl.onclick = function() {};
+          window.alert(msg);
+          document.getElementsByTagName('body')[0].innerHTML = 
+              '<h1>' + msg + '</h1>';
         },
 
         value: function() {
