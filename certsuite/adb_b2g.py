@@ -258,6 +258,11 @@ class ADBB2G(adb.ADBDevice):
         self.wait_for_device_ready(timeout,
                                    after_first=lambda:self.command_output(["reboot"]))
 
+    def root(self, timeout=None, wait_polling_interval=None):
+        """run adbd as root. 
+        """
+        self.command_output(["root"])
+
     def get_profiles(self, profile_base="/data/b2g/mozilla", timeout=None):
         """Return a list of paths to gecko profiles on the device,
 
