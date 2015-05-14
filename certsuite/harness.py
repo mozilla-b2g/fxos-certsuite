@@ -74,10 +74,16 @@ def load_config(path):
     with open(path) as f:
         config = json.load(f)
 
+    # replace command line folder separator for windows
+    # because the arguments saved in config.json in unix form
     if sys.platform == 'win32':
-        config_str = json.dumps(config)
-        config_str.replace('/', os.sep)
-        config = json.loads(config_str)
+        keys = ["run_args", "extra_files", "common_args"]
+        for i,suite in enumerate(config['suites']):
+            for k in keys:
+                if k in suite[1]:
+                    for j,cmds in enumerate(suite[1][k]):
+                        config['suites'][i][1][k][j] = cmds.replace('/', os.sep)
+
     config["suites"] = OrderedDict(config["suites"])
     return config
 
@@ -309,7 +315,8 @@ class TestRunner(object):
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
 
-        cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port])
+        if self.args.mode == 'stingray' and suite == 'webapi':
+            cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port])
 
         return cmd, output_files, log_name
 
