@@ -1,10 +1,10 @@
-graft certsuite/atoms
-graft webapi_tests/semiauto/static
-include certsuite/config.json
-include certsuite/report/report.css
-include webapi_tests/app_management.js
-recursive-include certsuite/expected_omni_results *
-recursive-include certsuite/expected_permissions_results *
-recursive-include certsuite/expected_webapi_results *
-recursive-include certsuite/html_output *
-recursive-include certsuite/static *
+graft mcts/atoms
+graft mcts/webapi_tests/semiauto/static
+include mcts/config.json
+include mcts/report/report.css
+include mcts/webapi_tests/app_management.js
+recursive-include mcts/certsuite/expected_omni_results *
+recursive-include mcts/certsuite/expected_permissions_results *
+recursive-include mcts/certsuite/expected_webapi_results *
+recursive-include mcts/certsuite/html_output *
+recursive-include mcts/certsuite/static *
