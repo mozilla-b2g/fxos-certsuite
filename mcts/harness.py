@@ -39,14 +39,15 @@ from mozfile import TemporaryDirectory
 from mozlog.structured import structuredlog, handlers, formatters, set_default_logger
 from webapi_tests.semiauto import environment, server
 
-from reportmanager import ReportManager
-from logmanager import LogManager
+from mcts.utils.reportmanager import ReportManager
+from mcts.utils.logger.logmanager import LogManager
 
-from report.results import KEY_MAIN
+import mcts.utils.report
+from mcts.utils.report.results import KEY_MAIN
 
-import adb_b2g
-import gaiautils
-import report
+import mcts.utils.handlers.adb_b2g as adb_b2g
+import mcts.utils.handlers.gaiautils as gaiautils
+
 
 DeviceBackup = adb_b2g.DeviceBackup
 _adbflag = False
