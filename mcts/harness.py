@@ -169,7 +169,7 @@ class TestRunner(object):
             default_tests = self.config["suites"].keys()
 
             # stingray only test 'webapi' part
-            if args.mode == 'stingray':
+            if self.args.mode == 'stingray':
                 default_tests = [default_tests['webapi']]
 
             tests = default_tests
