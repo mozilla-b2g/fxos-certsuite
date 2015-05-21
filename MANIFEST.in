@@ -1,10 +1,8 @@
 graft mcts/utils
 graft mcts/static
-graft mcts/webapi_tests/semiauto/static
-include mcts/config.json
-include mcts/utils/report/report.css
-include mcts/webapi_tests/app_management.js
-recursive-include mcts *
-recursive-include mcts/certsuite/expected_omni_results *
-recursive-include mcts/certsuite/expected_permissions_results *
-recursive-include mcts/certsuite/expected_webapi_results *
+
+include mcts *
+recursive-include mcts/certsuite *
+recursive-include mcts/securitysuite *
+recursive-include mcts/web-platform-tests *
+recursive-include mcts/webapi_tests *
