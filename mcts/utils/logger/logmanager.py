@@ -31,7 +31,7 @@ class LogManager(object):
             logger = get_default_logger()
             logger.info("Testrun interrupted")
         try:
-            self.structured_file.__exit__(*args)
+            self.structured_file.close()
             self.zip_file.write(self.structured_path)
         finally:
             try:
