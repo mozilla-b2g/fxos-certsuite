@@ -6,7 +6,7 @@
 
 source setup_venv.sh
 echo "Installing Certified App"
-fxos_appgen --install --type=certified --version=1.3 --all-permissions "CertTest App"
+fxos_appgen --install --type=certified --version=2.2 --all-permissions "CertTest App"
 adb forward tcp:2828 tcp:2828
 echo "Done, running the suite"
 webapirunner

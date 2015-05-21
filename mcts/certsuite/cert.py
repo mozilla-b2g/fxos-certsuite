@@ -49,7 +49,7 @@ webapi_results_embed_app = None
 last_test_started = 'None'
 logger = None
 
-supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
+# supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
 
 @wptserve.handlers.handler
@@ -152,7 +152,7 @@ def test_omni_analyzer(logger, report, args):
     testid = test_id('cert', 'omni-analyzer', 'check-omni-diff')
     logger.test_start(testid)
     omni_ref_path = pkg_resources.resource_filename(
-                        __name__, os.path.join('expected_omni_results', 'omni.ja.%s' % args.version))
+                        __name__, os.path.join('expected_omni_results', 'omni.ja.mcts'))
     omni_analyzer = OmniAnalyzer(omni_ref_path, logger=logger)
     if args.html_result_file is not None:
         diff, is_run_success = omni_analyzer.run(html_format=True, results_file=os.path.join(os.path.dirname(args.html_result_file), 'omni_diff_report.html'))
@@ -192,7 +192,7 @@ def test_webapi(logger, report, args, addr):
         if "headers" not in report:
             report["headers"] = headers
 
-        results_filename = '%s.%s.json' % (args.version, apptype)
+        results_filename = '%s.json' % apptype
         if args.generate_reference:
             with open(results_filename, 'w') as f:
                 f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
@@ -230,7 +230,7 @@ def test_permissions(logger, report, args, addr):
             result = get_permission(permission, installed_appname)
             results[permission] = result
 
-        results_filename = '%s.%s.json' % (args.version, apptype)
+        results_filename = '%s.json' % apptype
         if args.generate_reference:
             with open(results_filename, 'w') as f:
                 f.write(json.dumps(results, sort_keys=True, indent=2))
@@ -314,7 +314,7 @@ def test_permissions(logger, report, args, addr):
     results['open-remote-window'] = test_open_remote_window(logger,
                                         args.version, addr)
 
-    results_filename = '%s.permissions.json' % args.version
+    results_filename = 'permissions.json'
     if args.generate_reference:
         with open(results_filename, 'w') as f:
             f.write(json.dumps(results, sort_keys=True, indent=2))
@@ -685,10 +685,10 @@ def _run(args, logger):
         raise Exception("Couldn't connect to marionette after %d attempts. " \
         "Is the marionette extension installed?" % retries)
 
-    if args.version not in supported_versions:
-        print "%s is not a valid version. Please enter one of %s" % \
-              (args.version, supported_versions)
-        raise Exception("%s is not a valid version" % args.version)
+    # if args.version not in supported_versions:
+    #     print "%s is not a valid version. Please enter one of %s" % \
+    #           (args.version, supported_versions)
+    #     raise Exception("%s is not a valid version" % args.version)
 
     result_file_path = args.result_file
     if not result_file_path:
