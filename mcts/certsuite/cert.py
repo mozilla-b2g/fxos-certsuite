@@ -51,7 +51,7 @@ logger = None
 
 # supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
-expected_result_folder = os.join('..', 'static', 'expected_results')
+expected_result_folder = os.path.join('..', 'static', 'expected_results')
 
 
 @wptserve.handlers.handler
