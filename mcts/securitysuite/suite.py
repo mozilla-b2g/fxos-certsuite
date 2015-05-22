@@ -34,10 +34,12 @@ class ExtraTest(object):
             return 'unknown'
 
     @staticmethod
-    def group_list():
+    def group_list(mode='phone'):
         """
         Returns a list of all groups in the test suite.
         """
+        if mode == 'stingray':
+            return ['ssl']
         groups = []
         for t in ExtraTest.__subclasses__():
             if t.groupname() not in groups:
@@ -45,10 +47,12 @@ class ExtraTest(object):
         return groups
 
     @staticmethod
-    def test_list(group=None):
+    def test_list(group=None, mode='phone'):
         """
         Returns a list of all tests, optionally filtered by group.
         """
+        if mode == 'stingray' and group is not None:
+            group = 'ssl'
         if group is None:
             return ExtraTest.__subclasses__()
         else:
@@ -59,11 +63,12 @@ class ExtraTest(object):
             return tests
 
     @staticmethod
-    def run_groups(groups=[], version=None):
+    def run_groups(groups=[], version=None, host='localhost', port=2828, mode='phone'):
+        hasadb = mode == 'phone'
         logger = get_default_logger()
         if groups is None or len(groups) == 0:  # run all groups
-            logger.debug('running securitysuite tests for all groups %s' % str(ExtraTest.group_list()))
-            groups = ExtraTest.group_list()
+            logger.debug('running securitysuite tests for all groups %s' % str(ExtraTest.group_list(mode=mode)))
+            groups = ExtraTest.group_list(mode=mode)
         else:
             logger.debug('running securitysuite tests for groups %s' % str(groups))
         logger.suite_start(tests=groups)
@@ -71,7 +76,7 @@ class ExtraTest(object):
             logger.debug("running securitysuite test group %s" % g)
             logger.test_start(g)
             try:
-                ExtraTest.run(g, version=version)
+                ExtraTest.run(g, version=version, host=host, port=port, hasadb=hasadb)
                 logger.test_end(g, 'OK')
             except:
                 logger.critical(traceback.format_exc())
@@ -80,12 +85,12 @@ class ExtraTest(object):
         logger.suite_end()
 
     @classmethod
-    def run(cls, group=None, version=None):
+    def run(cls, group=None, version=None, host='localhost', port=2828, hasadb=True):
         """
         Runs all the tests, optionally just within the specified group.
         """
         for t in cls.test_list(group):
-            t.run(version=version)
+            t.run(version=version, host=host, port=port, hasadb=hasadb)
 
     @classmethod
     def log_status(cls, status, msg):
@@ -141,6 +146,15 @@ def securitycli():
                         help="B2G version")
     parser.add_argument("--ipython", dest="ipython", action="store_true",
                         help="drop to ipython session")
+    parser.add_argument('-H', '--host',
+                        help='Hostname or ip for target device',
+                        action='store', default='localhost')
+    parser.add_argument('-P', '--port',
+                        help='Port for target device',
+                        action='store', default=2828)
+    parser.add_argument('-m', '--mode',
+                        help='Test mode (stingray, phone) default (phone)',
+                        action='store', default='phone')
     parser.add_argument("-v", dest="verbose", action="store_true",
                         help="Verbose output")
 
@@ -154,15 +168,20 @@ def securitycli():
     try:
         logger.debug("security cli runnng with args %s" % args)
         if args.list_test_groups:
-            for group in ExtraTest.group_list():
+            for group in ExtraTest.group_list(args.mode):
                 print group
         elif args.list_all_tests:
-            for test in ExtraTest.test_list():
+            for test in ExtraTest.test_list(args.mode):
                 print "%s.%s" % (test.group, test.__name__)
         elif args.ipython:
             from IPython import embed
 
             embed()
+        elif args.mode == 'stingray':
+            ExtraTest.run_groups(args.include,
+                                 version=args.version,
+                                 host=args.host, port=int(args.port),
+                                 mode=args.mode)
         else:
             wait_for_adb_device()
             if not adb_has_root():

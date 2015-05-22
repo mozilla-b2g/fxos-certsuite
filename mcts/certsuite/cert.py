@@ -496,9 +496,9 @@ def parse_permissions_results(expected_results_path, results, prefix, logger, re
     return not unexpected_results
 
 
-def run_marionette_script(script, chrome=False, async=False):
+def run_marionette_script(script, chrome=False, async=False, host='localhost', port=2828):
     """Create a Marionette instance and run the provided script"""
-    m = marionette.Marionette()
+    m = marionette.Marionette(host, port)
     m.start_session()
     if chrome:
         m.set_context(marionette.Marionette.CONTEXT_CHROME)

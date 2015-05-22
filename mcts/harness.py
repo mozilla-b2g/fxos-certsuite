@@ -89,7 +89,7 @@ def load_config(path):
     return config
 
 
-def iter_test_lists(suites_config):
+def iter_test_lists(suites_config, mode='phone'):
     '''
     Query each subharness for the list of test groups it can run and
     yield a tuple of (subharness, test group) for each one.
@@ -97,6 +97,11 @@ def iter_test_lists(suites_config):
     for name, opts in suites_config.iteritems():
         try:
             cmd = [opts["cmd"], '--list-test-groups'] + opts.get("common_args", [])
+
+            if mode == 'stingray':
+                cmd.append('--mode')
+                cmd.append('stingray')
+
             for group in subprocess.check_output(cmd).splitlines():
                 yield name, group
         except (subprocess.CalledProcessError, OSError) as e:
@@ -170,7 +175,7 @@ class TestRunner(object):
 
             # stingray only test 'webapi' part
             if self.args.mode == 'stingray':
-                default_tests = [default_tests['webapi']]
+                default_tests = ['webapi', 'security']
 
             tests = default_tests
         else:
@@ -207,6 +212,7 @@ class TestRunner(object):
     def generate_retry(self):
         test_map = {'certsuite' : 'cert',
                     'webapi' : 'webapi',
+                    'securitysuite' : 'security',
                     'web-platform-tests':'web-platform-tests'}
 
         failed = []
@@ -316,8 +322,8 @@ class TestRunner(object):
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
 
-        if self.args.mode == 'stingray' and suite == 'webapi':
-            cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port])
+        if self.args.mode == 'stingray' and (suite == 'webapi' or suite == 'security'):
+            cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port, u'--mode=stingray'])
 
         return cmd, output_files, log_name
 
@@ -501,7 +507,15 @@ def check_server(device):
 
 
 def list_tests(args, config):
-    for test, group in iter_test_lists(config["suites"]):
+    suites = OrderedDict.copy(config["suites"])
+    
+    if args.mode == 'stingray':
+        stingray_suite_keys = ['webapi', 'security']
+        for key in suites.keys():
+            if key not in stingray_suite_keys:
+                del suites[key]
+
+    for test, group in iter_test_lists(suites, args.mode):
         print "%s:%s" % (test, group)
     return True
 
