@@ -19,7 +19,10 @@ from mozlog.structured import commandline
 from webapi_tests import semiauto
 from webapi_tests.semiauto import environment
 
-def iter_tests(start_dir, pattern="test_*.py"):
+stingray_test = ['apps', 'device_storage', 'geolocation',
+                 'moztime', 'notification', 'tcp_socket']
+
+def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
     """List available Web API tests and yield a tuple of (group, tests),
     where tests is a list of test names."""
 
@@ -32,6 +35,8 @@ def iter_tests(start_dir, pattern="test_*.py"):
         visited.add(root)
 
         group = os.path.relpath(root, start_dir)
+        if mode == 'stingray' and group not in stingray_test:
+            continue
 
         tests = []
         for file in files:
@@ -87,6 +92,9 @@ def main():
     parser.add_argument('-P', '--port',
                         help='Port for target device',
                         action='store', default=2828)
+    parser.add_argument('-m', '--mode',
+                        help='Test mode (stingray, phone) default (phone)',
+                        action='store', default='phone')
     parser.add_argument('-p', "--device-profile", action="store",  type=os.path.abspath,
                         help="specify the device profile file path which could include skipped test case information")
     parser.add_argument(
@@ -102,7 +110,7 @@ def main():
         parser.print_usage()
         sys.exit(1)
 
-    testgen = iter_tests(os.path.dirname(__file__))
+    testgen = iter_tests(os.path.dirname(__file__), mode=args.mode)
     if args.list_test_groups:
         for group, _ in testgen:
             print(group)
