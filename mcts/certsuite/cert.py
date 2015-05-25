@@ -51,6 +51,8 @@ logger = None
 
 # supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
+expected_result_folder = os.path.join('..', 'static', 'expected_results')
+
 
 @wptserve.handlers.handler
 def webapi_results_handler(request, response):
@@ -152,7 +154,7 @@ def test_omni_analyzer(logger, report, args):
     testid = test_id('cert', 'omni-analyzer', 'check-omni-diff')
     logger.test_start(testid)
     omni_ref_path = pkg_resources.resource_filename(
-                        __name__, os.path.join('expected_omni_results', 'omni.ja.mcts'))
+                        __name__, os.path.join(expected_results_path, 'expected_omni_results', 'omni.ja.mcts'))
     omni_analyzer = OmniAnalyzer(omni_ref_path, logger=logger)
     if args.html_result_file is not None:
         diff, is_run_success = omni_analyzer.run(html_format=True, results_file=os.path.join(os.path.dirname(args.html_result_file), 'omni_diff_report.html'))
@@ -198,7 +200,7 @@ def test_webapi(logger, report, args, addr):
                 f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
         else:
             file_path = pkg_resources.resource_filename(
-                            __name__, os.path.sep.join(['expected_webapi_results', results_filename]))
+                            __name__, os.path.sep.join([expected_results_path, 'expected_webapi_results', results_filename]))
 
             parse_webapi_results(file_path, webapi_results, '%s-' % apptype, logger, report)
 
@@ -236,7 +238,7 @@ def test_permissions(logger, report, args, addr):
                 f.write(json.dumps(results, sort_keys=True, indent=2))
         else:
             file_path = pkg_resources.resource_filename(__name__,
-                        os.path.sep.join(['expected_permissions_results',
+                        os.path.sep.join([expected_results_path, 'expected_permissions_results',
                         results_filename]))
             parse_permissions_results(file_path, results, '%s-' % apptype,
                 logger, report)
@@ -320,7 +322,7 @@ def test_permissions(logger, report, args, addr):
             f.write(json.dumps(results, sort_keys=True, indent=2))
     else:
         file_path = pkg_resources.resource_filename(__name__,
-                    os.path.sep.join(['expected_permissions_results',
+                    os.path.sep.join([expected_results_path, 'expected_permissions_results',
                     results_filename]))
         parse_permissions_results(file_path, results, 'individual-',
             logger, report)
