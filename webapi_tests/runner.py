@@ -17,8 +17,10 @@ from mozlog.structured import commandline
 
 from webapi_tests import semiauto
 
+stingray_test = ['apps', 'device_storage', 'geolocation',
+                 'moztime', 'notification', 'tcp_socket']
 
-def iter_tests(start_dir, pattern="test_*.py"):
+def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
     """List available Web API tests and yield a tuple of (group, tests),
     where tests is a list of test names."""
 
@@ -31,6 +33,8 @@ def iter_tests(start_dir, pattern="test_*.py"):
         visited.add(root)
 
         group = os.path.relpath(root, start_dir)
+        if mode == 'stingray' and group not in stingray_test:
+            continue
 
         tests = []
         for file in files:
@@ -80,6 +84,15 @@ def main():
                         help="Don't start a browser but wait for manual connection")
     parser.add_argument("--version", action="store", dest="version",
                         help="B2G version")
+    parser.add_argument('-H', '--host',
+                        help='Hostname or ip for target device',
+                        action='store', default='localhost')
+    parser.add_argument('-P', '--port',
+                        help='Port for target device',
+                        action='store', default=2828)
+    parser.add_argument('-m', '--mode',
+                        help='Test mode (stingray, phone) default (phone)',
+                        action='store', default='phone')
     parser.add_argument(
         "-v", dest="verbose", action="store_true", help="Verbose output")
     commandline.add_logging_group(parser)
@@ -93,7 +106,7 @@ def main():
         parser.print_usage()
         sys.exit(1)
 
-    testgen = iter_tests(os.path.dirname(__file__))
+    testgen = iter_tests(os.path.dirname(__file__), mode=args.mode)
     if args.list_test_groups:
         for group, _ in testgen:
             print(group)
@@ -103,6 +116,10 @@ def main():
             for test in tests:
                 print("%s.%s" % (group, test))
         return 0
+
+    semiauto.testcase._host = args.host
+    semiauto.testcase._port = int(args.port)
+    semiauto.testcase._mode = args.mode
 
     test_loader = semiauto.TestLoader(version=args.version)
     tests = test_loader.loadTestsFromNames(

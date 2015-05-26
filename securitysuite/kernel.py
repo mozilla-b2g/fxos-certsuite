@@ -117,7 +117,7 @@ class seccomp(ExtraTest):
     module = sys.modules[__name__]
 
     @classmethod
-    def run(cls, version=None):
+    def run(cls, version=None, host='localhost', port=2828, hasadb=True):
         logger = get_default_logger()
 
         try:

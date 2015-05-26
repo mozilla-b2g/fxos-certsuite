@@ -21,6 +21,13 @@ from webapi_tests.semiauto.environment import InProcessTestEnvironment
 instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
+# local variable for marionette
+_host = 'localhost'
+_port = 2828
+_mode = 'phone'
+
+def is_stingry():
+    return _mode == 'stingray'
 
 class TestCase(unittest.TestCase):
     stored = threading.local()
@@ -33,8 +40,9 @@ class TestCase(unittest.TestCase):
 
         self.marionette, self.server, self.handler, self.app = None, None, None, None
 
-        device = mozdevice.DeviceManagerADB()
-        device.forward("tcp:2828", "tcp:2828")
+        if not is_stingry():
+            device = mozdevice.DeviceManagerADB()
+            device.forward("tcp:2828", "tcp:2828")
 
         # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.cleanup)
@@ -65,10 +73,11 @@ class TestCase(unittest.TestCase):
         self.handler = env.handler
 
         self.assert_browser_connected()
-        self.marionette = TestCase.create_marionette()
+        self.marionette = TestCase.create_marionette(host=_host, port=_port)
 
-        if not certapp.is_installed():
-            certapp.install(marionette=self.marionette, version=self.version)
+        if not is_stingry():
+            if not certapp.is_installed():
+                certapp.install(marionette=self.marionette, version=self.version)
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
@@ -91,7 +100,7 @@ class TestCase(unittest.TestCase):
         self.assertTrue(self.handler.connected, "Browser disconnected")
 
     @staticmethod
-    def create_marionette():
+    def create_marionette(host='localhost', port=2828):
         """Returns current Marionette session, or creates one if
         one does not exist.
 
@@ -99,7 +108,7 @@ class TestCase(unittest.TestCase):
 
         m = TestCase.stored.marionette
         if m is None:
-            m = Marionette()
+            m = Marionette(host=host, port=port)
             m.wait_for_port()
             m.start_session()
             TestCase.stored.marionette = m
@@ -183,8 +192,9 @@ class TestCase(unittest.TestCase):
             "Please close the app manually by holding down the Home button "
             "and pressing the X above the %s card." % (certapp.name, certapp.name))
         if not success:
-            device = mozdevice.DeviceManagerADB()
-            device.reboot(wait=True)
+            if not is_stingry():
+                device = mozdevice.DeviceManagerADB()
+                device.reboot(wait=True)
             self.instruct("Please unlock the lockscreen (if present) after device reboots")
             self.fail("Failed attempts at closing certapp")
 
