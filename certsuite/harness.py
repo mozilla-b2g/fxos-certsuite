@@ -40,6 +40,10 @@ import adb_b2g
 import gaiautils
 import report
 
+DeviceBackup = adb_b2g.DeviceBackup
+_hasadb = True
+_host = 'localhost'
+_port = 2828
 logger = None
 stdio_handler = handlers.StreamHandler(sys.stderr,
                                        formatters.MachFormatter())
@@ -64,7 +68,7 @@ def load_config(path):
     return config
 
 
-def iter_test_lists(suites_config):
+def iter_test_lists(suites_config, mode='phone'):
     '''
     Query each subharness for the list of test groups it can run and
     yield a tuple of (subharness, test group) for each one.
@@ -72,6 +76,11 @@ def iter_test_lists(suites_config):
     for name, opts in suites_config.iteritems():
         try:
             cmd = [opts["cmd"], '--list-test-groups'] + opts.get("common_args", [])
+            
+            if mode == 'stingray':
+                cmd.append('--mode')
+                cmd.append('stingray')
+
             for group in subprocess.check_output(cmd).splitlines():
                 yield name, group
         except (subprocess.CalledProcessError, OSError) as e:
@@ -140,9 +149,9 @@ class LogManager(object):
 
 # Consider upstreaming this to marionette-client:
 class MarionetteSession(object):
-    def __init__(self, device):
+    def __init__(self, device, host='localhost', port=2828):
         self.device = device
-        self.marionette = marionette.Marionette()
+        self.marionette = marionette.Marionette(host=host, port=port)
 
     def __enter__(self):
         self.device.forward("tcp:2828", "tcp:2828")
@@ -168,7 +177,10 @@ class TestRunner(object):
         or the empty list to indicate all tests.
         '''
         if not self.args.tests:
-            tests = self.config["suites"].keys()
+            default_tests = self.config["suites"].keys()
+            if self.args.mode == 'stingray':
+                default_tests = ['webapi', 'security']
+            tests = default_tests
         else:
             tests = self.args.tests
 
@@ -266,6 +278,9 @@ class TestRunner(object):
         output_files = [log_name]
         output_files += [item % subn for item in suite_opts.get("extra_files", [])]
 
+        if self.args.mode == 'stingray' and (suite == 'webapi' or suite == 'security'):
+            cmd.extend([u'--host=%s' % _host, u'--port=%s' % _port, u'--mode=stingray'])
+
         return cmd, output_files, log_name
 
 
@@ -298,10 +313,35 @@ def check_preconditions(config):
 
     logger.info("Passed precondition checks")
 
+class NoADBDeviceBackup():
+    def __enter__(self):
+        self.device = NoADB()
+        return self
+    def __exit__(self, *args, **kwargs):
+        pass
+    def restore(self):
+        pass
+
+class NoADB():
+    def reboot(self):
+        pass
+    def wait_for_net(self):
+        pass
+    def shell_output(self):
+        pass
+    def forward(self, *args):
+        pass
+    def get_process_list(self):
+        return [[1447, '/sbin/adbd', 'root']]
+    def restart(self):
+        pass
 
 def check_adb():
     try:
         logger.info("Testing ADB connection")
+        if not _hasadb:
+            logger.debug('Dummy ADB, please remember install Marionette and Cert Test App to device ')
+            return NoADB()
         return adb_b2g.ADBB2G()
     except (mozdevice.ADBError, mozdevice.ADBTimeoutError) as e:
         logger.critical('Error connecting to device via adb (error: %s). Please be ' \
@@ -327,6 +367,10 @@ def check_root(device):
 
 
 def install_marionette(device, version):
+    if not _hasadb:
+        logger.debug('The marionette should be installed manually by user.')
+        return True
+
     try:
         logger.info("Installing marionette extension")
         try:
@@ -361,7 +405,7 @@ def ensure_settings(device):
                      "screen.brightness": 1.0,
                      "screen.timeout": 0.0}
     logger.info("Setting up device for testing")
-    with MarionetteSession(device) as marionette:
+    with MarionetteSession(device, _host, _port) as marionette:
         settings = gaiautils.Settings(marionette)
         for k, v in test_settings.iteritems():
             settings.set(k, v)
@@ -381,6 +425,10 @@ def wait_for_homescreen(marionette, timeout):
 
 def check_server(device):
     logger.info("Checking access to host machine")
+
+    if not _hasadb:
+        return True
+
     routes = [("GET", "/", test_handler)]
 
     host_ip = moznetwork.get_ip()
@@ -411,7 +459,15 @@ def check_server(device):
 
 
 def list_tests(args, config):
-    for test, group in iter_test_lists(config["suites"]):
+    suites = OrderedDict.copy(config['suites'])
+
+    if args.mode == 'stingray':
+        stingray_suite_keys = ['webapi', 'security']
+        for key in suites.keys():
+            if key not in stingray_suite_keys:
+                del suites[key]
+                
+    for test, group in iter_test_lists(suites, args.mode):
         print "%s:%s" % (test, group)
     return True
 
@@ -429,7 +485,7 @@ def run_tests(args, config):
 
             check_preconditions(config)
 
-            with adb_b2g.DeviceBackup() as backup:
+            with DeviceBackup() as backup:
                 device = backup.device
                 runner = TestRunner(args, config)
                 for suite, groups in runner.iter_suites():
@@ -464,6 +520,15 @@ def get_parser():
     parser.add_argument('--list-tests',
                         help='list all tests available to run',
                         action='store_true')
+    parser.add_argument('-H', '--host',
+                        help='Hostname or ip for target device',
+                        action='store', default='localhost')
+    parser.add_argument('-P', '--port',
+                        help='Port for target device',
+                        action='store', default=2828)
+    parser.add_argument('-m', '--mode',
+                        help='Test mode (stingray, phone) default (phone)',
+                        action='store', default='phone')
     parser.add_argument('tests',
                         metavar='TEST',
                         help='tests to run',
@@ -475,6 +540,17 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     config = load_config(args.config)
+
+    global _host
+    global _port
+    global _hasadb
+    global DeviceBackup
+    _host = args.host
+    _port = int(args.port)
+
+    if args.mode == 'stingray':
+        _hasadb = False
+        DeviceBackup = NoADBDeviceBackup
 
     if args.list_tests:
         return list_tests(args, config)
