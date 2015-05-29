@@ -27,14 +27,18 @@ class LogManager(object):
 
     def __exit__(self, ex_type, ex_value, tb):
         args = ex_type, ex_value, tb
+        logger = get_default_logger()
         if ex_type in (SystemExit, KeyboardInterrupt):
-            logger = get_default_logger()
             logger.info("Testrun interrupted")
         try:
+            for handle in logger.handlers:
+                logger.remove_handler(handle);
             self.structured_file.close()
             self.zip_file.write(self.structured_path)
         finally:
             try:
                 os.unlink(self.structured_path)
+            except WindowsError:
+                pass
             finally:
                 self.zip_file.__exit__(*args)
