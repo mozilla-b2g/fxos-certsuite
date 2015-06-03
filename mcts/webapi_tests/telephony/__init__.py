@@ -1,0 +1,19 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
+from mcts.webapi_tests.telephony.telephony_test import TelephonyTestCommon
+from mcts.webapi_tests.telephony.test_telephony_incoming import TestTelephonyIncoming
+from mcts.webapi_tests.telephony.test_telephony_outgoing import TestTelephonyOutgoing
+from mcts.webapi_tests.telephony.test_telephony_outgoing_hangup_alerting import TestTelephonyOutgoingHangupAlerting
+from mcts.webapi_tests.telephony.test_telephony_incoming_rejection import TestTelephonyIncomingRejection
+from mcts.webapi_tests.telephony.test_telephony_incoming_hold_resume import TestTelephonyIncomingHoldResume
+from mcts.webapi_tests.telephony.test_telephony_incoming_mute import TestTelephonyIncomingMute
+from mcts.webapi_tests.telephony.test_telephony_incoming_remote_hangup import TestTelephonyIncomingRemoteHangup
+from mcts.webapi_tests.telephony.test_telephony_outgoing_remote_hangup import TestTelephonyOutgoingRemoteHangup
+from mcts.webapi_tests.telephony.test_telephony_incoming_multiple import TestTelephonyIncomingMultiple
+from mcts.webapi_tests.telephony.test_telephony_outgoing_speaker import TestTelephonyOutgoingSpeaker
+from mcts.webapi_tests.telephony.test_telephony_incoming_hold_outgoing import TestTelephonyIncomingHoldOutgoing
+from mcts.webapi_tests.telephony.test_telephony_outgoing_incoming import TestTelephonyOutgoingIncoming
+from mcts.webapi_tests.telephony.test_telephony_incoming_sendtone import TestTelephonyIncomingSendtone
+from mcts.webapi_tests.telephony.test_telephony_outgoing_busy import TestTelephonyOutgoingBusy

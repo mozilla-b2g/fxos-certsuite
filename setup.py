@@ -23,7 +23,7 @@ setup(name='fxos-certsuite',
       include_package_data=True,
       zip_safe=False,
       install_requires=deps,
-      entry_points={"console_scripts": ["runcertsuite = certsuite:harness_main",
-                                        "securityrunner = securitysuite:securitycli",
-                                        "cert = certsuite:certcli",
-                                        "webapirunner = webapi_tests.runner:main"]})
+      entry_points={"console_scripts": ["runcertsuite = mcts:harness_main",
+                                        "securityrunner = mcts.securitysuite:securitycli",
+                                        "cert = mcts.certsuite:certcli",
+                                        "webapirunner = mcts.webapi_tests.runner:main"]})
