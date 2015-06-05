@@ -591,8 +591,11 @@ def prepare_device_profile(edit_profile, profile_path, suites):
             # mark unchecked for those loaded from profile to skip
             for test in profile_data.keys():
                 for i in range(len(profile_data[test])):
-                    if profile_data[test][i]['id'] in profile_object['result'][test]:
-                        profile_data[test][i]['checked'] = False
+                    try:
+                        if profile_data[test][i]['id'] in profile_object['result'][test]:
+                            profile_data[test][i]['checked'] = False
+                    except:
+                        logger.debug('device profile[%s][%d] compare failed %s' % (test, i, profile_data[test][i]['id']))
 
             # other profile datas are list, but profile_data['contact'] is map
             profile_data['contact'] = profile_object['result']['contact']

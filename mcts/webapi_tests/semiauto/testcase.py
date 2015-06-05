@@ -15,7 +15,7 @@ from marionette import errors
 from mcts.webapi_tests import certapp
 from mcts.webapi_tests.semiauto import environment
 from mcts.webapi_tests.semiauto.environment import InProcessTestEnvironment
-
+from mcts.utils.device.devicehelper import DeviceHelper
 
 """The default time to wait for a user to respond to a prompt or
 instruction in a test."""
@@ -36,8 +36,7 @@ class TestCase(unittest.TestCase):
 
         self.marionette, self.server, self.handler, self.app = None, None, None, None
 
-        device = mozdevice.DeviceManagerADB()
-        device.forward("tcp:2828", "tcp:2828")
+        device = DeviceHelper.getDevice()
 
         # Cleanups are run irrespective of whether setUp fails
         self.addCleanup(self.cleanup)
@@ -119,7 +118,7 @@ class TestCase(unittest.TestCase):
 
         m = TestCase.stored.marionette
         if m is None:
-            m = Marionette(host=_host, port=_port)
+            m = DeviceHelper.getMarionette(host=_host, port=_port)
             m.wait_for_port()
             m.start_session()
             TestCase.stored.marionette = m
