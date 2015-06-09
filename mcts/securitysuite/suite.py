@@ -11,6 +11,7 @@ import traceback
 from mozdevice import DeviceManagerADB, DMError, ADBError
 from mozlog.structured import commandline, get_default_logger
 from time import sleep
+from mcts.utils.device.devicehelper import DeviceHelper
 
 # ######################################################################################################################
 # Test class that all test must be derived from
@@ -72,11 +73,17 @@ class ExtraTest(object):
         else:
             logger.debug('running securitysuite tests for groups %s' % str(groups))
         logger.suite_start(tests=groups)
+        
+        # setup marionette before any test
+        marionette = DeviceHelper.getMarionette(host=host, port=port)
+        # setup device before any test
+        device = DeviceHelper.getDevice(runAdbAsRoot=True)
+
         for g in groups:
             logger.debug("running securitysuite test group %s" % g)
             logger.test_start(g)
             try:
-                ExtraTest.run(g, version=version, host=host, port=port, hasadb=hasadb)
+                ExtraTest.run(g, version=version)
                 logger.test_end(g, 'OK')
             except:
                 logger.critical(traceback.format_exc())
@@ -85,12 +92,12 @@ class ExtraTest(object):
         logger.suite_end()
 
     @classmethod
-    def run(cls, group=None, version=None, host='localhost', port=2828, hasadb=True):
+    def run(cls, group=None, version=None):
         """
         Runs all the tests, optionally just within the specified group.
         """
         for t in cls.test_list(group):
-            t.run(version=version, host=host, port=port, hasadb=hasadb)
+            t.run(version=version)
 
     @classmethod
     def log_status(cls, status, msg):
@@ -104,13 +111,13 @@ class ExtraTest(object):
 
 def wait_for_adb_device():
     try:
-        adb = DeviceManagerADB()
+        adb = DeviceHelper.getDevice(runAdbAsRoot=True)
     except DMError:
         adb = None
         print "Waiting for adb connection..."
     while adb is None:
         try:
-            adb = DeviceManagerADB()
+            adb = DeviceHelper.getDevice(runAdbAsRoot=True)
         except DMError:
             sleep(0.2)
     if len(adb.devices()) < 1:
@@ -121,7 +128,7 @@ def wait_for_adb_device():
 
 def adb_has_root():
     # normally this should check via root=True to .shellCheckOutput, but doesn't work
-    adb = DeviceManagerADB()
+    adb = DeviceHelper.getDevice(runAdbAsRoot=True)
     return adb.shellCheckOutput(["id"]).startswith("uid=0(root)")
 
 
