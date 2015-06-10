@@ -188,8 +188,8 @@ class nssversion(ExtraTest):
         '2.2': {
             'hgtag': 'mozilla-b2g37_v2_2',
             'release_date:': '2015-06-08',
-            'release_branch': 'B2G_2_2_20150511_MERGEDAY',  # TODO: update on release
-            'release_nss_version': 'NSS_3_17_4_RTM'         # TODO: update on release
+            'release_branch': 'FIREFOX_RELEASE_37_BASE',
+            'release_nss_version': 'NSS_3_17_4_RTM'
         }
     }
 
