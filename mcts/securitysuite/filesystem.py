@@ -12,6 +12,7 @@ import mozdevice
 
 # getter for shared logger instance
 from mozlog.structured import get_default_logger
+from mcts.utils.device.devicehelper import DeviceHelper
 
 
 # ######################################################################################################################
@@ -171,11 +172,11 @@ class worldwritable_info(ExtraTest):
         return r.match(name) is not None
 
     @classmethod
-    def run(cls, version=None, host='localhost', port=2828, hasadb=True):
+    def run(cls, version=None):
         logger = get_default_logger()
 
         try:
-            dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
+            dm = DeviceHelper.getDevice(runAdbAsRoot=True)
         except mozdevice.DMError as e:
             logger.error("Error connecting to device via adb (error: %s). Please be " \
                          "sure device is connected and 'remote debugging' is enabled." % \
@@ -231,11 +232,11 @@ class suidroot_info(ExtraTest):
         return r.match(name) is not None
 
     @classmethod
-    def run(cls, version=None, host='localhost', port=2828, hasadb=True):
+    def run(cls, version=None):
         logger = get_default_logger()
 
         try:
-            dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
+            dm = DeviceHelper.getDevice(runAdbAsRoot=True)
         except mozdevice.DMError as e:
             logger.error("Error connecting to device via adb (error: %s). Please be " \
                          "sure device is connected and 'remote debugging' is enabled." % \

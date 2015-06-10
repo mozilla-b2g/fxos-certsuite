@@ -29,6 +29,7 @@ import wptserve
 from mozlog.structured import commandline
 
 from omni_analyzer import OmniAnalyzer
+from mcts.utils.device.devicehelper import DeviceHelper
 
 """Signalizes whether client has made initial connection to HTTP
 server.
@@ -500,7 +501,7 @@ def parse_permissions_results(expected_results_path, results, prefix, logger, re
 
 def run_marionette_script(script, chrome=False, async=False, host='localhost', port=2828):
     """Create a Marionette instance and run the provided script"""
-    m = marionette.Marionette(host, port)
+    m = DeviceHelper.getMarionette(host, port)
     m.start_session()
     if chrome:
         m.set_context(marionette.Marionette.CONTEXT_CHROME)
@@ -662,7 +663,7 @@ def _run(args, logger):
     logging.basicConfig()
     # Step 1: Get device information
     try:
-        dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
+        dm = DeviceHelper.getDevice()
     except mozdevice.DMError as e:
         print "Error connecting to device via adb (error: %s). Please be " \
             "sure device is connected and 'remote debugging' is enabled." % \
@@ -671,12 +672,11 @@ def _run(args, logger):
 
     # wait here to make sure marionette is running
     logger.debug('Attempting to set up port forwarding for marionette')
-    dm.forward("tcp:2828", "tcp:2828")
 
     retries = 0
     while retries < 5:
         try:
-            m = marionette.Marionette()
+            m = DeviceHelper.getMarionette()
             m.start_session()
             m.delete_session()
             break

@@ -11,9 +11,8 @@ import marionette
 # getter for shared logger instance
 from mozlog.structured import get_default_logger
 
-from mcts.harness import check_adb
-from mcts.harness import MarionetteSession
 from mcts.certsuite.cert import run_marionette_script
+from mcts.utils.device.devicehelper import DeviceHelper
 
 # https://gist.github.com/mozkeeler/3531c27239d92bc1535c
 # https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette/Marionette_JavaScript_Tests
@@ -75,32 +74,18 @@ class certdump(object):
         '''
 
 
-    def __init__(self, hasadb=True):
-        self.hasadb = hasadb
+    def __init__(self):
         self.logger = get_default_logger()
-        try:
-            if hasadb:
-                self.dm = mozdevice.DeviceManagerADB(runAdbAsRoot=True)
-        except mozdevice.DMError as e:
-            self.logger.error("Error connecting to device via adb (error: %s). Please be " \
-                              "sure device is connected and 'remote debugging' is enabled." % \
-                              e.msg)
-            raise
-        self.logger.debug("Attempting to set up port forwarding for marionette")
 
 
-    def get_via_marionette(self, host='localhost', port=2828):
-        if self.hasadb:
-            self.dm.forward("tcp:2828", "tcp:2828")
+    def get_via_marionette(self):
         return run_marionette_script(certdump.js_certdump(),
-                                     chrome=True, host=host, port=port)
+                                     chrome=True)
 
 
-    def nssversion_via_marionette(self, host='localhost', port=2828):
-        if self.hasadb:
-            self.dm.forward("tcp:2828", "tcp:2828")
+    def nssversion_via_marionette(self):
         return run_marionette_script(certdump.js_nssversions(),
-                                     chrome=True, host=host, port=port)
+                                     chrome=True)
 
 
 #######################################################################################################################
@@ -123,12 +108,12 @@ class certdb_info(ExtraTest):
     module = sys.modules[__name__]
 
     @classmethod
-    def run(cls, version=None, host='localhost', port=2828, hasadb=True):
+    def run(cls, version=None):
         logger = get_default_logger()
 
         try:
-            dumper = certdump(hasadb)
-            certs = dumper.get_via_marionette(host, port)
+            dumper = certdump()
+            certs = dumper.get_via_marionette()
         except:
             cls.log_status('FAIL', 'Failed to gather information from the device via Marionette.')
             return False
@@ -151,12 +136,12 @@ class nssversion_info(ExtraTest):
     module = sys.modules[__name__]
 
     @classmethod
-    def run(cls, version=None, host='localhost', port=2828, hasadb=True):
+    def run(cls, version=None):
         logger = get_default_logger()
 
         try:
-            dumper = certdump(hasadb)
-            versions = dumper.nssversion_via_marionette(host, port)
+            dumper = certdump()
+            versions = dumper.nssversion_via_marionette()
         except:
             cls.log_status('FAIL', 'Failed to gather information from the device via Marionette.')
             return False
