@@ -114,8 +114,8 @@ class certdb_info(ExtraTest):
         try:
             dumper = certdump()
             certs = dumper.get_via_marionette()
-        except:
-            cls.log_status('FAIL', 'Failed to gather information from the device via Marionette.')
+        except Exception as e:  # TODO: too broad exception
+            cls.log_status('FAIL', 'Failed to gather information from the device via Marionette: %s' % e)
             return False
 
         # TODO: just listing all of the certs, no filtering
@@ -309,8 +309,8 @@ class nssversion(ExtraTest):
         try:
             dumper = certdump()
             versions = dumper.nssversion_via_marionette()
-        except:  # TODO: too broad exception. Log reason for failure.
-            cls.log_status('FAIL', 'Failed to gather information from the device via Marionette.')
+        except Exception as e:  # TODO: too broad exception
+            cls.log_status('FAIL', 'Failed to gather information from the device via Marionette: %s' % e)
             return False
 
         if version is None:
