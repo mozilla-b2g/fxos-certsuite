@@ -2,6 +2,7 @@ graft mcts/utils
 graft mcts/static
 
 include mcts *
+include mcts/config.json
 recursive-include mcts/certsuite *
 recursive-include mcts/securitysuite *
 recursive-include mcts/web-platform-tests *
