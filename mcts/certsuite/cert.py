@@ -602,10 +602,14 @@ def make_html_report(path, report):
 
 def get_application_ini(dm):
     # application.ini information
-    appinicontents = dm.pullFile('/system/b2g/application.ini')
-    sf = StringIO.StringIO(appinicontents)
-    config = ConfigParser.ConfigParser()
-    config.readfp(sf)
+    #appinicontents = dm.pullFile('/system/b2g/application.ini')
+    #sf = StringIO.StringIO(appinicontents)
+    #config = ConfigParser.ConfigParser()
+    #config.readfp(sf)
+    ini_file = '_app.ini'
+    dm.pull('/system/b2g/application.ini', ini_file)
+    config = ConfigParser.RawConfigParser()
+    config.read(ini_file)
     application_ini = {}
     for section in config.sections():
         application_ini[section] = dict(config.items(section))
@@ -615,7 +619,7 @@ def get_application_ini(dm):
 def get_buildprop(dm):
     # get build properties
     buildprops = {}
-    buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
+    buildpropoutput = dm.shell_output("cat /system/build.prop")
     for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
                           in line]:
         eq = buildprop.find('=')
@@ -626,11 +630,11 @@ def get_buildprop(dm):
 
 
 def get_processes_running(dm):
-    return map(lambda p: {'name': p[1], 'user': p[2]}, dm.getProcessList())
+    return map(lambda p: {'name': p[1], 'user': p[2]}, dm.get_process_list())
 
 
 def get_kernel_version(dm):
-    return dm.shellCheckOutput(["cat", "/proc/version"])
+    return dm.shell_output("cat /proc/version")
 
 
 def _run(args, logger):

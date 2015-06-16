@@ -382,6 +382,8 @@ class NoADB():
         pass
     def root(self):
         pass
+    def devices(self, timeout=None):
+        pass
 
 def check_adb():
     try:

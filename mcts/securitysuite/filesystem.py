@@ -13,6 +13,7 @@ import mozdevice
 # getter for shared logger instance
 from mozlog.structured import get_default_logger
 from mcts.utils.device.devicehelper import DeviceHelper
+from mozdevice.adb import ADBError
 
 
 # ######################################################################################################################
@@ -176,16 +177,16 @@ class worldwritable_info(ExtraTest):
         logger = get_default_logger()
 
         try:
-            dm = DeviceHelper.getDevice(runAdbAsRoot=True)
-        except mozdevice.DMError as e:
+            device = DeviceHelper.getDevice()
+        except ADBError as e:
             logger.error("Error connecting to device via adb (error: %s). Please be " \
                          "sure device is connected and 'remote debugging' is enabled." % \
                          e.msg)
             raise
 
         try:
-            out = dm.shellCheckOutput(['ls', '-alR', '/'], root=True)
-        except mozdevice.DMError as e:
+            out = device.shell_output('ls -alR /', root=True)
+        except ADBError as e:
             cls.log_status('FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg)
             return False
 
@@ -236,16 +237,16 @@ class suidroot_info(ExtraTest):
         logger = get_default_logger()
 
         try:
-            dm = DeviceHelper.getDevice(runAdbAsRoot=True)
-        except mozdevice.DMError as e:
+            device = DeviceHelper.getDevice()
+        except ADBError as e:
             logger.error("Error connecting to device via adb (error: %s). Please be " \
                          "sure device is connected and 'remote debugging' is enabled." % \
                          e.msg)
             raise
 
         try:
-            out = dm.shellCheckOutput(['ls', '-alR', '/'], root=True)
-        except mozdevice.DMError as e:
+            out = device.shell_output('ls -alR /', root=True)
+        except ADBError as e:
             cls.log_status('FAIL', 'Failed to gather filesystem information from device via adb: %s' % e.msg)
             return False
 

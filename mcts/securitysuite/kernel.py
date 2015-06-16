@@ -11,6 +11,7 @@ import mozdevice
 from mozlog.structured import get_default_logger
 
 from mcts.utils.device.devicehelper import DeviceHelper
+from mozdevice.adb import ADBError
 
 # ######################################################################################################################
 # shared module functions
@@ -44,16 +45,16 @@ class b2gps(object):
     def __init__(self):
         self.logger = get_default_logger()
         try:
-            self.dm = DeviceHelper.getDevice()
-        except mozdevice.DMError as e:
+            self.device = DeviceHelper.getDevice()
+        except ADBError as e:
             self.logger.error("Error connecting to device via adb (error: %s). Please be "
                               "sure device is connected and 'remote debugging' is enabled." %
                               e.msg)
             raise
 
         try:
-            self.ps = self.dm.shellCheckOutput(['b2g-ps'], root=True).split('\n')
-        except mozdevice.DMError as e:
+            self.ps = self.device.shell_output('b2g-ps', root=True).split('\n')
+        except ADBError as e:
             self.logger.error("Error reading b2g-ps result from device: %s" % e.msg)
             raise
 
@@ -83,15 +84,15 @@ class procpid(object):
     def __init__(self):
         self.logger = get_default_logger()
         try:
-            self.dm = DeviceHelper.getDevice(runAdbAsRoot)
-        except mozdevice.DMError as e:
+            self.device = DeviceHelper.getDevice()
+        except ADBError as e:
             self.logger.error("Error connecting to device via adb (error: %s). Please be "
                               "sure device is connected and 'remote debugging' is enabled." %
                               e.msg)
             raise
 
     def get_pidlist(self):
-        out = self.dm.shellCheckOutput(['ls', '/proc/*/status'], root=True)
+        out = self.device.shell_output('ls /proc/*/status', root=True)
         proclines = out.split('\n')[-1]  # skip 'self' which is always last
         pids = [x.split('/')[2] for x in proclines]
         return pids

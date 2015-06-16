@@ -202,7 +202,7 @@ class TestCase(unittest.TestCase):
             "Please close the app manually by holding down the Home button "
             "and pressing the X above the %s card." % (certapp.name, certapp.name))
         if not success:
-            device = mozdevice.DeviceManagerADB()
+            device = DeviceHelper.getDevice()
             device.reboot(wait=True)
             self.instruct("Please unlock the lockscreen (if present) after device reboots")
             self.fail("Failed attempts at closing certapp")
