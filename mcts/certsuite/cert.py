@@ -50,6 +50,8 @@ webapi_results_embed_app = None
 last_test_started = 'None'
 logger = None
 
+expected_results_path = '../static/expected_results'
+
 # supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
 expected_result_folder = os.path.join('..', 'static', 'expected_results')
