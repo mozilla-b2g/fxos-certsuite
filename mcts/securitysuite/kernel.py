@@ -53,7 +53,7 @@ class b2gps(object):
             raise
 
         try:
-            self.ps = self.device.shell_output('b2g-ps', root=True).split('\n')
+            self.ps = self.device.shell_output('b2g-ps', root=True).split('\r\n')
         except ADBError as e:
             self.logger.error("Error reading b2g-ps result from device: %s" % e.msg)
             raise
@@ -93,7 +93,7 @@ class procpid(object):
 
     def get_pidlist(self):
         out = self.device.shell_output('ls /proc/*/status', root=True)
-        proclines = out.split('\n')[-1]  # skip 'self' which is always last
+        proclines = out.split('\r\n')[-1]  # skip 'self' which is always last
         pids = [x.split('/')[2] for x in proclines]
         return pids
 

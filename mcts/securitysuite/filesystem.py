@@ -46,8 +46,8 @@ def parse_ls(out):
 
     # adb returns newline as \r\n
     # but mozdevice uses \n
-    for dirstr in out[2:-2].split('\n\n'):
-        lines = dirstr.split('\n')
+    for dirstr in out[2:-2].split('\r\n\r\n'):
+        lines = dirstr.split('\r\n')
         dirname = lines[0][:-1]
         if len(lines) == 2 and lines[1].startswith("opendir failed"):
             continue
