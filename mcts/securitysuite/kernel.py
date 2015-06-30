@@ -122,8 +122,8 @@ class seccomp(ExtraTest):
 
         try:
             ps = b2gps()
-        except:
-            cls.log_status('FAIL', 'Failed to retrieve b2g-ps info.')
+        except Exception as e:
+            cls.log_status('FAIL', 'Failed to retrieve b2g-ps info: %s' % e)
             return False
 
         # list of b2g versions that don't have seccomp support
