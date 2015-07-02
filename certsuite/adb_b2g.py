@@ -169,6 +169,11 @@ class ADBB2G(adb.ADBDevice):
 
             def inner():
                 try:
+                    # add checking adbd's user, if it's not root, then give a command adb root to restart adbd as root user
+                    adbd_process = self.shell_output("ps|grep adbd")
+                    if "root" not in adbd_process:
+                        self._logger.info("Restart adbd running as root user")
+                        os.system("adb root")
                     listing = self.shell_output("ls -l %s" % (prefs_file))
                     mode, user, group, size, date, time, name = listing.split(None, 6)
                     mtime = "%s %s" % (date, time)

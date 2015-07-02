@@ -360,6 +360,8 @@ def check_root(device):
             have_root = user == "root"
             if not have_root:
                 logger.critical("adbd running as non-root user %s" % user)
+                logger.critical("Restart adbd running as root user")
+                os.system("adb root")
             break
     if not have_adbd:
         logger.critical("adbd process not found")
