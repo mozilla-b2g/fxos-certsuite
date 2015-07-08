@@ -98,9 +98,8 @@ routes = [("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_log", webapi_log_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
-static_path = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), "static"))
-
+mcts_current_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+static_path = os.path.join(mcts_current_path, "static")
 
 def read_manifest(app):
     with open(os.path.join(app, 'manifest.webapp')) as f:
@@ -176,7 +175,8 @@ def test_webapi(logger, report, args, addr):
         webapi_results = None
 
         appname = '%s WebAPI Verifier' % apptype.capitalize()
-        apppath = os.path.join(static_path, 'webapi-test-app')
+        sampleapppath = os.path.join(static_path, 'sample_apps')
+        apppath = os.path.join(sampleapppath, 'webapi-test-app')
         install_app(logger, appname, args.version, apptype, apppath, True,
                     {'results_uri.js':
                         'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)},
@@ -254,14 +254,16 @@ def test_permissions(logger, report, args, addr):
 
     # first install test app for embed-apps permission test
     embed_appname = 'Embed Apps Test App'
-    apppath = os.path.join(static_path, 'embed-apps-test-app')
+    sampleapppath = os.path.join(static_path, 'sample_apps')
+    apppath = os.path.join(sampleapppath, 'embed-apps-test-app')
     install_app(logger, embed_appname, args.version, 'certified', apppath, True,
                 {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr},
                  False)
 
     appname = 'Permissions Test App'
     installed_appname = appname.lower().replace(" ", "-")
-    apppath = os.path.join(static_path, 'permissions-test-app')
+    sampleapppath = os.path.join(static_path, 'sample_apps')
+    apppath = os.path.join(sampleapppath, 'permissions-test-app')
     install_app(logger, appname, args.version, 'web', apppath, False,
             {'results_uri.js':
                 'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)})
@@ -398,7 +400,8 @@ def test_open_remote_window(logger, version, addr):
 
         appname = 'Open Remote Window Test App'
         installed_appname = appname.lower().replace(" ", "-")
-        apppath = os.path.join(static_path, 'open-remote-window-test-app')
+        sampleapppath = os.path.join(static_path, 'sample_apps')
+        apppath = os.path.join(sampleapppath, 'open-remote-window-test-app')
         install_app(logger, appname, version, 'web', apppath, False,
             {'results_uri.js':
                 'RESULTS_URI="http://%s:%s/webapi_results";' % addr})
