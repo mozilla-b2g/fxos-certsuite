@@ -22,7 +22,7 @@ instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
 # local variable for marionette
-_host = 'localhos'
+_host = 'localhost'
 _port = 2828
 
 class TestCase(unittest.TestCase):
@@ -76,8 +76,11 @@ class TestCase(unittest.TestCase):
 
         env = environment.get(InProcessTestEnvironment)
 
-        if env.device_profile:
-            self.check_skip(env.device_profile['webapi'])
+        try:
+            if env.device_profile:
+                self.check_skip(env.device_profile['webapi'])
+        except:
+            self.test_name = str(self.__class__).split('.')[1]
 
         self.server = env.server
         self.handler = env.handler
