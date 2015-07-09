@@ -152,6 +152,15 @@ class TelephonyTestCommon(object):
                       hear the ringing signal click 'OK'")
         self.verify_incoming_call()
 
+    def resume(self):
+        self.marionette.execute_async_script("""
+        if (window.wrappedJSObject.calls.length > 0) {
+          window.wrappedJSObject.calls[0].resume();
+        }
+
+        marionetteScriptFinished(1);
+        """, special_powers=True)
+
     def hangup_call(self, call_type="Active", remote_hangup=False, active_call_selected=0):
         # hangup the active/incoming call, verify
         self.marionette.execute_async_script("""
@@ -198,10 +207,6 @@ class TelephonyTestCommon(object):
 
         if (!remote_hangup) {
           call_to_hangup.hangUp();
-        }
-
-        if (window.wrappedJSObject.calls.length > 0) {
-          window.wrappedJSObject.calls[0].resume();
         }
 
         marionetteScriptFinished(1);

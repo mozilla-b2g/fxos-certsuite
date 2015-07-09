@@ -292,3 +292,53 @@ class ADBB2G(adb.ADBDevice):
             proc.stderr_file.close()
 
         return rv
+
+    def devices(self, timeout=None):
+        """Executes adb devices -l and returns a list of objects describing attached devices.
+
+        :param timeout: optional integer specifying the maximum time in
+            seconds for any spawned adb process to complete before
+            throwing an ADBTimeoutError.  This timeout is per adb call. The
+            total time spent may exceed this value. If it is not
+            specified, the value set in the ADBHost constructor is used.
+        :returns: an object contain
+        :raises: * ADBTimeoutError
+                 * ADBError
+
+        The output of adb devices -l ::
+
+            $ adb devices -l
+            List of devices attached
+            b313b945               device usb:1-7 product:d2vzw model:SCH_I535 device:d2vzw
+
+        is parsed and placed into an object as in
+
+        [{'device_serial': 'b313b945', 'state': 'device', 'product': 'd2vzw',
+          'usb': '1-7', 'device': 'd2vzw', 'model': 'SCH_I535' }]
+
+        """
+        # b313b945               device usb:1-7 product:d2vzw model:SCH_I535 device:d2vzw
+        # from Android system/core/adb/transport.c statename()
+        re_device_info = re.compile(r'([^\s]+)\s+(offline|bootloader|device|host|recovery|sideload|no permissions|unauthorized|unknown)')
+        devices = []
+        lines = self.command_output(["devices", "-l"], timeout=timeout).split('\n')
+        for line in lines:
+            if line == 'List of devices attached ':
+                continue
+            match = re_device_info.match(line)
+            if match:
+                device = {
+                    'device_serial': match.group(1),
+                    'state': match.group(2)
+                }
+                remainder = line[match.end(2):].strip()
+                if remainder:
+                    try:
+                        device.update(dict([j.split(':')
+                                            for j in remainder.split(' ')]))
+                    except ValueError:
+                        self._logger.warning('devices: Unable to parse '
+                                             'remainder for device %s' % line)
+                devices.append(device)
+        return devices
+

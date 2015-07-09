@@ -50,6 +50,8 @@ webapi_results_embed_app = None
 last_test_started = 'None'
 logger = None
 
+expected_results_path = '../static/expected_results'
+
 # supported_versions = ["2.2", "2.1", "2.0", "1.4", "1.3"]
 
 expected_result_folder = os.path.join('..', 'static', 'expected_results')
@@ -96,9 +98,8 @@ routes = [("POST", "/webapi_results", webapi_results_handler),
           ("POST", "/webapi_log", webapi_log_handler),
           ("GET", "/*", wptserve.handlers.file_handler)]
 
-static_path = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), "static"))
-
+mcts_current_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+static_path = os.path.join(mcts_current_path, "static")
 
 def read_manifest(app):
     with open(os.path.join(app, 'manifest.webapp')) as f:
@@ -174,7 +175,8 @@ def test_webapi(logger, report, args, addr):
         webapi_results = None
 
         appname = '%s WebAPI Verifier' % apptype.capitalize()
-        apppath = os.path.join(static_path, 'webapi-test-app')
+        sampleapppath = os.path.join(static_path, 'sample_apps')
+        apppath = os.path.join(sampleapppath, 'webapi-test-app')
         install_app(logger, appname, args.version, apptype, apppath, True,
                     {'results_uri.js':
                         'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)},
@@ -252,14 +254,16 @@ def test_permissions(logger, report, args, addr):
 
     # first install test app for embed-apps permission test
     embed_appname = 'Embed Apps Test App'
-    apppath = os.path.join(static_path, 'embed-apps-test-app')
+    sampleapppath = os.path.join(static_path, 'sample_apps')
+    apppath = os.path.join(sampleapppath, 'embed-apps-test-app')
     install_app(logger, embed_appname, args.version, 'certified', apppath, True,
                 {'results_uri.js': 'RESULTS_URI="http://%s:%s/webapi_results_embed_apps";' % addr},
                  False)
 
     appname = 'Permissions Test App'
     installed_appname = appname.lower().replace(" ", "-")
-    apppath = os.path.join(static_path, 'permissions-test-app')
+    sampleapppath = os.path.join(static_path, 'sample_apps')
+    apppath = os.path.join(sampleapppath, 'permissions-test-app')
     install_app(logger, appname, args.version, 'web', apppath, False,
             {'results_uri.js':
                 'RESULTS_URI="http://%s:%s/webapi_results";LOG_URI="http://%s:%s/webapi_log";' % (addr * 2)})
@@ -396,7 +400,8 @@ def test_open_remote_window(logger, version, addr):
 
         appname = 'Open Remote Window Test App'
         installed_appname = appname.lower().replace(" ", "-")
-        apppath = os.path.join(static_path, 'open-remote-window-test-app')
+        sampleapppath = os.path.join(static_path, 'sample_apps')
+        apppath = os.path.join(sampleapppath, 'open-remote-window-test-app')
         install_app(logger, appname, version, 'web', apppath, False,
             {'results_uri.js':
                 'RESULTS_URI="http://%s:%s/webapi_results";' % addr})
@@ -602,10 +607,14 @@ def make_html_report(path, report):
 
 def get_application_ini(dm):
     # application.ini information
-    appinicontents = dm.pullFile('/system/b2g/application.ini')
-    sf = StringIO.StringIO(appinicontents)
-    config = ConfigParser.ConfigParser()
-    config.readfp(sf)
+    #appinicontents = dm.pullFile('/system/b2g/application.ini')
+    #sf = StringIO.StringIO(appinicontents)
+    #config = ConfigParser.ConfigParser()
+    #config.readfp(sf)
+    ini_file = '_app.ini'
+    dm.pull('/system/b2g/application.ini', ini_file)
+    config = ConfigParser.RawConfigParser()
+    config.read(ini_file)
     application_ini = {}
     for section in config.sections():
         application_ini[section] = dict(config.items(section))
@@ -615,7 +624,7 @@ def get_application_ini(dm):
 def get_buildprop(dm):
     # get build properties
     buildprops = {}
-    buildpropoutput = dm.shellCheckOutput(["cat", "/system/build.prop"])
+    buildpropoutput = dm.shell_output("cat /system/build.prop")
     for buildprop in [line for line in buildpropoutput.splitlines() if '=' \
                           in line]:
         eq = buildprop.find('=')
@@ -626,11 +635,11 @@ def get_buildprop(dm):
 
 
 def get_processes_running(dm):
-    return map(lambda p: {'name': p[1], 'user': p[2]}, dm.getProcessList())
+    return map(lambda p: {'name': p[1], 'user': p[2]}, dm.get_process_list())
 
 
 def get_kernel_version(dm):
-    return dm.shellCheckOutput(["cat", "/proc/version"])
+    return dm.shell_output("cat /proc/version")
 
 
 def _run(args, logger):

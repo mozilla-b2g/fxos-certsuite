@@ -22,7 +22,7 @@ instruction in a test."""
 prompt_timeout = 600  # 10 minutes
 
 # local variable for marionette
-_host = 'localhos'
+_host = 'localhost'
 _port = 2828
 
 class TestCase(unittest.TestCase):
@@ -76,8 +76,11 @@ class TestCase(unittest.TestCase):
 
         env = environment.get(InProcessTestEnvironment)
 
-        if env.device_profile:
-            self.check_skip(env.device_profile['webapi'])
+        try:
+            if env.device_profile:
+                self.check_skip(env.device_profile['webapi'])
+        except:
+            self.test_name = str(self.__class__).split('.')[1]
 
         self.server = env.server
         self.handler = env.handler
@@ -202,7 +205,7 @@ class TestCase(unittest.TestCase):
             "Please close the app manually by holding down the Home button "
             "and pressing the X above the %s card." % (certapp.name, certapp.name))
         if not success:
-            device = mozdevice.DeviceManagerADB()
+            device = DeviceHelper.getDevice()
             device.reboot(wait=True)
             self.instruct("Please unlock the lockscreen (if present) after device reboots")
             self.fail("Failed attempts at closing certapp")
