@@ -6,7 +6,7 @@ import os
 
 import fxos_appgen
 
-from marionette import MarionetteException
+from marionette_driver.errors import MarionetteException
 
 
 __all__ = ["name", "canonical_name", "frame_name",

@@ -25,5 +25,4 @@ class Settings(object):
         value = json.dumps(value)
         self.driver.execute_script(
             "return GaiaDataLayer.setSetting('%s', %s)" %
-            (key.replace("'", '"'), value),
-            special_powers=True)
+            (key.replace("'", '"'), value))

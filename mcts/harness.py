@@ -29,9 +29,9 @@ import moznetwork
 import mozprocess
 import wptserve
 
-from marionette import expected
-from marionette.by import By
-from marionette.wait import Wait
+from marionette_driver import expected
+from marionette_driver.by import By
+from marionette_driver.wait import Wait
 from marionette_extension import AlreadyInstalledException
 from marionette_extension import install as marionette_install
 from marionette_extension import uninstall as marionette_uninstall
