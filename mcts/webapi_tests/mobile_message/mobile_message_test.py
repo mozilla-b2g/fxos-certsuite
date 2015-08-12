@@ -4,8 +4,8 @@
 
 import time
 
-from marionette.wait import Wait
-from marionette import errors
+from marionette_driver.wait import Wait
+from marionette_driver import errors
 
 
 class MobileMessageTestCommon(object):

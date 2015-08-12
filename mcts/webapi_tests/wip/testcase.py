@@ -6,7 +6,7 @@ import os
 import time
 
 import mozdevice
-from marionette import Marionette, MarionetteTestCase, MarionetteException
+from marionette import Marionette, MarionetteTestCase
 
 from certapp import CertAppMixin
 

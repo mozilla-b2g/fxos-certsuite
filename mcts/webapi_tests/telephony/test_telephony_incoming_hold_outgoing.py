@@ -3,7 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import time
-from marionette.wait import Wait
+from marionette_driver.wait import Wait
 
 from mcts.webapi_tests.semiauto import TestCase
 from mcts.webapi_tests.telephony import TelephonyTestCommon

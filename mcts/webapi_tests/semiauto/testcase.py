@@ -9,8 +9,8 @@ import unittest
 
 import mozdevice
 from marionette import Marionette
-from marionette.wait import Wait
-from marionette import errors
+from marionette_driver.wait import Wait
+from marionette_driver import errors
 
 from mcts.webapi_tests import certapp
 from mcts.webapi_tests.semiauto import environment

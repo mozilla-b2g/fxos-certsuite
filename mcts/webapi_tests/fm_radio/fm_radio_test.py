@@ -4,7 +4,7 @@
 
 import time
 
-from marionette.wait import Wait
+from marionette_driver.wait import Wait
 
 
 class FMRadioTestCommon(object):
