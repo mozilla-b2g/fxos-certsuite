@@ -366,6 +366,9 @@ class NoADBDeviceBackup():
         return self
     def __exit__(self, *args, **kwargs):
         pass
+    def restore(self):
+        pass
+
 
 class NoADB():
     def reboot(self):
@@ -381,6 +384,8 @@ class NoADB():
     def restart(self):
         pass
     def root(self):
+        pass
+    def devices(self, timeout=None):
         pass
 
 def check_adb():

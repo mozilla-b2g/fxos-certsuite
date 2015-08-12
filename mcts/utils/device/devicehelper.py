@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from mozdevice import DeviceManagerADB
+from mcts.utils.handlers.adb_b2g import ADBB2G
 from marionette import Marionette
 
 class DeviceHelper(object):
@@ -10,7 +10,7 @@ class DeviceHelper(object):
     marionette = None
 
     @staticmethod
-    def getDevice(DeviceManager=DeviceManagerADB, **kwargs):
+    def getDevice(DeviceManager=ADBB2G, **kwargs):
         if not DeviceHelper.device:
             DeviceHelper.device = DeviceManager(**kwargs)
             

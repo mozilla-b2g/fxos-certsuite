@@ -12,6 +12,7 @@ from mozdevice import DeviceManagerADB, DMError, ADBError
 from mozlog.structured import commandline, get_default_logger
 from time import sleep
 from mcts.utils.device.devicehelper import DeviceHelper
+from mozdevice.adb import ADBError
 
 # ######################################################################################################################
 # Test class that all test must be derived from
@@ -77,7 +78,7 @@ class ExtraTest(object):
         # setup marionette before any test
         marionette = DeviceHelper.getMarionette(host=host, port=port)
         # setup device before any test
-        device = DeviceHelper.getDevice(runAdbAsRoot=True)
+        device = DeviceHelper.getDevice()
 
         for g in groups:
             logger.debug("running securitysuite test group %s" % g)
@@ -111,25 +112,25 @@ class ExtraTest(object):
 
 def wait_for_adb_device():
     try:
-        adb = DeviceHelper.getDevice(runAdbAsRoot=True)
-    except DMError:
-        adb = None
+        device = DeviceHelper.getDevice()
+    except ADBError:
+        device = None
         print "Waiting for adb connection..."
-    while adb is None:
+    while device is None:
         try:
-            adb = DeviceHelper.getDevice(runAdbAsRoot=True)
-        except DMError:
+            device = DeviceHelper.getDevice()
+        except ADBError:
             sleep(0.2)
-    if len(adb.devices()) < 1:
+    if len(device.devices()) < 1:
         print "Waiting for adb device..."
-        while len(adb.devices()) < 1:
+        while len(device.devices()) < 1:
             sleep(0.2)
 
 
 def adb_has_root():
-    # normally this should check via root=True to .shellCheckOutput, but doesn't work
-    adb = DeviceHelper.getDevice(runAdbAsRoot=True)
-    return adb.shellCheckOutput(["id"]).startswith("uid=0(root)")
+    # normally this should check via root=True to .shell_output, but doesn't work
+    device = DeviceHelper.getDevice()
+    return device.shell_output("id").startswith("uid=0(root)")
 
 
 #######################################################################################################################
