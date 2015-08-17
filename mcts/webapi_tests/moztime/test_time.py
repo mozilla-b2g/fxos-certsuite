@@ -1,3 +1,4 @@
+from pytz import reference
 from datetime import datetime
 import time
 
@@ -33,16 +34,23 @@ class TestTime(TestCase):
 
             //set the time using timer webAPI
             time_interface.set(datetime_to_set);
+        """
+        get_time = """
             //get the newly set time
             var get_new_time = new Date();
             return get_new_time.getTime();
         """
+
         #get current time from system
         current_time_msec = self.marionette.execute_script(get_current_time)
         str_current_time = time.strftime('%Y-%m-%d %H:%M', \
+                                   time.gmtime(current_time_msec / 1000.0))
+        str_current_time_zone = reference.LocalTimezone().tzname(datetime.now())
+        str_current_local_time = time.strftime('%Y-%m-%d %H:%M', \
                                    time.localtime(current_time_msec / 1000.0))
-        self.confirm("Pull the notification bar and confirm if %s is current"\
-                                 " date and time on phone?" % str_current_time)
+        self.confirm("Pull the notification bar and confirm if %s (UTC time)" \
+                     " or %s (%s time) is current date and time on phone?" \
+                     % (str_current_time, str_current_local_time, str_current_time_zone))
 
         #get the new date and time from user and pass to script to set
         str_date = self.prompt("Please enter a date to be changed in"\
@@ -59,12 +67,19 @@ class TestTime(TestCase):
         date_format = date_struct.strftime('%B %d, %Y')
         date_n_time = date_format + ' ' + str_time
 
-        mozset_time = self.marionette.execute_script(set_time, \
-                                         script_args=[date_n_time])
+        self.marionette.execute_script(set_time, script_args=[date_n_time])
+        time.sleep(5)
+        mozset_time = self.marionette.execute_script(get_time)
+
         #compare the times
         str_mozset_time = time.strftime('%B %d, %Y %H:%M', \
+                                   time.gmtime(mozset_time / 1000.0))
+        str_current_mozset_time = time.strftime('%B %d, %Y %H:%M', \
                                    time.localtime(mozset_time / 1000.0))
-        self.assertEqual(date_n_time, str_mozset_time)
+        self.assertEqual(date_n_time, str_current_mozset_time)
 
         self.confirm("Pull the notification bar and confirm that the date" \
-                        " and time you have been set to %s" % str_mozset_time)
+                     " and time you have been set to %s (UTC time) or %s (%s time)" \
+                     % (str_mozset_time, str_current_mozset_time, str_current_time_zone))
+
+
