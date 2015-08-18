@@ -26,7 +26,7 @@ class MobileMessageTestCommon(object):
             window.wrappedJSObject.received_msg = true;
             window.wrappedJSObject.in_msg = event.message;
         };
-        """, special_powers=True)
+        """)
 
     def remove_receiving_listener(self):
         self.marionette.execute_script("""
@@ -73,7 +73,7 @@ class MobileMessageTestCommon(object):
             log("Get message returned error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
-        """, script_args=[msg_id], special_powers=True)
+        """, script_args=[msg_id])
 
         # wait for a result
         wait = Wait(self.marionette, timeout=30, interval=0.5)
@@ -107,7 +107,7 @@ class MobileMessageTestCommon(object):
             log("Delete message returned error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
-        """, script_args=[msg_id], special_powers=True)
+        """, script_args=[msg_id])
 
         # wait for request.onsuccess
         wait = Wait(self.marionette, timeout=30, interval=0.5)
@@ -144,7 +144,7 @@ class MobileMessageTestCommon(object):
             window.wrappedJSObject.rcvd_on_failed = true;
         };
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
     def remove_sending_listeners(self):
         self.marionette.execute_script("""
@@ -190,7 +190,7 @@ class MobileMessageTestCommon(object):
             log("Failed to send message, received error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
-        """, script_args=[msg_type, destination, body], special_powers=True)
+        """, script_args=[msg_type, destination, body])
         time.sleep(5)
 
     def assert_message_sent(self):
@@ -289,7 +289,7 @@ class MobileMessageTestCommon(object):
             log("Failed to mark message read status, received error: %s" % requestRet.error.name);
         };
         marionetteScriptFinished(1);
-        """, script_args=[msg_id, is_read], special_powers=True)
+        """, script_args=[msg_id, is_read])
 
         wait = Wait(self.marionette, timeout=15, interval=0.5)
         try:

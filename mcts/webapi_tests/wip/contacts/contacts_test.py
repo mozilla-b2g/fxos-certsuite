@@ -51,7 +51,7 @@ class ContactsTestCommon(object):
             window.wrappedJSObject.gotSuccess = false;
         };
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         # sleep a couple of seconds to ensure contact saved
         time.sleep(2)
@@ -98,7 +98,7 @@ class ContactsTestCommon(object):
             window.wrappedJSObject.gotSuccess = false;
         };
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         # sleep a couple of seconds
         time.sleep(2)
@@ -145,7 +145,7 @@ class ContactsTestCommon(object):
             console.log(err);
         }
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         # verify success event
         success = self.marionette.execute_script("return window.wrappedJSObject.gotSuccess")
@@ -174,7 +174,7 @@ class ContactsTestCommon(object):
             console.log(err);
         }
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         time.sleep(2)
 
@@ -217,7 +217,7 @@ class ContactsTestCommon(object):
             console.log(err);
         }
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         # fails without a sleep here
         time.sleep(5)
@@ -247,7 +247,7 @@ class ContactsTestCommon(object):
             console.log(err);
         }
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         # give time for delete, could be alot of contacts
         time.sleep(15)

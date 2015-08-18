@@ -62,7 +62,7 @@ class TelephonyTestCommon(object):
         );
 
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
@@ -126,7 +126,7 @@ class TelephonyTestCommon(object):
         };
 
         marionetteScriptFinished(1);
-        """, script_args=[incoming], special_powers=True)
+        """, script_args=[incoming])
 
         # answer outgoing call via user answering on target
         if not incoming:
@@ -159,7 +159,7 @@ class TelephonyTestCommon(object):
         }
 
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
     def hangup_call(self, call_type="Active", remote_hangup=False, active_call_selected=0):
         # hangup the active/incoming call, verify
@@ -210,7 +210,7 @@ class TelephonyTestCommon(object):
         }
 
         marionetteScriptFinished(1);
-        """, script_args=[call_type, remote_hangup, active_call_selected], special_powers=True)
+        """, script_args=[call_type, remote_hangup, active_call_selected])
 
         if remote_hangup == False:
             if self.marionette.execute_script("return window.wrappedJSObject.rcvd_error;"):
@@ -283,7 +283,7 @@ class TelephonyTestCommon(object):
           active.hold();
         }
         marionetteScriptFinished(1);
-        """, script_args=[user_initiate_hold], special_powers=True)
+        """, script_args=[user_initiate_hold])
 
         if user_initiate_hold == True:
             # should have received both events associated with a call on hold
@@ -318,7 +318,7 @@ class TelephonyTestCommon(object):
 
         active.resume();
         marionetteScriptFinished(1);
-        """, special_powers=True)
+        """)
 
         # should have received event associated with a resumed call
         wait = Wait(self.marionette, timeout=90, interval=0.5)
@@ -394,7 +394,7 @@ class TelephonyTestCommon(object):
         );
 
         marionetteScriptFinished(1);
-        """, script_args=[destination], special_powers=True)
+        """, script_args=[destination])
 
         # should have received all events associated with an outgoing call
         wait = Wait(self.marionette, timeout=30, interval=0.5)
@@ -440,7 +440,7 @@ class TelephonyTestCommon(object):
             log("disabling system dialer agent");
             window.wrappedJSObject.dialerAgent.stop();
             marionetteScriptFinished(1);
-            """, special_powers=True)
+            """)
         except:
             self.fail("failed to disable dialer agent")
         finally:
@@ -455,7 +455,7 @@ class TelephonyTestCommon(object):
             log("enabling system dialer agent");
             window.wrappedJSObject.dialerAgent.start();
             marionetteScriptFinished(1);
-            """, special_powers=True)
+            """)
         except:
             self.fail("failed to enable dialer agent")
         finally:
@@ -472,7 +472,7 @@ class TelephonyTestCommon(object):
           log("disabling mute");
           telephony.muted = false;
         }
-        """, script_args=[enable], special_powers=True)
+        """, script_args=[enable])
 
     def set_speaker(self, enable=True):
         self.marionette.execute_script("""
@@ -485,4 +485,4 @@ class TelephonyTestCommon(object):
           log("disabling speaker");
           telephony.speakerEnabled = false;
         }
-        """, script_args=[enable], special_powers=True)
+        """, script_args=[enable])
