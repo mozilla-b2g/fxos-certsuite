@@ -438,7 +438,7 @@ class TelephonyTestCommon(object):
         try:
             self.marionette.execute_async_script("""
             log("disabling system dialer agent");
-            window.wrappedJSObject.dialerAgent.stop();
+            window.wrappedJSObject.core.appcore.AttentionWindow.dialerAgent.stop();
             marionetteScriptFinished(1);
             """)
         except:
@@ -453,7 +453,7 @@ class TelephonyTestCommon(object):
         try:
             self.marionette.execute_async_script("""
             log("enabling system dialer agent");
-            window.wrappedJSObject.dialerAgent.start();
+            window.wrappedJSObject.core.appcore.AttentionWindow.dialerAgent.start();
             marionetteScriptFinished(1);
             """)
         except:
