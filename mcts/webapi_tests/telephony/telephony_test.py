@@ -4,6 +4,10 @@
 
 from marionette_driver.wait import Wait
 
+# TODO: I think we need to split this javascript functions out and make it clean.
+# Please be reminded that mozTelephony couldn't be found in marionette but it exists.
+# marionette.execute_script("return Object.getOwnPropertyNames(window.navigator);")
+# won't show you much useful information.   -Walter
 
 class TelephonyTestCommon(object):
 
@@ -33,7 +37,7 @@ class TelephonyTestCommon(object):
         var telephony = window.navigator.mozTelephony;
         window.wrappedJSObject.received_incoming = false;
         telephony.onincoming = function onincoming(event) {
-          log("Received 'incoming' call event.");
+          console.log("Received 'incoming' call event.");
           window.wrappedJSObject.received_incoming = true;
           window.wrappedJSObject.incoming_call = event.call;
           window.wrappedJSObject.returnable_incoming_call = {
@@ -45,7 +49,7 @@ class TelephonyTestCommon(object):
 
         window.wrappedJSObject.received_callschanged = false;
         telephony.oncallschanged = function oncallschanged(event) {
-          log("Received Telephony 'oncallschanged' event.");
+          console.log("Received Telephony 'oncallschanged' event.");
           window.wrappedJSObject.received_callschanged = true;
         };
 
@@ -91,25 +95,17 @@ class TelephonyTestCommon(object):
           var call_to_answer = window.wrappedJSObject.outgoing_call;
         };
 
-        window.wrappedJSObject.connecting_call_ok = false;
-        call_to_answer.onconnecting = function onconnecting(event) {
-          log("Received 'onconnecting' call event.");
-          if (event.call.state == "connecting") {
-            window.wrappedJSObject.connecting_call_ok = true;
-          };
-        };
-
         window.wrappedJSObject.received_statechange = false;
         call_to_answer.onstatechange = function onstatechange(event) {
-        log("Received TelephonyCall 'onstatechange' event.");
+        console.log("Received TelephonyCall 'onstatechange' event.");
           if (event.call.state == "connected") {
             window.wrappedJSObject.received_statechange = true;
-          };
+          };    
         };
 
         window.wrappedJSObject.connected_call_ok = false;
         call_to_answer.onconnected = function onconnected(event) {
-          log("Received 'onconnected' call event.");
+          console.log("Received 'onconnected' call event.");
           if (event.call.state == "connected") {
             window.wrappedJSObject.active_call = window.navigator.mozTelephony.active;
             window.wrappedJSObject.returnable_active_call = {
@@ -135,8 +131,6 @@ class TelephonyTestCommon(object):
         # should have received both events associated with answering a call
         wait = Wait(self.marionette, timeout=90, interval=0.5)
         try:
-            if incoming:  # only receive 'onconnecting' for incoming call
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connecting_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.connected_call_ok"))
             wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
         except:
@@ -181,17 +175,9 @@ class TelephonyTestCommon(object):
           }
         };
 
-        window.wrappedJSObject.disconnecting_call_ok = false;
-        call_to_hangup.ondisconnecting = function ondisconnecting(event) {
-          log("Received 'ondisconnecting' call event.");
-          if (event.call.state == "disconnecting") {
-            window.wrappedJSObject.disconnecting_call_ok = true;
-          };
-        };
-
         window.wrappedJSObject.received_statechange = false;
         call_to_hangup.onstatechange = function onstatechange(event) {
-        log("Received TelephonyCall 'onstatechange' event.");
+        console.log("Received TelephonyCall 'onstatechange' event.");
           if (event.call.state == "disconnected") {
             window.wrappedJSObject.received_statechange = true;
           };
@@ -199,7 +185,7 @@ class TelephonyTestCommon(object):
 
         window.wrappedJSObject.disconnected_call_ok = false;
         call_to_hangup.ondisconnected = function ondisconnected(event) {
-          log("Received 'ondisconnected' call event.");
+          console.log("Received 'ondisconnected' call event.");
           if (event.call.state == "disconnected") {
             window.wrappedJSObject.disconnected_call_ok = true;
           };
@@ -219,7 +205,6 @@ class TelephonyTestCommon(object):
             # should have received both events associated with a active call hangup
             wait = Wait(self.marionette, timeout=90, interval=0.5)
             try:
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnecting_call_ok"))
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.disconnected_call_ok"))
             except:
                 # failed to hangup
@@ -256,17 +241,9 @@ class TelephonyTestCommon(object):
         let active = window.wrappedJSObject.active_call;
         var user_initiate_hold = arguments[0];
 
-        window.wrappedJSObject.onholding_call_ok = false;
-        active.onholding = function ondisconnecting(event) {
-          log("Received 'onholding' call event.");
-          if (event.call.state == "holding") {
-            window.wrappedJSObject.onholding_call_ok = true;
-          };
-        };
-
         window.wrappedJSObject.received_statechange = false;
         active.onstatechange = function onstatechange(event) {
-        log("Received TelephonyCall 'onstatechange' event.");
+        console.log("Received TelephonyCall 'onstatechange' event.");
           if (event.call.state == "held") {
             window.wrappedJSObject.received_statechange = true;
           };
@@ -274,7 +251,7 @@ class TelephonyTestCommon(object):
 
         window.wrappedJSObject.onheld_call_ok = false;
         active.onheld = function ondisconnected(event) {
-          log("Received 'onheld' call event.");
+          console.log("Received 'onheld' call event.");
           if (event.call.state == "held") {
             window.wrappedJSObject.onheld_call_ok = true;
           };
@@ -289,7 +266,6 @@ class TelephonyTestCommon(object):
             # should have received both events associated with a call on hold
             wait = Wait(self.marionette, timeout=90, interval=0.5)
             try:
-                wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onholding_call_ok"))
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.onheld_call_ok"))
                 wait.until(lambda x: x.execute_script("return window.wrappedJSObject.received_statechange"))
             except:
@@ -302,7 +278,7 @@ class TelephonyTestCommon(object):
 
         window.wrappedJSObject.received_statechange = false;
         active.onstatechange = function onstatechange(event) {
-        log("Received TelephonyCall 'onstatechange' event.");
+        console.log("Received TelephonyCall 'onstatechange' event.");
           if (event.call.state == "resuming") {
             window.wrappedJSObject.received_statechange = true;
           };
@@ -310,7 +286,7 @@ class TelephonyTestCommon(object):
 
         window.wrappedJSObject.onresuming_call_ok = false;
         active.onresuming = function onresuming(event) {
-          log("Received 'onresuming' call event.");
+          console.log("Received 'onresuming' call event.");
           if (event.call.state == "resuming") {
             window.wrappedJSObject.onresuming_call_ok = true;
           };
@@ -339,14 +315,14 @@ class TelephonyTestCommon(object):
 
         telephony.dial(destination).then(out_call => {
 
-            window.wrappedJSObject.received_dialing = false;
+            window.wrappedJSObject.received_dialing  = false;
             if (out_call.state == "dialing") {
                 window.wrappedJSObject.received_dialing = true;
             };
 
             window.wrappedJSObject.received_statechange = false;
             out_call.onstatechange = function onstatechange(event) {
-              log("Received TelephonyCall 'onstatechange' event.");
+              console.log("Received TelephonyCall 'onstatechange' event.");
               if (event.call.state == "alerting") {
                 window.wrappedJSObject.received_statechange = true;
               };
@@ -354,7 +330,7 @@ class TelephonyTestCommon(object):
 
             window.wrappedJSObject.received_alerting = false;
             out_call.onalerting = function onalerting(event) {
-              log("Received TelephonyCall 'onalerting' event.");
+              console.log("Received TelephonyCall 'onalerting' event.");
               if (event.call.state == "alerting") {
                 window.wrappedJSObject.received_alerting = true;
                 window.wrappedJSObject.outgoing_call = out_call;
@@ -368,13 +344,13 @@ class TelephonyTestCommon(object):
 
             window.wrappedJSObject.received_callschanged = false;
             telephony.oncallschanged = function oncallschanged(event) {
-              log("Received Telephony 'oncallschanged' event.");
+              console.log("Received Telephony 'oncallschanged' event.");
               window.wrappedJSObject.received_callschanged = true;
             };
 
             window.wrappedJSObject.received_busy = false;
             out_call.onerror = function onerror(event) {
-              log("Received TelephonyCall 'onerror' event.");
+              console.log("Received TelephonyCall 'onerror' event.");
               if (event.call.error.name == "BusyError") {
                 window.wrappedJSObject.received_busy = true;
               };
@@ -437,8 +413,8 @@ class TelephonyTestCommon(object):
         self.marionette.switch_to_frame()  # system app
         try:
             self.marionette.execute_async_script("""
-            log("disabling system dialer agent");
-            window.wrappedJSObject.core.appcore.AttentionWindow.dialerAgent.stop();
+            console.log("disabling system dialer agent");
+            window.wrappedJSObject.core.appCore.attentionWindowManager.dialerAgent.stop();
             marionetteScriptFinished(1);
             """)
         except:
@@ -452,8 +428,8 @@ class TelephonyTestCommon(object):
         self.marionette.switch_to_frame()  # system app
         try:
             self.marionette.execute_async_script("""
-            log("enabling system dialer agent");
-            window.wrappedJSObject.core.appcore.AttentionWindow.dialerAgent.start();
+            console.log("enabling system dialer agent");
+            window.wrappedJSObject.core.appCore.attentionWindowManager.dialerAgent.start();
             marionetteScriptFinished(1);
             """)
         except:
@@ -466,10 +442,10 @@ class TelephonyTestCommon(object):
         var enable = arguments[0];
         var telephony = window.navigator.mozTelephony;
         if (enable) {
-          log("enabling mute");
+          console.log("enabling mute");
           telephony.muted = true;
         } else {
-          log("disabling mute");
+          console.log("disabling mute");
           telephony.muted = false;
         }
         """, script_args=[enable])
@@ -479,10 +455,10 @@ class TelephonyTestCommon(object):
         var enable = arguments[0];
         var telephony = window.navigator.mozTelephony;
         if (enable) {
-          log("enabling speaker");
+          console.log("enabling speaker");
           telephony.speakerEnabled = true;
         } else {
-          log("disabling speaker");
+          console.log("disabling speaker");
           telephony.speakerEnabled = false;
         }
         """, script_args=[enable])
