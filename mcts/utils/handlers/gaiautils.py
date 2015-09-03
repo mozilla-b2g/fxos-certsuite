@@ -18,8 +18,7 @@ class Settings(object):
 
     def get(self, key):
         return self.driver.execute_async_script(
-            "return GaiaDataLayer.getSetting('%s')" % key.replace("'", '"'),
-            special_powers=True)
+            "return GaiaDataLayer.getSetting('%s')" % key.replace("'", '"'))
 
     def set(self, key, value):
         value = json.dumps(value)
