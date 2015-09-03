@@ -174,7 +174,6 @@ def securitycli():
     logger = commandline.setup_logging("securitysuite", vars(args), {"raw": sys.stdout})
 
     try:
-        logger.debug("security cli runnng with args %s" % args)
         if args.list_test_groups:
             for group in ExtraTest.group_list(args.mode):
                 print group
@@ -186,11 +185,13 @@ def securitycli():
 
             embed()
         elif args.mode == 'stingray':
+            logger.debug("security cli runnng with args %s" % args)
             ExtraTest.run_groups(args.include,
                                  version=args.version,
                                  host=args.host, port=int(args.port),
                                  mode=args.mode)
         else:
+            logger.debug("security cli runnng with args %s" % args)
             wait_for_adb_device()
             if not adb_has_root():
                 logger.warning("adb has no root. Results will be incomplete.")
