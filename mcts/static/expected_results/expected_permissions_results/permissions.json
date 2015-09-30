@@ -12,6 +12,7 @@
   "audio-channel-notification": [], 
   "audio-channel-publicnotification": [], 
   "audio-channel-ringer": [], 
+  "audio-channel-system": [], 
   "audio-channel-telephony": [], 
   "background-sensors": [], 
   "backgroundservice": [], 
@@ -19,38 +20,63 @@
     "window.BeforeAfterKeyboardEvent"
   ], 
   "bluetooth": [
+    "window.BluetoothDiscoveryHandle", 
+    "window.BluetoothAdapterEvent", 
+    "window.BluetoothVCardListingEvent", 
+    "window.BluetoothAdapter", 
+    "window.BluetoothGattServer", 
+    "window.BluetoothGattService", 
+    "window.BluetoothGattDescriptor", 
+    "window.BluetoothPhonebookPullingEvent", 
+    "window.BluetoothStatusChangedEvent", 
+    "window.BluetoothGattCharacteristic", 
     "window.BluetoothDeviceEvent", 
     "window.BluetoothDevice", 
-    "window.BluetoothDiscoveryStateChangedEvent", 
-    "window.BluetoothAdapter", 
+    "window.BluetoothPbapRequestHandle", 
+    "window.BluetoothGatt", 
+    "window.BluetoothClassOfDevice", 
+    "window.BluetoothAttributeEvent", 
+    "window.BluetoothPairingHandle", 
+    "window.BluetoothGattCharacteristicEvent", 
+    "window.BluetoothPairingEvent", 
+    "window.BluetoothVCardPullingEvent", 
     "window.BluetoothManager", 
-    "window.BluetoothStatusChangedEvent", 
+    "window.BluetoothLeDeviceEvent", 
     "window.navigator.mozBluetooth"
   ], 
   "browser": [
     "browser", 
+    "window.BrowserElementAudioChannel", 
     "window.document.body.lastElementChild.getCanGoBack", 
-    "window.document.body.lastElementChild.purgeHistory", 
-    "window.document.body.lastElementChild.getCanGoForward", 
-    "window.document.body.lastElementChild.reload", 
-    "window.document.body.lastElementChild.goForward", 
-    "window.document.body.lastElementChild.setInputMethodActive", 
-    "window.document.body.lastElementChild.setActive", 
-    "window.document.body.lastElementChild.sendTouchEvent", 
-    "window.document.body.lastElementChild.stop", 
-    "window.document.body.lastElementChild.zoom", 
+    "window.document.body.lastElementChild.getVolume", 
+    "window.document.body.lastElementChild.mute", 
     "window.document.body.lastElementChild.getVisible", 
     "window.document.body.lastElementChild.download", 
-    "window.document.body.lastElementChild.removeNextPaintListener", 
-    "window.document.body.lastElementChild.getActive", 
-    "window.document.body.lastElementChild.getScreenshot", 
+    "window.document.body.lastElementChild.getMuted", 
+    "window.document.body.lastElementChild.getCanGoForward", 
+    "window.document.body.lastElementChild.goForward", 
     "window.document.body.lastElementChild.goBack", 
-    "window.document.body.lastElementChild.getContentDimensions", 
-    "window.document.body.lastElementChild.addNextPaintListener", 
+    "window.document.body.lastElementChild.purgeHistory", 
+    "window.document.body.lastElementChild.findNext", 
+    "window.document.body.lastElementChild.getActive", 
+    "window.document.body.lastElementChild.setActive", 
+    "window.document.body.lastElementChild.allowedAudioChannels", 
+    "window.document.body.lastElementChild.setVolume", 
+    "window.document.body.lastElementChild.sendTouchEvent", 
+    "window.document.body.lastElementChild.stop", 
+    "window.document.body.lastElementChild.getScreenshot", 
     "window.document.body.lastElementChild.sendMouseEvent", 
+    "window.document.body.lastElementChild.addNextPaintListener", 
+    "window.document.body.lastElementChild.clearMatch", 
+    "window.document.body.lastElementChild.unmute", 
+    "window.document.body.lastElementChild.zoom", 
+    "window.document.body.lastElementChild.reload", 
+    "window.document.body.lastElementChild.removeNextPaintListener", 
+    "window.document.body.lastElementChild.getContentDimensions", 
     "window.document.body.lastElementChild.setVisible", 
-    "window.document.body.lastElementChild.setNFCFocus"
+    "window.document.body.lastElementChild.findAll"
   ], 
+  "browser:universalxss": [], 
   "camera": [
     "window.CameraCapabilities", 
     "window.CameraFacesDetectedEvent", 
@@ -66,9 +92,7 @@
     "window.CameraRecorderVideoProfile", 
     "window.navigator.mozCameras"
   ], 
-  "cellbroadcast": [
-    "window.navigator.mozCellBroadcast"
-  ], 
+  "cellbroadcast": [], 
   "contacts": [], 
   "desktop-notification": [], 
   "device-storage:apps": [], 
@@ -108,7 +132,9 @@
   "geolocation": [], 
   "geolocation-noprompt": [], 
   "global-clickthrough-overlay": [], 
-  "homescreen-webapps-manage": [], 
+  "homescreen-webapps-manage": [
+    "window.navigator.mozApps.mgmt"
+  ], 
   "idle": [
     "window.navigator.addIdleObserver", 
     "window.navigator.removeIdleObserver"
@@ -121,8 +147,9 @@
     "window.MozInputMethod", 
     "window.navigator.mozInputMethod"
   ], 
+  "inputport": [], 
+  "killswitch": [], 
   "mobileconnection": [
-    "window.navigator.mozIccManager", 
     "window.navigator.mozMobileConnections"
   ], 
   "mobileid": [
@@ -134,6 +161,34 @@
   "moz-attention": [], 
   "moz-audio-channel-ringer": [], 
   "moz-audio-channel-telephony": [], 
+  "moz-extremely-unstable-and-will-change-webcomponents": [
+    "window.ShadowRoot", 
+    "window.document.registerElement", 
+    "window.document.body.createShadowRoot", 
+    "window.document.body.getDestinationInsertionPoints", 
+    "window.document.body.shadowRoot", 
+    "window.document.body.previousElementSibling.createShadowRoot", 
+    "window.document.body.previousElementSibling.getDestinationInsertionPoints", 
+    "window.document.body.previousElementSibling.shadowRoot", 
+    "window.document.body.previousElementSibling.children.0.createShadowRoot", 
+    "window.document.body.previousElementSibling.children.0.getDestinationInsertionPoints", 
+    "window.document.body.previousElementSibling.children.0.shadowRoot", 
+    "window.document.body.previousElementSibling.children.0.nextElementSibling.createShadowRoot", 
+    "window.document.body.previousElementSibling.children.0.nextElementSibling.getDestinationInsertionPoints", 
+    "window.document.body.previousElementSibling.children.0.nextElementSibling.shadowRoot", 
+    "window.document.body.previousElementSibling.parentNode.createShadowRoot", 
+    "window.document.body.previousElementSibling.parentNode.getDestinationInsertionPoints", 
+    "window.document.body.previousElementSibling.parentNode.shadowRoot", 
+    "window.document.body.firstElementChild.createShadowRoot", 
+    "window.document.body.firstElementChild.getDestinationInsertionPoints", 
+    "window.document.body.firstElementChild.shadowRoot", 
+    "window.document.body.firstElementChild.nextElementSibling.createShadowRoot", 
+    "window.document.body.firstElementChild.nextElementSibling.getDestinationInsertionPoints", 
+    "window.document.body.firstElementChild.nextElementSibling.shadowRoot", 
+    "window.document.body.lastElementChild.createShadowRoot", 
+    "window.document.body.lastElementChild.getDestinationInsertionPoints", 
+    "window.document.body.lastElementChild.shadowRoot"
+  ], 
   "moz-firefox-accounts": [], 
   "network-events": [], 
   "networkstats-manage": [
@@ -143,6 +198,7 @@
   "nfc-hci-events": [], 
   "nfc-manager": [], 
   "nfc-share": [], 
+  "open-hidden-window": [], 
   "open-remote-window": {
     "open-remote-window-allow": true, 
     "open-remote-window-deny": false
@@ -158,28 +214,34 @@
   "power": [
     "window.navigator.mozPower"
   ], 
+  "presentation": [], 
+  "presentation-device-manage": [], 
   "push": [
+    "window.SimplePushManager", 
     "window.navigator.push"
   ], 
+  "requestsync-manager": [], 
   "resourcestats-manage": [], 
   "secureelement-manage": [], 
   "settings": [], 
   "settings-clear": [], 
   "settings:wallpaper.image": [], 
-  "sms": [
-    "window.navigator.mozMobileMessage"
-  ], 
+  "sms": [], 
   "speaker-control": [
     "speaker-control"
   ], 
-  "storage": [], 
+  "system-update": [
+    "window.SystemUpdateProvider", 
+    "window.SystemUpdateManager", 
+    "window.navigator.updateManager"
+  ], 
   "systemXHR": [
     "systemXHR"
   ], 
   "tcp-socket": [], 
   "telephony": [
     "window.navigator.mozTelephony", 
-    "window.document.body.itemType (expected object)"
+    "window.document.fonts.ready (expected object)"
   ], 
   "test-permission": [], 
   "themeable": [], 
@@ -192,9 +254,7 @@
     "window.UDPSocket"
   ], 
   "video-capture": [], 
-  "voicemail": [
-    "window.navigator.mozVoicemail"
-  ], 
+  "voicemail": [], 
   "wappush": [], 
   "webapps-manage": [
     "device-storage:apps", 
@@ -204,8 +264,8 @@
     "window.MozWifiP2pGroupOwner", 
     "window.MozWifiP2pStatusChangeEvent", 
     "window.MozWifiP2pManager", 
-    "window.MozWifiCapabilities", 
     "window.MozWifiManager", 
+    "window.MozWifiCapabilities", 
     "window.MozWifiNetwork", 
     "window.navigator.mozWifiManager", 
     "window.navigator.mozWifiP2pManager"
