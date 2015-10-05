@@ -197,8 +197,10 @@ def test_webapi(logger, report, args, addr):
         if "headers" not in report:
             report["headers"] = headers
 
-        results_filename = '%s.json' % apptype
+        results_filename = 'webapi_ref/%s.json' % apptype
         if args.generate_reference:
+            if not os.path.exists(os.path.dirname(results_filename)):
+                os.makedirs(os.path.dirname(results_filename))
             with open(results_filename, 'w') as f:
                 f.write(json.dumps(webapi_results, sort_keys=True, indent=2))
         else:
@@ -235,8 +237,10 @@ def test_permissions(logger, report, args, addr):
             result = get_permission(permission, installed_appname)
             results[permission] = result
 
-        results_filename = '%s.json' % apptype
+        results_filename = 'permissions_ref/%s.json' % apptype
         if args.generate_reference:
+            if not os.path.exists(os.path.dirname(results_filename)):
+                os.makedirs(os.path.dirname(results_filename))
             with open(results_filename, 'w') as f:
                 f.write(json.dumps(results, sort_keys=True, indent=2))
         else:
@@ -321,8 +325,10 @@ def test_permissions(logger, report, args, addr):
     results['open-remote-window'] = test_open_remote_window(logger,
                                         args.version, addr)
 
-    results_filename = 'permissions.json'
+    results_filename = 'permissions_ref/permissions.json'
     if args.generate_reference:
+        if not os.path.exists(os.path.dirname(results_filename)):
+            os.makedirs(os.path.dirname(results_filename))
         with open(results_filename, 'w') as f:
             f.write(json.dumps(results, sort_keys=True, indent=2))
     else:
