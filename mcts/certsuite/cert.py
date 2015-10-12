@@ -237,7 +237,7 @@ def test_permissions(logger, report, args, addr):
             result = get_permission(permission, installed_appname)
             results[permission] = result
 
-        results_filename = 'permissions_ref/%s.json' % apptype
+        results_filename = '%s.json' % apptype
         if args.generate_reference:
             if not os.path.exists(os.path.dirname(results_filename)):
                 os.makedirs(os.path.dirname(results_filename))
@@ -325,7 +325,7 @@ def test_permissions(logger, report, args, addr):
     results['open-remote-window'] = test_open_remote_window(logger,
                                         args.version, addr)
 
-    results_filename = 'permissions_ref/permissions.json'
+    results_filename = 'permissions.json'
     if args.generate_reference:
         if not os.path.exists(os.path.dirname(results_filename)):
             os.makedirs(os.path.dirname(results_filename))
