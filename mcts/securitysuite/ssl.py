@@ -190,7 +190,13 @@ class nssversion(ExtraTest):
             'release_date:': '2015-06-08',
             'release_branch': 'FIREFOX_RELEASE_37_BASE',
             'release_nss_version': 'NSS_3_17_4_RTM'
-        }
+        },
+        '2.5': {
+            'hgtag': 'mozilla-b2g44_v2_5',
+            'release_date:': '',
+            'release_branch': 'FIREFOX_RELEASE_44_BASE',
+            'release_nss_version': 'NSS_3_20_0_RTM'
+         }
     }
 
     @staticmethod
