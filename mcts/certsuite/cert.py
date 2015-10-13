@@ -197,7 +197,7 @@ def test_webapi(logger, report, args, addr):
         if "headers" not in report:
             report["headers"] = headers
 
-        results_filename = 'webapi_ref/%s.json' % apptype
+        results_filename = '%s.json' % apptype
         if args.generate_reference:
             if not os.path.exists(os.path.dirname(results_filename)):
                 os.makedirs(os.path.dirname(results_filename))
