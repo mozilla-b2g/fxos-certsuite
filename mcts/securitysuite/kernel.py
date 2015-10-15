@@ -37,6 +37,16 @@ from mozdevice.adb import ADBError
 # Find My Device   2 u0_a1202  1202  499   72800  22800 ffffffff b6eaf8ac S /system/b2g/b2g
 # (Preallocated a  2 u0_a1785  1785  499   71500  18248 ffffffff b6eaf8ac S /system/b2g/b2g
 
+### Aries v2.5 nightly eng
+# APPLICATION    SEC USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
+# b2g              0 root      319   1     317096 105956 ffffffff b6e3d894 S /system/b2g/b2g
+# (Nuwa)           0 root      587   319   98940  20952 ffffffff b6e3d894 S /system/b2g/b2g
+# Default Home Sc  2 u0_a1226  1226  587   233152 50432 ffffffff b6e3d894 S /system/b2g/b2g
+# Built-in Keyboa  2 u0_a1453  1453  587   124576 28240 ffffffff b6e3d894 S /system/b2g/b2g
+# Smart Collectio  2 u0_a1542  1542  587   117472 32308 ffffffff b6e3d894 S /system/b2g/b2g
+# (Preallocated a  2 u0_a1634  1634  587   112608 24612 ffffffff b6e3d894 S /system/b2g/b2g
+
+
 class b2gps(object):
     """
     Class to retrieve and interpret output from the b2g-ps shell command
@@ -73,8 +83,9 @@ class b2gps(object):
         for psline in self.ps:
             if psline.startswith('Homescreen       2 '):
                 return True
+            elif psline.startswith('Default Home Sc  2'):
+                return True
         return False
-
 
 class procpid(object):
     """
