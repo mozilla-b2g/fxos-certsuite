@@ -2,7 +2,7 @@ This suite is intended to compare between golden samples and DUT(Device Under Te
 
 For certsuite owner, you need to do the following steps to generate the golden sample.
 
-0. make sure /FirefoxOS/fxos-certsuite/mcts/static/sample_apps/ is correct
+0. make sure /fxos-certsuite/mcts/static/sample_apps/ is correct
    Also, restart your phone and make sure you connect to Wifi of the same internet zone with your PC
 
 In /fxos-certsuite/mcts/certsuite, do the following steps.
@@ -13,6 +13,10 @@ In /fxos-certsuite/mcts/certsuite, do the following steps.
 3. > python cert.py --include permissions --generate-reference
    copy 3 json files to /fxos-certsuite/mcts/static/expected_results/expected_permissions_results
 
+*  Or, you may try to do 1~3 simultaneously in /fxos-certsuite/mcts/certsuite .
+   > python cert.py --generate-reference
+   It should generate reference files in different folders.
+
 Finally, it's the last step for generating golden sample.
 4. remove generated files, reinstall mcts, restart the phone, and rerun mcts
 
@@ -20,7 +24,7 @@ It should all pass now.
 
 
 
-For normal runner, you may run this in 2 different ways.
+For a normal run, you may run it in 2 different ways.
 
 a. > runcertsuite cert
    this should run all the cert suite tests
