@@ -142,8 +142,8 @@ class TestTcpSocketFormality(TestCase):
         for prop in ["open", "listen"]:
             self.assert_property_in(prop, "navigator.mozTCPSocket")
 
-        self.assertEqual(self.prop("navigator.mozTCPSocket", "open"), None, "'host' incorrect")
-        self.assertEqual(self.prop("navigator.mozTCPSocket", "listen"), None, "'port' incorrect")
+        self.assertEqual(self.prop("navigator.mozTCPSocket", "open"), None, "'open' incorrect")
+        self.assertEqual(self.prop("navigator.mozTCPSocket", "listen"), None, "'listen' incorrect")
 
         # The following code is preferable, but triggers a null
         # pointer exception in the bufferedAmount property function in
