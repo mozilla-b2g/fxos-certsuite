@@ -139,37 +139,19 @@ class TestTcpSocketFormality(TestCase):
         self.assert_property_in("mozTCPSocket", "navigator")
 
     def test_properties(self):
-        for prop in ["host", "port", "ssl", "bufferedAmount",
-                     "binaryType", "readyState"]:
+        for prop in ["open", "listen"]:
             self.assert_property_in(prop, "navigator.mozTCPSocket")
 
-        self.assertEqual(self.prop("navigator.mozTCPSocket", "host"), "", "'host' incorrect")
-        self.assertEqual(self.prop("navigator.mozTCPSocket", "port"), 0, "'port' incorrect")
-        self.assertEqual(self.prop("navigator.mozTCPSocket", "ssl"), False, "'ssl' incorrect")
-        self.assertEqual(
-            self.prop("navigator.mozTCPSocket", "readyState"), "closed", "'readyState' incorrect")
-        self.assertEqual(
-            self.prop("navigator.mozTCPSocket", "binaryType"), "string", "'binaryType' incorrect")
+        self.assertEqual(self.prop("navigator.mozTCPSocket", "open"), None, "'open' incorrect")
+        self.assertEqual(self.prop("navigator.mozTCPSocket", "listen"), None, "'listen' incorrect")
 
         # The following code is preferable, but triggers a null
         # pointer exception in the bufferedAmount property function in
         # dom/network/TCPSocket.js.
-
         # props = self.marionette.execute_script(
         #     "return navigator.mozTCPSocket")
-        # self.assertIn("host", props)
-        # self.assertIn("port", props)
-        # self.assertIn("ssl", props)
-        # self.assertIn("bufferedAmount", props)
-        # self.assertIn("binaryType", props)
-        # self.assertIn("readyState", props)
-
-        # self.assertEqual(props["host"], "")
-        # self.assertEqual(props["port"], 0)
-        # self.assertEqual(props["ssl"], False)
-        # self.assertEqual(props["bufferedAmount"], 0)
-        # self.assertEqual(props["readyState"], "closed")
-        # self.assertEqual(props["binaryType"], "string")
+        # self.assertIn("property", props)
+        # self.assertEqual(props["property"], "")
 
 
 # class TestTcpSocketOpen(TcpSocketTestCase):

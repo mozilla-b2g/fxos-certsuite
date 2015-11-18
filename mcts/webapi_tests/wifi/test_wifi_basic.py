@@ -39,7 +39,8 @@ class TestWifiBasic(TestCase, WifiTestCommon):
     def test_get_wifi_networks(self):
         # enable wifi via settings
         self.set_wifi_enabled(True)
-        time.sleep(10)
+        # TODO: need to find a better way to improve this
+        time.sleep(20)
         # get wifi networks
         wifi_networks = self.get_wifi_networks()
         self.assertTrue(len(wifi_networks) > 1, "Atleast one Wifi network should be available")
