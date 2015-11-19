@@ -5216,34 +5216,34 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"CanvasCaptureMediaStream\" expected property \"CanvasCaptureMediaStream\" missing", 
+      "message": "assert_equals: prototype of window's property \"CanvasCaptureMediaStream\" is not Function.prototype expected function \"function () {\n}\" but got function \"function MediaStream() {\n    [native code]\n}\"", 
       "name": "CanvasCaptureMediaStream interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"CanvasCaptureMediaStream\" expected property \"CanvasCaptureMediaStream\" missing", 
+      "message": "assert_false: CanvasCaptureMediaStream.length is configurable expected false got true", 
       "name": "CanvasCaptureMediaStream interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"CanvasCaptureMediaStream\" expected property \"CanvasCaptureMediaStream\" missing", 
+      "message": "assert_equals: prototype of CanvasCaptureMediaStream.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object MediaStreamPrototype]\"", 
       "name": "CanvasCaptureMediaStream interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"CanvasCaptureMediaStream\" expected property \"CanvasCaptureMediaStream\" missing", 
+      "message": null, 
       "name": "CanvasCaptureMediaStream interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"CanvasCaptureMediaStream\" expected property \"CanvasCaptureMediaStream\" missing", 
+      "message": null, 
       "name": "CanvasCaptureMediaStream interface: attribute canvas", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: window does not have own property \"CanvasCaptureMediaStream\" expected property \"CanvasCaptureMediaStream\" missing", 
+      "message": null, 
       "name": "CanvasCaptureMediaStream interface: operation requestFrame()", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -9036,9 +9036,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getFilesAndDirectories\" missing", 
       "name": "DataTransfer interface: operation getFilesAndDirectories()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -10756,9 +10756,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"internalSubset\" expected true got false", 
       "name": "DocumentType interface: attribute internalSubset", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -14476,7 +14476,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"captureStream\" missing", 
+      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
       "name": "HTMLCanvasElement interface: operation captureStream(double)", 
       "result": "FAIL"
     }, 
@@ -17141,24 +17141,24 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"directory\" expected true got false", 
       "name": "HTMLInputElement interface: attribute directory", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"isFilesAndDirectoriesSupported\" expected true got false", 
       "name": "HTMLInputElement interface: attribute isFilesAndDirectoriesSupported", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getFilesAndDirectories\" missing", 
       "name": "HTMLInputElement interface: operation getFilesAndDirectories()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"chooseDirectory\" missing", 
       "name": "HTMLInputElement interface: operation chooseDirectory()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_true: The prototype object must have a property \"loadingEnabled\" expected true got false", 
@@ -19996,9 +19996,9 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"mozUseScreenWakeLock\" expected true got false", 
+      "message": null, 
       "name": "HTMLVideoElement interface: attribute mozUseScreenWakeLock", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -20651,12 +20651,12 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getAll\" missing", 
+      "message": "assert_equals: property has wrong .length expected 2 but got 0", 
       "name": "IDBIndex interface: operation getAll(Any,UnsignedLong)", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getAllKeys\" missing", 
+      "message": "assert_equals: property has wrong .length expected 2 but got 0", 
       "name": "IDBIndex interface: operation getAllKeys(Any,UnsignedLong)", 
       "result": "FAIL"
     }, 
@@ -20901,17 +20901,17 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getAll\" missing", 
+      "message": "assert_equals: property has wrong .length expected 2 but got 0", 
       "name": "IDBObjectStore interface: operation getAll(Any,UnsignedLong)", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getAllKeys\" missing", 
+      "message": "assert_equals: property has wrong .length expected 2 but got 0", 
       "name": "IDBObjectStore interface: operation getAllKeys(Any,UnsignedLong)", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"openKeyCursor\" missing", 
+      "message": "assert_equals: property has wrong .length expected 2 but got 0", 
       "name": "IDBObjectStore interface: operation openKeyCursor(Any,IDBCursorDirection (Wrapper))", 
       "result": "FAIL"
     }, 
@@ -21556,9 +21556,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of window's property \"MozInputMethodManager\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
       "name": "MozInputMethodManager interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_false: MozInputMethodManager.length is configurable expected false got true", 
@@ -21566,9 +21566,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of MozInputMethodManager.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
       "name": "MozInputMethodManager interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -21596,9 +21596,9 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setSupportsSwitchingTypes\" missing", 
+      "message": null, 
       "name": "MozInputMethodManager interface: operation setSupportsSwitchingTypes(MozInputMethodInputContextInputTypes (Wrapper)Sequence)", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": "assert_equals: prototype of window's property \"MozInputContext\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
@@ -23206,9 +23206,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of window's property \"MediaStreamTrack\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
       "name": "MediaStreamTrack interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_false: MediaStreamTrack.length is configurable expected false got true", 
@@ -23216,9 +23216,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of MediaStreamTrack.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
       "name": "MediaStreamTrack interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -23601,14 +23601,14 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"offsetX\" expected true got false", 
+      "message": null, 
       "name": "MouseEvent interface: attribute offsetX", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"offsetY\" expected true got false", 
+      "message": null, 
       "name": "MouseEvent interface: attribute offsetY", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -27081,9 +27081,9 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"permissions\" expected true got false", 
       "name": "Navigator interface: attribute permissions", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -27326,14 +27326,14 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 2 but got 1", 
+      "message": null, 
       "name": "Navigator interface: operation requestMediaKeySystemAccess(String,MediaKeySystemOptions (Wrapper)Sequence)", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"mozE10sEnabled\" expected true got false", 
       "name": "Navigator interface: attribute mozE10sEnabled", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_own_property: interface prototype object missing non-static operation expected property \"queryInterface\" missing", 
@@ -29641,59 +29641,59 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"PermissionStatus\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
+      "message": "assert_own_property: window does not have own property \"PermissionStatus\" expected property \"PermissionStatus\" missing", 
       "name": "PermissionStatus interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_false: PermissionStatus.length is configurable expected false got true", 
+      "message": "assert_own_property: window does not have own property \"PermissionStatus\" expected property \"PermissionStatus\" missing", 
       "name": "PermissionStatus interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of PermissionStatus.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
+      "message": "assert_own_property: window does not have own property \"PermissionStatus\" expected property \"PermissionStatus\" missing", 
       "name": "PermissionStatus interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"PermissionStatus\" expected property \"PermissionStatus\" missing", 
       "name": "PermissionStatus interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"PermissionStatus\" expected property \"PermissionStatus\" missing", 
       "name": "PermissionStatus interface: attribute state", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"PermissionStatus\" expected property \"PermissionStatus\" missing", 
       "name": "PermissionStatus interface: attribute onchange", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"Permissions\" expected property \"Permissions\" missing", 
       "name": "Permissions interface: existence and properties of interface object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_false: Permissions.length is configurable expected false got true", 
+      "message": "assert_own_property: window does not have own property \"Permissions\" expected property \"Permissions\" missing", 
       "name": "Permissions interface object length", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"Permissions\" expected property \"Permissions\" missing", 
       "name": "Permissions interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"Permissions\" expected property \"Permissions\" missing", 
       "name": "Permissions interface: existence and properties of interface prototype object's \"constructor\" property", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: window does not have own property \"Permissions\" expected property \"Permissions\" missing", 
       "name": "Permissions interface: operation query(Object)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -30906,7 +30906,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_equals: prototype of window's property \"mozRTCIceCandidate\" is not Function.prototype expected function \"function () {\n}\" but got function \"function RTCIceCandidate() {\n    [native code]\n}\"", 
       "name": "mozRTCIceCandidate interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -30916,9 +30916,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of mozRTCIceCandidate.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object RTCIceCandidatePrototype]\"", 
       "name": "mozRTCIceCandidate interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -30926,19 +30926,19 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"candidate\" missing", 
       "name": "mozRTCIceCandidate interface: attribute candidate", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"sdpMid\" missing", 
       "name": "mozRTCIceCandidate interface: attribute sdpMid", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"sdpMLineIndex\" missing", 
       "name": "mozRTCIceCandidate interface: attribute sdpMLineIndex", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_own_property: interface prototype object missing non-static operation expected property \"__jsonifier\" missing", 
@@ -31016,7 +31016,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of window's property \"mozRTCPeerConnection\" is not Function.prototype expected function \"function () {\n}\" but got function \"function EventTarget() {\n    [native code]\n}\"", 
+      "message": "assert_equals: prototype of window's property \"mozRTCPeerConnection\" is not Function.prototype expected function \"function () {\n}\" but got function \"function RTCPeerConnection() {\n    [native code]\n}\"", 
       "name": "mozRTCPeerConnection interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -31026,7 +31026,7 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: prototype of mozRTCPeerConnection.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object EventTargetPrototype]\"", 
+      "message": "assert_equals: prototype of mozRTCPeerConnection.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object RTCPeerConnectionPrototype]\"", 
       "name": "mozRTCPeerConnection interface: existence and properties of interface prototype object", 
       "result": "FAIL"
     }, 
@@ -31041,79 +31041,79 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 1", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setIdentityProvider\" missing", 
       "name": "mozRTCPeerConnection interface: operation setIdentityProvider(String,String,String)", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getIdentityAssertion\" missing", 
       "name": "mozRTCPeerConnection interface: operation getIdentityAssertion()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"createOffer\" missing", 
       "name": "mozRTCPeerConnection interface: operation createOffer(RTCOfferOptions (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"createAnswer\" missing", 
       "name": "mozRTCPeerConnection interface: operation createAnswer(RTCAnswerOptions (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setLocalDescription\" missing", 
       "name": "mozRTCPeerConnection interface: operation setLocalDescription(mozRTCSessionDescription (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"setRemoteDescription\" missing", 
       "name": "mozRTCPeerConnection interface: operation setRemoteDescription(mozRTCSessionDescription (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"localDescription\" missing", 
       "name": "mozRTCPeerConnection interface: attribute localDescription", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"remoteDescription\" missing", 
       "name": "mozRTCPeerConnection interface: attribute remoteDescription", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"signalingState\" missing", 
       "name": "mozRTCPeerConnection interface: attribute signalingState", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"updateIce\" missing", 
       "name": "mozRTCPeerConnection interface: operation updateIce(RTCConfiguration (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"addIceCandidate\" missing", 
       "name": "mozRTCPeerConnection interface: operation addIceCandidate(mozRTCIceCandidate (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"iceGatheringState\" missing", 
       "name": "mozRTCPeerConnection interface: attribute iceGatheringState", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"iceConnectionState\" missing", 
       "name": "mozRTCPeerConnection interface: attribute iceConnectionState", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"peerIdentity\" missing", 
       "name": "mozRTCPeerConnection interface: attribute peerIdentity", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"idpLoginUrl\" missing", 
       "name": "mozRTCPeerConnection interface: attribute idpLoginUrl", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_true: The prototype object must have a property \"id\" expected true got false", 
@@ -31121,109 +31121,109 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getConfiguration\" missing", 
       "name": "mozRTCPeerConnection interface: operation getConfiguration()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getLocalStreams\" missing", 
       "name": "mozRTCPeerConnection interface: operation getLocalStreams()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getRemoteStreams\" missing", 
       "name": "mozRTCPeerConnection interface: operation getRemoteStreams()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getStreamById\" missing", 
       "name": "mozRTCPeerConnection interface: operation getStreamById(String)", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"addStream\" missing", 
       "name": "mozRTCPeerConnection interface: operation addStream(MediaStream (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"removeStream\" missing", 
       "name": "mozRTCPeerConnection interface: operation removeStream(MediaStream (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 3 but got 2", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"addTrack\" missing", 
       "name": "mozRTCPeerConnection interface: operation addTrack(MediaStreamTrack (Wrapper),MediaStream (Wrapper),MediaStream (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"removeTrack\" missing", 
       "name": "mozRTCPeerConnection interface: operation removeTrack(RTCRtpSender (Wrapper))", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getSenders\" missing", 
       "name": "mozRTCPeerConnection interface: operation getSenders()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getReceivers\" missing", 
       "name": "mozRTCPeerConnection interface: operation getReceivers()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"close\" missing", 
       "name": "mozRTCPeerConnection interface: operation close()", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"onnegotiationneeded\" missing", 
       "name": "mozRTCPeerConnection interface: attribute onnegotiationneeded", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"onicecandidate\" missing", 
       "name": "mozRTCPeerConnection interface: attribute onicecandidate", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"onsignalingstatechange\" missing", 
       "name": "mozRTCPeerConnection interface: attribute onsignalingstatechange", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"onaddstream\" missing", 
       "name": "mozRTCPeerConnection interface: attribute onaddstream", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"onaddtrack\" missing", 
       "name": "mozRTCPeerConnection interface: attribute onaddtrack", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"onremovestream\" missing", 
       "name": "mozRTCPeerConnection interface: attribute onremovestream", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"oniceconnectionstatechange\" missing", 
       "name": "mozRTCPeerConnection interface: attribute oniceconnectionstatechange", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 1 but got 0", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"getStats\" missing", 
       "name": "mozRTCPeerConnection interface: operation getStats(MediaStreamTrack (Wrapper)OrNull)", 
       "result": "FAIL"
     }, 
     {
-      "message": "assert_equals: property has wrong .length expected 2 but got 1", 
+      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"createDataChannel\" missing", 
       "name": "mozRTCPeerConnection interface: operation createDataChannel(String,RTCDataChannelInit (Wrapper))", 
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"ondatachannel\" missing", 
       "name": "mozRTCPeerConnection interface: attribute ondatachannel", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_equals: prototype of window's property \"RTCPeerConnectionIceEvent\" is not Function.prototype expected function \"function () {\n}\" but got function \"function Event() {\n    [native code]\n}\"", 
@@ -31336,7 +31336,7 @@
       "result": "PASS"
     }, 
     {
-      "message": "assert_throws: interface object didn't throw TypeError when called as a constructor function \"function () {\n    [native code]\n}\" did not throw", 
+      "message": "assert_equals: prototype of window's property \"mozRTCSessionDescription\" is not Function.prototype expected function \"function () {\n}\" but got function \"function RTCSessionDescription() {\n    [native code]\n}\"", 
       "name": "mozRTCSessionDescription interface: existence and properties of interface object", 
       "result": "FAIL"
     }, 
@@ -31346,9 +31346,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_equals: prototype of mozRTCSessionDescription.prototype is not Object.prototype expected object \"[object Object]\" but got object \"[object RTCSessionDescriptionPrototype]\"", 
       "name": "mozRTCSessionDescription interface: existence and properties of interface prototype object", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": null, 
@@ -31356,14 +31356,14 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"type\" missing", 
       "name": "mozRTCSessionDescription interface: attribute type", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": null, 
+      "message": "assert_own_property: expected property \"sdp\" missing", 
       "name": "mozRTCSessionDescription interface: attribute sdp", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
       "message": "assert_own_property: interface prototype object missing non-static operation expected property \"__jsonifier\" missing", 
@@ -31741,14 +31741,14 @@
       "result": "PASS"
     }, 
     {
-      "message": null, 
+      "message": "assert_true: The prototype object must have a property \"cache\" expected true got false", 
       "name": "Request interface: attribute cache", 
-      "result": "PASS"
+      "result": "FAIL"
     }, 
     {
-      "message": "assert_true: The prototype object must have a property \"redirect\" expected true got false", 
+      "message": null, 
       "name": "Request interface: attribute redirect", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -41476,9 +41476,9 @@
       "result": "FAIL"
     }, 
     {
-      "message": "assert_own_property: interface prototype object missing non-static operation expected property \"ownAudioChannel\" missing", 
+      "message": null, 
       "name": "Telephony interface: operation ownAudioChannel()", 
-      "result": "FAIL"
+      "result": "PASS"
     }, 
     {
       "message": null, 
@@ -50351,39 +50351,6 @@
     "AnimationTimeline": true, 
     "Array": true, 
     "ArrayBuffer": true, 
-    "Atomics": {
-      "NOTEQUAL": true, 
-      "OK": true, 
-      "TIMEDOUT": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "add": true, 
-      "and": true, 
-      "compareExchange": true, 
-      "constructor": true, 
-      "exchange": true, 
-      "fence": true, 
-      "futexWait": true, 
-      "futexWake": true, 
-      "futexWakeOrRequeue": true, 
-      "hasOwnProperty": true, 
-      "isLockFree": true, 
-      "isPrototypeOf": true, 
-      "load": true, 
-      "or": true, 
-      "propertyIsEnumerable": true, 
-      "store": true, 
-      "sub": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true, 
-      "xor": true
-    }, 
     "Attr": true, 
     "Audio": true, 
     "AudioBuffer": true, 
@@ -50410,6 +50377,7 @@
     "BluetoothDeviceEvent": true, 
     "BluetoothDiscoveryHandle": true, 
     "BluetoothGatt": true, 
+    "BluetoothGattAttributeEvent": true, 
     "BluetoothGattCharacteristic": true, 
     "BluetoothGattCharacteristicEvent": true, 
     "BluetoothGattDescriptor": true, 
@@ -50417,6 +50385,13 @@
     "BluetoothGattService": true, 
     "BluetoothLeDeviceEvent": true, 
     "BluetoothManager": true, 
+    "BluetoothMapFolderListingEvent": true, 
+    "BluetoothMapGetMessageEvent": true, 
+    "BluetoothMapMessageUpdateEvent": true, 
+    "BluetoothMapMessagesListingEvent": true, 
+    "BluetoothMapRequestHandle": true, 
+    "BluetoothMapSendMessageEvent": true, 
+    "BluetoothMapSetMessageStatusEvent": true, 
     "BluetoothPairingEvent": true, 
     "BluetoothPairingHandle": true, 
     "BluetoothPairingListener": true, 
@@ -50461,7 +50436,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50479,7 +50454,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50497,7 +50472,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50533,7 +50508,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50551,7 +50526,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50569,7 +50544,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50602,7 +50577,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50620,7 +50595,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50689,44 +50664,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": {
-        "CHARSET_RULE": true, 
-        "COUNTER_STYLE_RULE": true, 
-        "FONT_FACE_RULE": true, 
-        "FONT_FEATURE_VALUES_RULE": true, 
-        "IMPORT_RULE": true, 
-        "KEYFRAMES_RULE": true, 
-        "KEYFRAME_RULE": true, 
-        "MEDIA_RULE": true, 
-        "MOZ_KEYFRAMES_RULE": true, 
-        "MOZ_KEYFRAME_RULE": true, 
-        "NAMESPACE_RULE": true, 
-        "PAGE_RULE": true, 
-        "QueryInterface": true, 
-        "STYLE_RULE": true, 
-        "SUPPORTS_RULE": true, 
-        "UNKNOWN_RULE": true, 
-        "__defineGetter__": true, 
-        "__defineSetter__": true, 
-        "__lookupGetter__": true, 
-        "__lookupSetter__": true, 
-        "constructor": true, 
-        "cssText": {}, 
-        "hasOwnProperty": true, 
-        "isPrototypeOf": true, 
-        "parentRule": {}, 
-        "parentStyleSheet": {}, 
-        "propertyIsEnumerable": true, 
-        "selectorText": {}, 
-        "style": {}, 
-        "toLocaleString": true, 
-        "toSource": true, 
-        "toString": true, 
-        "type": {}, 
-        "unwatch": true, 
-        "valueOf": true, 
-        "watch": true
-      }, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50745,7 +50683,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -50772,6 +50710,7 @@
     "CameraRecorderProfiles": true, 
     "CameraRecorderVideoProfile": true, 
     "CameraStateChangeEvent": true, 
+    "CanvasCaptureMediaStream": true, 
     "CanvasGradient": true, 
     "CanvasPattern": true, 
     "CanvasRenderingContext2D": true, 
@@ -51107,7 +51046,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -51125,7 +51064,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -51146,8 +51085,10 @@
     "MozIccInfo": true, 
     "MozIccManager": true, 
     "MozInputContext": true, 
+    "MozInputContextFocusEventDetail": true, 
     "MozInputMethod": true, 
     "MozInputMethodManager": true, 
+    "MozInputRegistryEventDetail": true, 
     "MozIsoDepTech": true, 
     "MozMessageDeletedEvent": true, 
     "MozMmsEvent": true, 
@@ -51161,7 +51102,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -51184,7 +51125,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -51212,7 +51153,7 @@
       "hasOwnProperty": true, 
       "isPrototypeOf": true, 
       "propertyIsEnumerable": true, 
-      "prototype": true, 
+      "prototype": {}, 
       "toLocaleString": true, 
       "toSource": true, 
       "toString": true, 
@@ -51272,8 +51213,6 @@
     "PerformanceTiming": true, 
     "PeriodicWave": true, 
     "PermissionSettings": true, 
-    "PermissionStatus": true, 
-    "Permissions": true, 
     "PhoneNumberService": true, 
     "Plugin": true, 
     "PluginArray": true, 
@@ -51289,9 +51228,12 @@
     "RGBColor": true, 
     "RTCCertificate": true, 
     "RTCDataChannelEvent": true, 
+    "RTCIceCandidate": true, 
+    "RTCPeerConnection": true, 
     "RTCPeerConnectionIceEvent": true, 
     "RTCRtpReceiver": true, 
     "RTCRtpSender": true, 
+    "RTCSessionDescription": true, 
     "RTCStatsReport": true, 
     "RadioNodeList": true, 
     "Range": true, 
@@ -51307,27 +51249,6 @@
     "ResourceStatsAlarm": true, 
     "ResourceStatsManager": true, 
     "Response": true, 
-    "SIMD": {
-      "Float32x4": {}, 
-      "Float64x2": {}, 
-      "Int16x8": {}, 
-      "Int32x4": {}, 
-      "Int8x16": {}, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "hasOwnProperty": true, 
-      "isPrototypeOf": true, 
-      "propertyIsEnumerable": true, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "SVGAElement": true, 
     "SVGAltGlyphElement": true, 
     "SVGAngle": true, 
@@ -51457,16 +51378,6 @@
     "Set": true, 
     "SettingsLock": true, 
     "SettingsManager": true, 
-    "SharedArrayBuffer": true, 
-    "SharedFloat32Array": true, 
-    "SharedFloat64Array": true, 
-    "SharedInt16Array": true, 
-    "SharedInt32Array": true, 
-    "SharedInt8Array": true, 
-    "SharedUint16Array": true, 
-    "SharedUint32Array": true, 
-    "SharedUint8Array": true, 
-    "SharedUint8ClampedArray": true, 
     "SharedWorker": true, 
     "SimpleGestureEvent": true, 
     "SimplePushManager": true, 
@@ -51510,6 +51421,11 @@
     "SubtleCrypto": true, 
     "Symbol": true, 
     "SyntaxError": true, 
+    "TCPServerSocket": true, 
+    "TCPServerSocketEvent": true, 
+    "TCPSocket": true, 
+    "TCPSocketErrorEvent": true, 
+    "TCPSocketEvent": true, 
     "TESTED_IDL": null, 
     "Telephony": true, 
     "TelephonyCall": true, 
@@ -51532,38 +51448,6 @@
     "TransitionEvent": true, 
     "TreeWalker": true, 
     "TypeError": true, 
-    "TypedObject": {
-      "Any": {}, 
-      "ArrayType": true, 
-      "Object": {}, 
-      "StructType": true, 
-      "__defineGetter__": true, 
-      "__defineSetter__": true, 
-      "__lookupGetter__": true, 
-      "__lookupSetter__": true, 
-      "constructor": true, 
-      "float32": {}, 
-      "float64": {}, 
-      "hasOwnProperty": true, 
-      "int16": {}, 
-      "int32": {}, 
-      "int8": {}, 
-      "isPrototypeOf": true, 
-      "objectType": true, 
-      "propertyIsEnumerable": true, 
-      "storage": true, 
-      "string": {}, 
-      "toLocaleString": true, 
-      "toSource": true, 
-      "toString": true, 
-      "uint16": {}, 
-      "uint32": {}, 
-      "uint8": {}, 
-      "uint8Clamped": {}, 
-      "unwatch": true, 
-      "valueOf": true, 
-      "watch": true
-    }, 
     "UDPMessageEvent": true, 
     "UDPSocket": true, 
     "UIEvent": true, 
@@ -52271,7 +52155,8 @@
             "type": true, 
             "unwatch": true, 
             "valueOf": true, 
-            "watch": true
+            "watch": true, 
+            "webkitMatchesSelector": true
           }, 
           "nextSibling": true, 
           "nodeName": true, 
@@ -52395,7 +52280,8 @@
           "toString": true, 
           "unwatch": true, 
           "valueOf": true, 
-          "watch": true
+          "watch": true, 
+          "webkitMatchesSelector": true
         }, 
         "focus": true, 
         "getAnimations": true, 
@@ -53150,7 +53036,8 @@
                   "type": true, 
                   "unwatch": true, 
                   "valueOf": true, 
-                  "watch": true
+                  "watch": true, 
+                  "webkitMatchesSelector": true
                 }, 
                 "nextSibling": true, 
                 "nodeName": true, 
@@ -53275,7 +53162,8 @@
                 "toString": true, 
                 "unwatch": true, 
                 "valueOf": true, 
-                "watch": true
+                "watch": true, 
+                "webkitMatchesSelector": true
               }, 
               "nextSibling": true, 
               "nodeName": true, 
@@ -53400,7 +53288,8 @@
               "toString": true, 
               "unwatch": true, 
               "valueOf": true, 
-              "watch": true
+              "watch": true, 
+              "webkitMatchesSelector": true
             }, 
             "1": true, 
             "2": true, 
@@ -53860,7 +53749,6 @@
               "hasChildNodes": true, 
               "hasOwnProperty": true, 
               "insertBefore": true, 
-              "internalSubset": null, 
               "isDefaultNamespace": true, 
               "isEqualNode": true, 
               "isPrototypeOf": true, 
@@ -53935,7 +53823,8 @@
             "unwatch": true, 
             "valueOf": true, 
             "version": true, 
-            "watch": true
+            "watch": true, 
+            "webkitMatchesSelector": true
           }, 
           "prefix": null, 
           "previousElementSibling": null, 
@@ -53979,7 +53868,8 @@
           "toString": true, 
           "unwatch": true, 
           "valueOf": true, 
-          "watch": true
+          "watch": true, 
+          "webkitMatchesSelector": true
         }, 
         "previousSibling": true, 
         "properties": {
@@ -54125,7 +54015,6 @@
           "MozUserModify": true, 
           "MozUserSelect": true, 
           "MozWindowDragging": true, 
-          "MozWindowShadow": true, 
           "__defineGetter__": true, 
           "__defineSetter__": true, 
           "__lookupGetter__": true, 
@@ -54373,6 +54262,7 @@
           "getPropertyValue": true, 
           "hasOwnProperty": true, 
           "height": true, 
+          "hyphens": true, 
           "image-orientation": true, 
           "image-rendering": true, 
           "imageOrientation": true, 
@@ -54428,7 +54318,6 @@
           "markerMid": true, 
           "markerOffset": true, 
           "markerStart": true, 
-          "marks": true, 
           "mask": true, 
           "mask-type": true, 
           "maskType": true, 
@@ -54464,7 +54353,6 @@
           "offsetInlineStart": true, 
           "opacity": true, 
           "order": true, 
-          "orphans": true, 
           "outline": true, 
           "outline-color": true, 
           "outline-offset": true, 
@@ -54496,7 +54384,6 @@
           "paddingLeft": true, 
           "paddingRight": true, 
           "paddingTop": true, 
-          "page": true, 
           "page-break-after": true, 
           "page-break-before": true, 
           "page-break-inside": true, 
@@ -54538,7 +54425,6 @@
           "setProperty": true, 
           "shape-rendering": true, 
           "shapeRendering": true, 
-          "size": true, 
           "stop-color": true, 
           "stop-opacity": true, 
           "stopColor": true, 
@@ -54616,7 +54502,6 @@
           "watch": true, 
           "white-space": true, 
           "whiteSpace": true, 
-          "widows": true, 
           "width": true, 
           "will-change": true, 
           "willChange": true, 
@@ -54642,11 +54527,13 @@
         "unwatch": true, 
         "vLink": true, 
         "valueOf": true, 
-        "watch": true
+        "watch": true, 
+        "webkitMatchesSelector": true
       }, 
       "captureEvents": true, 
       "caretPositionFromPoint": true, 
       "characterSet": true, 
+      "charset": true, 
       "childElementCount": true, 
       "childNodes": true, 
       "children": true, 
@@ -55518,7 +55405,6 @@
         "valueOf": true, 
         "watch": true
       }, 
-      "mozE10sEnabled": true, 
       "mozFMRadio": {
         "__defineGetter__": true, 
         "__defineSetter__": true, 
@@ -55776,12 +55662,22 @@
           "__defineSetter__": true, 
           "__lookupGetter__": true, 
           "__lookupSetter__": true, 
+          "addEventListener": true, 
           "constructor": true, 
+          "dispatchEvent": true, 
           "hasOwnProperty": true, 
           "hide": true, 
           "isPrototypeOf": true, 
           "next": true, 
+          "onaddinputrequest": null, 
+          "oninputcontextblur": null, 
+          "oninputcontextfocus": null, 
+          "onnextrequest": null, 
+          "onremoveinputrequest": null, 
+          "onshowallrequest": null, 
           "propertyIsEnumerable": true, 
+          "removeEventListener": true, 
+          "setSupportsSwitchingTypes": true, 
           "showAll": true, 
           "supportsSwitching": true, 
           "toLocaleString": true, 
@@ -56133,37 +56029,20 @@
         "watch": true
       }, 
       "mozTCPSocket": {
-        "QueryInterface": true, 
         "__defineGetter__": true, 
         "__defineSetter__": true, 
         "__lookupGetter__": true, 
         "__lookupSetter__": true, 
-        "binaryType": true, 
-        "bufferedAmount": {}, 
-        "close": true, 
         "constructor": true, 
         "hasOwnProperty": true, 
-        "host": true, 
         "isPrototypeOf": true, 
         "listen": true, 
-        "onclose": null, 
-        "ondata": null, 
-        "ondrain": null, 
-        "onerror": null, 
-        "onopen": null, 
         "open": true, 
-        "port": true, 
         "propertyIsEnumerable": true, 
-        "readyState": true, 
-        "resume": true, 
-        "send": true, 
-        "ssl": true, 
-        "suspend": true, 
         "toLocaleString": true, 
         "toSource": true, 
         "toString": true, 
         "unwatch": true, 
-        "upgradeToSecure": true, 
         "valueOf": true, 
         "watch": true
       }, 
@@ -56217,6 +56096,7 @@
         "onincoming": null, 
         "onremoteheld": null, 
         "onremoteresumed": null, 
+        "ownAudioChannel": true, 
         "propertyIsEnumerable": true, 
         "ready": {
           "__defineGetter__": true, 
@@ -56702,23 +56582,6 @@
       }, 
       "onLine": true, 
       "oscpu": true, 
-      "permissions": {
-        "__defineGetter__": true, 
-        "__defineSetter__": true, 
-        "__lookupGetter__": true, 
-        "__lookupSetter__": true, 
-        "constructor": true, 
-        "hasOwnProperty": true, 
-        "isPrototypeOf": true, 
-        "propertyIsEnumerable": true, 
-        "query": true, 
-        "toLocaleString": true, 
-        "toSource": true, 
-        "toString": true, 
-        "unwatch": true, 
-        "valueOf": true, 
-        "watch": true
-      }, 
       "platform": true, 
       "plugins": {
         "__defineGetter__": true, 
@@ -56856,6 +56719,7 @@
     "onmoztimechange": null, 
     "onoffline": null, 
     "ononline": null, 
+    "onorientationchange": null, 
     "onpagehide": null, 
     "onpageshow": null, 
     "onpause": null, 
@@ -56886,6 +56750,7 @@
     "onwheel": null, 
     "open": true, 
     "opener": null, 
+    "orientation": true, 
     "outerHeight": true, 
     "outerWidth": true, 
     "pageXOffset": true, 
