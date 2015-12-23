@@ -7,6 +7,7 @@
 var GaiaApps = {
 
   normalizeName: function(name) {
+    if(name == null || name == "undefined") return "";
     return name.replace(/[- ]+/g, '').toLowerCase();
   },
 
