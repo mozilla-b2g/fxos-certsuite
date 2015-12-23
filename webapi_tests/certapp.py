@@ -72,7 +72,7 @@ def launch(marionette):
     # If the app is already launched this doesn't launch a new app, but
     # returns a reference to existing app.
     app = marionette.execute_async_script(
-        "GaiaApps.launchWithName('%s')" % name, script_timeout=timeout)
+             "GaiaApps.launchWithName('%s')" % name, script_timeout=timeout)
     if app is None:
         raise LaunchError("Unable to launch app: %s" % name)
     activate(marionette, app=app)
