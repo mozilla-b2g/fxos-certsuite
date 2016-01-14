@@ -1,7 +1,7 @@
 fxos-appgen == 0.15
-gaiatest == 0.33
-marionette_driver == 0.13
-marionette_client == 0.17
+gaiatest-v2.5 == 0.1
+marionette_driver == 1.0.0
+marionette_client == 1.0.0
 marionette_extension == 0.4.9
 mozdevice == 0.46
 mozlog == 3.0
