@@ -1,0 +1,28 @@
+{
+  "name": "mctsapp",
+  "description": "This is for testing of presentation API in Mozilla Certification Suite",
+  "launch_path": "/index.html",
+  "type": "privileged",
+  "developer": {
+    "name": "Walter Chen",
+    "url": "https://github.com/mozilla-b2g/fxos-certsuite"
+  },
+  "locales": {
+    "en-US": {
+      "name": "mctsapp",
+      "description": "This is for testing of presentation API in Mozilla Certification Suite"
+    }
+  },
+  "icons": {
+    "84": "/style/icons/video_84.png",
+    "128": "/style/icons/video_128.png",
+    "142": "/style/icons/video_142.png",
+    "189": "/style/icons/video_189.png",
+    "284": "/style/icons/video_284.png"
+  },
+  "default_locale": "en-US",
+  "permissions": {
+    "presentation":{},
+    "moz-extremely-unstable-and-will-change-webcomponents":{}
+  }
+}
