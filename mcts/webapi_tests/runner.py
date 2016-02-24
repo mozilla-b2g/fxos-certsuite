@@ -20,7 +20,7 @@ from mcts.webapi_tests import semiauto
 from mcts.webapi_tests.semiauto import environment
 
 # TODO: need to put presentation api here once fully tested
-stingray_test = ['apps', 'device_storage', 'geolocation',
+stingray_test = ['apps', 'device_storage', 'geolocation', 'webrtc',
                  'notification', 'tcp_socket', 'presentation']
 
 def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
@@ -37,6 +37,8 @@ def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
 
         group = os.path.relpath(root, start_dir)
         if mode == 'stingray' and group not in stingray_test:
+            continue
+        elif mode != 'stingray' and group == 'presentation':
             continue
 
         tests = []
