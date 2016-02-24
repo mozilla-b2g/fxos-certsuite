@@ -7,6 +7,8 @@ from mcts_apps import MCTSApps
 from mdsn import ServiceListener
 from presentation_controller.controller import PresentationApiController
 from zeroconf import ServiceBrowser, Zeroconf
+from mcts.webapi_tests.semiauto import TestCase
+
 
 class TestPresentation(TestCase):
     """
@@ -22,7 +24,7 @@ class TestPresentation(TestCase):
         super(TestPresentation, self).setUp()
         self.wait_for_obj("window.navigator.presentation")
 
-        # Get device IP for mDNS matching
+        # TODO: Get device IP for mDNS matching
         self.device_ip = AdbHelper.adb_shell("ifconfig wlan0").split(" ")[2]
 
         # Initial socket server for testig purpose
@@ -37,6 +39,7 @@ class TestPresentation(TestCase):
 
         # Using MCTS apps for launching the app
         mcts = MCTSApps(self.marionette)
+        manifesturl = mcts.getManifestURL(name="mctsapp")
         mcts.launch("MCTS")
 
         # TODO: need to find the manifest url for MCTS presentation api test app
@@ -55,7 +58,6 @@ class TestPresentation(TestCase):
                 time = time - 0.2
         finally:
             zeroconf.close()
-        #TODO: IP Verification Required
 
         # Start [Client - Target Device Communication]
         # Setup presentation server's host and port
@@ -70,27 +72,25 @@ class TestPresentation(TestCase):
         # Receive the message from presentation sever
         pre_received = self.controller.recv_pre_action_message()
 
-        #TODO: Verify Controller Side Data
-
         # close socket
         self.controller.finish_pre_action()
 
         # Start [Client Side Server - Target Device Communication]
         # Start listen
-        controller.start()
+        self.controller.start()
 
         # Client side server sends message to target device
         msg = 'This is Controller\'s first message.'
-        controller.sendall(msg)
+        self.controller.sendall(msg)
         print('Send: {}'.format(msg))
 
-        #TODO: App Side Verification Required
-
         # Client side server receives data/response
-        controller_received = controller.recv(1024)
-        print('Recv: {}'.format(controller_received))
+        self.controller_received = self.controller.recv(1024)
+        print('Recv: {}'.format(self.controller_received))
 
-        #TODO: App Side Verification Required
+        self.assertTrue((self.controller_received != ""), "Expected message returned.")
 
     def clean_up(self):
         # shut down all services
+        pass
+

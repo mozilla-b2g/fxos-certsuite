@@ -21,7 +21,7 @@ from mcts.webapi_tests.semiauto import environment
 
 # TODO: need to put presentation api here once fully tested
 stingray_test = ['apps', 'device_storage', 'geolocation',
-                 'notification', 'tcp_socket']
+                 'notification', 'tcp_socket', 'presentation']
 
 def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
     """List available Web API tests and yield a tuple of (group, tests),
@@ -37,9 +37,6 @@ def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
 
         group = os.path.relpath(root, start_dir)
         if mode == 'stingray' and group not in stingray_test:
-            continue
-        # presentation api test should only be run on stingray devices
-        elif group == 'presentation':
             continue
 
         tests = []

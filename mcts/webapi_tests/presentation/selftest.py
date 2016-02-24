@@ -60,6 +60,7 @@ finally:
 
 print("Presentation API Server found - " + flag[0] + ":" + str(flag[1]))
 
+
 # Start [Client - Target Device Communication]
 # Setup presentation server's host and port
 controller.set_pre_action(flag[0], flag[1])
@@ -71,11 +72,12 @@ controller.send_pre_action_message(msg_first + msg_second)
 print(msg_first)
 print(msg_second)
 
+sleep(1)
+
 # Receive the message from presentation sever
 pre_received = controller.recv_pre_action_message()
 
 response = json.loads(pre_received.rstrip())
-#TODO: Verify Controller Side Data: response["type"] == "requestSession:Answer"
 
 # close socket
 controller.finish_pre_action()
@@ -92,12 +94,10 @@ msg = 'echo'
 controller.sendall(msg)
 print('Send: {}'.format(msg))
 
-#TODO: App Side Verification Required
+sleep(1)
 
 # Client side server receives data/response
 controller_received = controller.recv(1024)
 print('Recv: {}'.format(controller_received))
 
 print("Second phrase of presentation API communication done.")
-
-#TODO: App Side Verification Required
