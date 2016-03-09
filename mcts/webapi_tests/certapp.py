@@ -72,6 +72,8 @@ def launch(marionette):
 
     # If the app is already launched this doesn't launch a new app, but
     # returns a reference to existing app.
+    import mcts
+    marionette.import_script(os.path.join(os.path.dirname(mcts.__file__), "static", "mcts.js"))
     app = marionette.execute_async_script("MCTS.test();")
     active_app = marionette.execute_script("return MCTS.focus();")
     marionette.switch_to_frame(active_app)
