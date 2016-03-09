@@ -5,12 +5,32 @@
 from mcts.utils.handlers.adb_b2g import ADBB2G
 from marionette import Marionette
 
+
+class NoADB():
+    def reboot(self):
+        pass
+    def wait_for_net(self):
+        pass
+    def shell_output(self):
+        pass
+    def forward(self, *args):
+        pass
+    def get_process_list(self):
+        return [[1447, '/sbin/adbd', 'root']]
+    def restart(self):
+        pass
+    def root(self):
+        pass
+    def devices(self, timeout=None):
+        pass
+
 class DeviceHelper(object):
     device = None
     marionette = None
 
     @staticmethod
     def getDevice(DeviceManager=ADBB2G, **kwargs):
+        DeviceHelper.device = NoADB()
         if not DeviceHelper.device:
             DeviceHelper.device = DeviceManager(**kwargs)
             

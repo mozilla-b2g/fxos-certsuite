@@ -20,8 +20,7 @@ from mcts.webapi_tests import semiauto
 from mcts.webapi_tests.semiauto import environment
 
 # TODO: need to put presentation api here once fully tested
-stingray_test = ['apps', 'device_storage', 'geolocation', 'webrtc',
-                 'notification', 'tcp_socket', 'presentation']
+stingray_test = ['apps', 'geolocation', 'webrtc', 'notification', 'tcp_socket', 'presentation']
 
 def iter_tests(start_dir, pattern="test_*.py", mode='phone'):
     """List available Web API tests and yield a tuple of (group, tests),

@@ -32,7 +32,7 @@ class CloseError(Exception):
     pass
 
 
-def install(marionette=None, version='1.3'):
+def install(marionette=None, version='2.5'):
     """Installs the app on the attached device.  Raises if app is
     already installed, but a guard can be added using ``is_installed``.
 
@@ -72,11 +72,11 @@ def launch(marionette):
 
     # If the app is already launched this doesn't launch a new app, but
     # returns a reference to existing app.
-    app = marionette.execute_async_script(
-        "GaiaApps.launchWithName('%s')" % name, script_timeout=timeout)
+    app = marionette.execute_async_script("MCTS.test();")
+    active_app = marionette.execute_script("return MCTS.focus();")
+    marionette.switch_to_frame(active_app)
     if app is None:
         raise LaunchError("Unable to launch app: %s" % name)
-    activate(marionette, app=app)
     return app
 
 

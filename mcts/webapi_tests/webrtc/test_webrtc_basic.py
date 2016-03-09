@@ -12,7 +12,7 @@ class TestWebrtcBasic(TestCase, WebrtcTestCommon):
     def setUp(self):
         super(TestWebrtcBasic, self).setUp()
 
-    def test_basic_wifi_enabled(self):
+    def test_basic_webrtc(self):
         # enable wifi via settings
         ret = self.webrtc_message_test()
         self.assertEqual(ret, "pc1 said: test from pc2")

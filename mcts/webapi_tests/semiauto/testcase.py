@@ -88,15 +88,15 @@ class TestCase(unittest.TestCase):
         self.assert_browser_connected()
         self.marionette = TestCase.create_marionette()
 
-        if not certapp.is_installed():
-            certapp.install(marionette=self.marionette, version=self.version)
+        # if not certapp.is_installed():
+        #     certapp.install(marionette=self.marionette, version=self.version)
 
         # Make sure we don't reuse the certapp context from a previous
         # testrun that was interrupted and left the certapp open.
-        try:
-            certapp.kill(self.marionette)
-        except certapp.CloseError:
-            self.close_app_manually()
+        # try:
+        #     certapp.kill(self.marionette)
+        # except certapp.CloseError:
+        #     self.close_app_manually()
 
         try:
             self.app = certapp.launch(self.marionette)

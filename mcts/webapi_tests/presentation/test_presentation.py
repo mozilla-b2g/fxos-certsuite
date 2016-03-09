@@ -52,7 +52,6 @@ class TestPresentation(TestCase):
         finally:
             zeroconf.close()
 
-        import pdb; pdb.set_trace()
         # Start [Client - Target Device Communication]
         # Setup presentation server's host and port
         self.controller.set_pre_action(flag[0], flag[1])
