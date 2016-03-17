@@ -16,13 +16,12 @@ from zeroconf import ServiceBrowser, Zeroconf
 
 # Don't need to initial marionette in real test cases
 from marionette import Marionette
-m = Marionette('localhost', port=2828)
+m = Marionette('10.247.37.107', port=2828)
 m.start_session()
 
 # TODO: do it in different way for TV
 # Get device IP for mDNS matching
-device_ip = AdbHelper.adb_shell("ifconfig wlan0").split(" ")[2]
-device_ip_webapi = m.execute_script("return navigator.mozWifiManager.connectionInformation.ipAddress;")
+device_ip = "10.247.37.107"
 
 ip_reg = re.compile("\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}")
 # TODO: Check ip_reg.match(device_ip)
@@ -38,7 +37,7 @@ listener = ServiceListener()
 
 # Using MCTS apps for launching the app
 mcts = MCTSApps(m)
-manifesturl = mcts.getManifestURL(name="mctsapp")
+manifesturl = "app://notification-receiver.gaiamobile.org/index.html"
 
 print("MCTS Presentation APP manifestURL got.")
 
@@ -48,7 +47,7 @@ browser = ServiceBrowser(zeroconf, "_mozilla_papi._tcp.local.", listener)
 
 # Keep waiting for mDNS response till device found (30 seconds)
 try:
-    time = 30
+    time = 300000
     while (not flag) and time >= 0:
         sleep(0.2)
         flag = listener.check_ip(device_ip)

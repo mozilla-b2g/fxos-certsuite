@@ -2,7 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import random
 import time
+import json
 
 from mcts_apps import MCTSApps
 from mdsn import ServiceListener
@@ -71,18 +73,18 @@ class TestPresentation(TestCase):
 
         # Start [Client Side Server - Target Device Communication]
         # Start listen
-        self.controller.start()
+        # self.controller.start()
 
         # Client side server sends message to target device
-        msg = 'This is Controller\'s first message.'
-        self.controller.sendall(msg)
-        print('Send: {}'.format(msg))
+        # msg = 'This is Controller\'s first message.'
+        # self.controller.sendall(msg)
+        # print('Send: {}'.format(msg))
 
         # Client side server receives data/response
-        self.controller_received = self.controller.recv(1024)
-        print('Recv: {}'.format(self.controller_received))
+        # self.controller_received = self.controller.recv(1024)
+        # print('Recv: {}'.format(self.controller_received))
 
-        self.assertTrue((self.controller_received != ""), "Expected to receive messages.")
+        self.assertTrue((pre_received.rstrip() != ""), "Expected to receive messages.")
 
     def clean_up(self):
         # shut down all services
