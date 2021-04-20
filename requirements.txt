@@ -10,7 +10,7 @@ mozprocess == 0.22
 mozprofile == 0.27
 mozrunner >= 6.1
 moztest == 0.7
-py == 1.4.20
+py == 1.10.0
 sphinx == 1.3.1
 tornado == 4.2.1
 wptrunner == 1.4
